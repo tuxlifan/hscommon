@@ -1,22 +1,17 @@
-#!/usr/bin/env python
-"""
-Unit Name: hs.sqlite_test
-Created By: Virgil Dupras
-Created On: 2007/05/19
-Last modified by:$Author: virgil $
-Last modified on:$Date: 2009-05-28 16:32:46 +0200 (Thu, 28 May 2009) $
-                 $Revision: 4391 $
-Copyright 2007 Hardcoded Software (http://www.hardcoded.net)
-"""
-import unittest
+# Unit Name: hsutil.tests.sqlite_test
+# Created By: Virgil Dupras
+# Created On: 2007/05/19
+# $Id$
+# Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
+
 import time
 import threading
 import os
 import os.path as op
 import sqlite3 as sqlite
 
-from hsutil.testcase import TestCase
-from .sqlite import ThreadedConn
+from ..testcase import TestCase
+from ..sqlite import ThreadedConn
 
 class TCThreadedConn(TestCase):
     ''' Threading is hard to test. In a lot of those tests, a failure means that the test run will
@@ -128,6 +123,3 @@ class TCThreadedConn(TestCase):
         os.mkdir(op.join(tmpdir, u'foo\u00e9'))
         ThreadedConn(op.join(tmpdir, u'foo\u00e9', 'foo.db'), True)
     
-
-if __name__ == '__main__':
-    unittest.main()

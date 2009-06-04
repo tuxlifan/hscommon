@@ -1,13 +1,12 @@
-#!/usr/bin/env python
 # Unit Name: hsutil.conflict_test
 # Created By: Virgil Dupras
 # Created On: 2008-01-08
 # $Id$
-# Copyright 2008 Hardcoded Software (http://www.hardcoded.net)
+# Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
 
 import unittest
 
-from .conflict import *
+from ..conflict import *
 
 class GetConflictedName(unittest.TestCase):
     def test_simple(self):

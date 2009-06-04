@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Unit Name: hsutil.testcase_test
+# Unit Name: hsutil.tests.testcase_test
 # Created By: Virgil Dupras
 # Created On: 2007/06/23
 # $Id$
@@ -14,7 +14,7 @@ import time
 import logging
 from datetime import date
 
-from . import testcase
+from .. import testcase
 
 class TCTestCase(testcase.TestCase):
     def setUp(self):

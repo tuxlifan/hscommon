@@ -7,8 +7,8 @@
 
 import logging
 
-from .testcase import TestCase
-from .decorators import *
+from ..testcase import TestCase
+from ..decorators import *
 
 class LogCalls(TestCase):
     @log_calls

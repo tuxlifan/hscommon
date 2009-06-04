@@ -1,15 +1,11 @@
-#!/usr/bin/env python
-"""
-Unit Name: hs.markable_test
-Created By: Virgil Dupras
-Created On: 2006/02/23
-Last modified by:$Author: virgil $
-Last modified on:$Date: $
-                 $Revision: $
-Copyright 2004-2006 Hardcoded Software (http://www.hardcoded.net)
-"""
+# Unit Name: hsutil.tests.markable_test
+# Created By: Virgil Dupras
+# Created On: 2006/02/23
+# $Id$
+# Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
+
 import unittest
-from .markable import *
+from ..markable import *
 
 class TCMarkable(unittest.TestCase):
     def gen(self):
@@ -157,6 +153,3 @@ class TCMarkable(unittest.TestCase):
         ml.mark_invert()
         self.assert_(ml.is_marked(1))
         self.assert_(not ml.is_marked(4))
-
-if __name__ == "__main__":
-    unittest.main()

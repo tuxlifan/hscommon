@@ -1,22 +1,19 @@
-#!/usr/bin/env python
-# Unit Name: hs.currency_test
+# Unit Name: hsutil.currency_test
 # Created By: Virgil Dupras
 # Created On: 2008-04-20
 # $Id$
-# Copyright 2008 Hardcoded Software (http://www.hardcoded.net)
+# Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
 
 from __future__ import division
 
 import copy
 import pickle
-import unittest
 from datetime import date
 import sqlite3 as sqlite
 
-from hsutil import testcase
-from hsutil import io
-from hsutil.path import Path
-from .currency import Currency, RatesDB, CAD, EUR, PLN, USD
+from .. import testcase, io
+from ..path import Path
+from ..currency import Currency, RatesDB, CAD, EUR, PLN, USD
 
 
 class TestCase(testcase.TestCase):
@@ -176,6 +173,3 @@ class DBProblemAfterConnection(TestCase):
     def test_set_rate(self):
         self.db.set_CAD_value(date(2008, 4, 20), 'USD', 42) # no crash
     
-
-if __name__ == '__main__':
-    unittest.main()

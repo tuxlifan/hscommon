@@ -1,16 +1,12 @@
-#!/usr/bin/env python
-"""
-Unit Name: tests.job
-Created By: Virgil Dupras
-Created On: 2005/04/07
-Last modified by:$Author: virgil $
-Last modified on:$Date: 2005-12-19 10:00:24 -0500 (Mon, 19 Dec 2005) $
-                 $Revision: 462 $
-Copyright 2007 Hardcoded Software (http://www.hardcoded.net)
-"""
+# Unit Name: hsutil.tests.job_test
+# Created By: Virgil Dupras
+# Created On: 2005/04/07
+# $Id$
+# Copyright 2007 Hardcoded Software (http://www.hardcoded.net)
+
 import unittest
 
-from . import job
+from .. import job
 
 class TCJob(unittest.TestCase):
     def setUp(self):

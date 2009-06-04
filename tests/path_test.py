@@ -1,18 +1,14 @@
-#!/usr/bin/env python
-"""
-Unit Name: tests.path
-Created By: Virgil Dupras
-Created On: 2006/02/21
-Last modified by:$Author: virgil $
-Last modified on:$Date: 2006-02-20 11:21:13 -0500 (Mon, 20 Feb 2006) $
-                 $Revision: 686 $
-Copyright 2006 Hardcoded Software (http://www.hardcoded.net)
-"""
+# Unit Name: hsutil.tests.path_test
+# Created By: Virgil Dupras
+# Created On: 2006/02/21
+# $Id$
+# Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
+
 import unittest
 import sys
 
-from .path import *
-from .testcase import TestCase
+from ..path import *
+from ..testcase import TestCase
 
 class TCPath(TestCase):
     def setUp(self):
@@ -192,6 +188,3 @@ class TCPath(TestCase):
         p = Path('foo/bar')
         self.assert_(Path(p) is p)
     
-
-if __name__ == "__main__":
-    unittest.main()

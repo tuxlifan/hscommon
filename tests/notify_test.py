@@ -1,5 +1,9 @@
-from hsutil.testcase import TestCase
-from .notify import Broadcaster, Listener
+# Unit Name: hsutil.tests.notify_test
+# $Id$
+# Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
+
+from ..testcase import TestCase
+from ..notify import Broadcaster, Listener
 
 class HelloListener(Listener):
     def __init__(self, broadcaster):

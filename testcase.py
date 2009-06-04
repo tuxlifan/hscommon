@@ -80,7 +80,7 @@ class TestCase(unittest.TestCase):
     
     @classmethod
     def datadirpath(cls):
-        return Path(__file__)[:-1] + 'testdata'
+        return Path(__file__)[:-1] + ('tests', 'testdata')
     
     @classmethod
     def filepath(cls, relative_path, *args):

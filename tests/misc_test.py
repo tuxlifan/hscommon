@@ -6,8 +6,8 @@
 
 from nose.tools import eq_, raises
 
-from .testcase import TestCase
-from .misc import *
+from ..testcase import TestCase
+from ..misc import *
 
 def testStrToFlags():
     eq_(StrToFlags('A'),(0,6))

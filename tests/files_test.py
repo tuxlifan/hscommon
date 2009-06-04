@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Unit Name: hsutil.files_test
 # Created By: Virgil Dupras
 # Created On: 2006/02/21
@@ -7,10 +6,10 @@
 
 from StringIO import StringIO
 
-from .testcase import TestCase
-from . import io
-from .files import *
-from .path import Path
+from .. import io
+from ..testcase import TestCase
+from ..files import *
+from ..path import Path
 
 class TCopen_if_filename(TestCase):
     def test_file_name(self):

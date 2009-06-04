@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# Unit Name: hsutil.str_test
+# Unit Name: hsutil.tests.str_test
 # Created By: Virgil Dupras
 # Created On: 2006/02/21
 # $Id$
@@ -7,7 +6,8 @@
 
 import unittest
 import warnings
-from .str import *
+
+from ..str import *
 
 class TCStrUtils(unittest.TestCase):
     def test_get_file_ext(self):
