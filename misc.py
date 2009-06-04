@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Unit Name: hsutil.misc
 # Created By: Virgil Dupras
 # Created On: 2006/02/21
@@ -112,6 +111,18 @@ def first(iterable):
         return iter(iterable).next()
     except StopIteration:
         return None
+
+def extract(predicate, iterable):
+    """Separates the wheat from the shaft (`predicate` defines what's the wheat), and returns both.
+    """
+    wheat = []
+    shaft = []
+    for item in iterable:
+        if predicate(item):
+            wheat.append(item)
+        else:
+            shaft.append(item)
+    return wheat, shaft
 
 def trydef(func, args, default=None):
     '''
