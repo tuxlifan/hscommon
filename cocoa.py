@@ -19,12 +19,15 @@ from .job import Job, JobCancelled, ThreadedJobPerformer as ThreadedJobPerformer
 
 def report_crash(type, value, tb):
     mainBundle = NSBundle.mainBundle()
-    s = ''.join(traceback.format_exception(type, value, tb))
+    app_identifier = mainBundle.bundleIdentifier()
+    app_version = mainBundle.infoDictionary().get('CFBundleVersion', 'Unknown')
+    s = "Application Identifier: {0}".format(app_identifier)
+    s += "\nApplication Version: {0}\n\n".format(app_version)
+    s += ''.join(traceback.format_exception(type, value, tb))
     HSErrorReportWindow = mainBundle.classNamed_('HSErrorReportWindow')
     if HSErrorReportWindow is None:
         logging.error(s)
         return
-    app_identifier = NSBundle.mainBundle().bundleIdentifier()
     if app_identifier:
         s += '\nRelevant Console logs:\n\n'
         p = subprocess.Popen(['grep', app_identifier, '/var/log/system.log'], stdout=subprocess.PIPE)
