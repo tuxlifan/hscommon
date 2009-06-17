@@ -13,7 +13,7 @@ import shutil
 import tempfile
 import threading
 import time
-from cStringIO import StringIO
+from StringIO import StringIO
 
 from .path import Path
 
@@ -23,7 +23,7 @@ class TestCase(unittest.TestCase):
     def run(self, result=None):
         self._created_directories = []
         self._mocked = []
-        self.logged = StringIO()
+        self.logged = StringIO(u'')
         logger = logging.getLogger()
         for handler in logger.handlers:
             logger.removeHandler(handler)

@@ -155,7 +155,7 @@ class TCTestCase(testcase.TestCase):
     
     def test_logging(self):
         # TestCase captures logging and put it in self.logged
-        logging.warning('foobar')
+        logging.warning(u'foobar\xe9')
         self.logged.seek(0)
-        self.assertEqual(self.logged.read(), 'WARNING:foobar\n')
+        self.assertEqual(self.logged.read(), u'WARNING:foobar\xe9\n')
     
