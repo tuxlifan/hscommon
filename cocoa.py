@@ -60,7 +60,8 @@ def as_fetch(as_list, as_type, step_size=1000):
     list (found in appscript.k). If we don't pass it to the 'each' arg of 'count()', it doesn't work.
     applescript is rather stupid..."""
     result = []
-    item_count = as_list.count(each=as_type, timeout=0) # no timeout. default timeout is 60 secs, and it is reached for libs > 30k songs
+    # no timeout. default timeout is 60 secs, and it is reached for libs > 30k songs
+    item_count = as_list.count(each=as_type, timeout=0)
     steps = item_count // step_size
     if item_count % step_size:
         steps += 1
@@ -70,9 +71,9 @@ def as_fetch(as_list, as_type, step_size=1000):
         begin = step * step_size + 1
         end = min(item_count, begin + step_size - 1)
         if end > begin:
-            result += as_list[begin:end]()
+            result += as_list[begin:end](timeout=0)
         else: # When there is only one item, the stupid fuck gives it directly instead of putting it in a list.
-            result.append(as_list[begin:end]())
+            result.append(as_list[begin:end](timeout=0))
         time.sleep(.1)
     logging.info('%d items fetched' % len(result))
     return result
