@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# Unit Name: hsutil.decorators
 # Created By: Virgil Dupras
 # Created On: 2007-06-17
 # $Id$

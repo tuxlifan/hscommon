@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# Unit Name: hs.notify
 # $Id$
 # Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
 

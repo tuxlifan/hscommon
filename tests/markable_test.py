@@ -1,4 +1,3 @@
-# Unit Name: hsutil.tests.markable_test
 # Created By: Virgil Dupras
 # Created On: 2006/02/23
 # $Id$

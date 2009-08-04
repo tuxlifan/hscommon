@@ -1,4 +1,3 @@
-# Unit Name: hsutil.misc
 # Created By: Virgil Dupras
 # Created On: 2006/02/21
 # $Id$

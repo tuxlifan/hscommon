@@ -1,8 +1,7 @@
-# Unit Name: hsutil.tests.job_test
 # Created By: Virgil Dupras
 # Created On: 2005/04/07
 # $Id$
-# Copyright 2007 Hardcoded Software (http://www.hardcoded.net)
+# Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
 
 import unittest
 

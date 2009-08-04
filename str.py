@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# Unit Name: hsutil.string
 # Created By: Virgil Dupras
 # Created On: 2006/02/21
 # $Id$

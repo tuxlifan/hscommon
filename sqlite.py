@@ -1,13 +1,8 @@
-#!/usr/bin/env python
-"""
-Unit Name: hs.sqlite
-Created By: Virgil Dupras
-Created On: 2007/05/19
-Last modified by:$Author: virgil $
-Last modified on:$Date: 2009-05-28 16:32:46 +0200 (Thu, 28 May 2009) $
-                 $Revision: 4391 $
-Copyright 2007 Hardcoded Software (http://www.hardcoded.net)
-"""
+# Created By: Virgil Dupras
+# Created On: 2007/05/19
+# $Id$
+# Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
+
 import sys
 import os
 import os.path as op

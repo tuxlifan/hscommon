@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# Unit Name: hsutil.io
 # Created By: Virgil Dupras
 # Created On: 2007-10-23
 # $Id$

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# Unit Name: hsutil.weak
 # Created By: Virgil Dupras
 # Created On: 2008-01-11
 # $Id$

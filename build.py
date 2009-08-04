@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# Unit Name: hsutil.build
 # Created By: Virgil Dupras
 # Created On: 2009-03-03
 # $Id$

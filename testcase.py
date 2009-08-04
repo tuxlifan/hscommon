@@ -1,4 +1,3 @@
-# Unit Name: hsutil.testcase
 # Created By: Virgil Dupras
 # Created On: 2007/06/23
 # $Id$

@@ -1,46 +1,41 @@
-#!/usr/bin/env python
-"""
-Unit Name: hs.job.py
-Created By: Virgil Dupras
-Created On: 2004/12/20
-Last modified by:$Author: virgil $
-Last modified on:$Date: 2009-05-28 15:19:49 +0200 (Thu, 28 May 2009) $
-                 $Revision: 4383 $
-Copyright 2004-2005 Hardcoded Software (http://www.hardcoded.net)
-Description: unit for the Job.
-How to use the job manager:
+# Created By: Virgil Dupras
+# Created On: 2004/12/20
+# $Id
+# Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
 
-The Job has been created to simplify that calculation of the progress of
-a multi-level task. To use it, first create a "mainjob", which is an instance
-of the Job. the initial jobcount parameter is usually 1. However, it can
-be more depending of the situation. The callback is usually the "Update" method
-of a wx.ProgressDialog.
+# How to use the job manager:
+# 
+# The Job has been created to simplify that calculation of the progress of
+# a multi-level task. To use it, first create a "mainjob", which is an instance
+# of the Job. the initial jobcount parameter is usually 1. However, it can
+# be more depending of the situation. The callback is usually the "Update" method
+# of a wx.ProgressDialog.
+# 
+# Your work functions should take a jobmanager instance in parameter. Every
+# subfunction called by the main work function and with a significant workload
+# should also receive a job instance in parameter. Every function should
+# create a subjob instance by calling job.StartSobJob.
+# 
+# Example: Let's say that We have a function ProcessMatrix(matrix,job) and that
+# our ProcessMatrix function calls ProcessRow(row,job), and that our ProcessRow
+# calls ProcessCell(row,col,job). ProcessMatrix would receive a mainjob instance
+# created like this: mainjob = Job(1,progressdialog.Update). Our functions
+# would look like this:
+# 
+# def ProcessMatrix(matrix,job):
+#     subjob = job.start_subjob(matrix.GetRowCount())
+#     for row in matrix:
+#         ProcessRow(row,subjob)
+# 
+# def ProcessRow(row,job):
+#     job.start_job(row.GetColCount())
+#     for col in row:
+#         ProcessCell(row,col,subjob)
+#         job.add_progress()
+# 
+# def ProcessCell(row,col)
+#     DoStuff()
 
-Your work functions should take a jobmanager instance in parameter. Every
-subfunction called by the main work function and with a significant workload
-should also receive a job instance in parameter. Every function should
-create a subjob instance by calling job.StartSobJob.
-
-Example: Let's say that We have a function ProcessMatrix(matrix,job) and that
-our ProcessMatrix function calls ProcessRow(row,job), and that our ProcessRow
-calls ProcessCell(row,col,job). ProcessMatrix would receive a mainjob instance
-created like this: mainjob = Job(1,progressdialog.Update). Our functions
-would look like this:
-
-def ProcessMatrix(matrix,job):
-    subjob = job.start_subjob(matrix.GetRowCount())
-    for row in matrix:
-        ProcessRow(row,subjob)
-
-def ProcessRow(row,job):
-    job.start_job(row.GetColCount())
-    for col in row:
-        ProcessCell(row,col,subjob)
-        job.add_progress()
-
-def ProcessCell(row,col)
-    DoStuff()
-"""
 from threading import Thread
 import sys
 

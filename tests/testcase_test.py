@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# Unit Name: hsutil.tests.testcase_test
 # Created By: Virgil Dupras
 # Created On: 2007/06/23
 # $Id$

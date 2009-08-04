@@ -1,4 +1,3 @@
-# Unit Name: hsutil.tests.weak_test
 # Created By: Virgil Dupras
 # Created On: 2008-01-11
 # $Id$

@@ -1,4 +1,3 @@
-# Unit Name: hsutil.tests.str_test
 # Created By: Virgil Dupras
 # Created On: 2006/02/21
 # $Id$

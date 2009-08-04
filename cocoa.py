@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# Unit Name: hs.cocoa
 # Created By: Virgil Dupras
 # Created On: 2007-10-06
 # $Id$

@@ -1,4 +1,3 @@
-# Unit Name: hsutil.tests.sqlite_test
 # Created By: Virgil Dupras
 # Created On: 2007/05/19
 # $Id$

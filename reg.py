@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# Unit Name: hsutil.reg
 # Created By: Virgil Dupras
 # Created On: 2009-05-16
 # $Id$

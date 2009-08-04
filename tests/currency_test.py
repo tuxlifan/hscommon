@@ -1,4 +1,3 @@
-# Unit Name: hsutil.currency_test
 # Created By: Virgil Dupras
 # Created On: 2008-04-20
 # $Id$

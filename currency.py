@@ -1,16 +1,14 @@
-#!/usr/bin/env python
-# Unit Name: hs.currency
 # Created By: Virgil Dupras
 # Created On: 2008-04-20
 # $Id$
-# Copyright 2008 Hardcoded Software (http://www.hardcoded.net)
+# Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
 
 import datetime
 import logging
 import sqlite3 as sqlite
 
-from hsutil import io
-from hsutil.path import Path
+from . import io
+from .path import Path
 
 
 class Currency(object):

@@ -1,4 +1,3 @@
-# Unit Name: hsutil.tests.notify_test
 # $Id$
 # Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
 
