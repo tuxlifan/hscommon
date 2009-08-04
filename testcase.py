@@ -48,10 +48,15 @@ class TestCase(unittest.TestCase):
     def jointhreads(self):
         """Join all threads to the main thread"""
         for thread in threading.enumerate():
+            if hasattr(thread, 'BUGGY'):
+                continue
             if thread.getName() != 'MainThread' and thread.isAlive():
                 if hasattr(thread, 'close'):
                     thread.close()
                 thread.join(1)
+                if thread.isAlive():
+                    print "Thread problem. Some thread doesn't want to stop."
+                    thread.BUGGY = True
     
     def mock(self, target, attrname, replace_with):
         ''' Replaces 'target' attribute 'attrname' with 'replace_with' and put it back to normal at
