@@ -3,6 +3,10 @@
 # $Id$
 # Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
 
+# This software is licensed under the "BSD" License as described in the "LICENSE" file, 
+# which should be included with this package. The terms are also available at 
+# http://www.hardcoded.net/licenses/bsd_license
+
 # HS code should only deal with Path instances, not string paths. One of the annoyances of this
 # is to always have to convert Path instances with unicode() when calling open() or listdir() etc..
 # this unit takes care of this

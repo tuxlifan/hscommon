@@ -3,6 +3,10 @@
 # $Id$
 # Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
 
+# This software is licensed under the "BSD" License as described in the "LICENSE" file, 
+# which should be included with this package. The terms are also available at 
+# http://www.hardcoded.net/licenses/bsd_license
+
 # About Flags:
 # In non-pythonic idioms, we often represent flags in integers, and test the
 # flags with binary operations like "if (FLAG & myflags):". This is not very
