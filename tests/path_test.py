@@ -10,6 +10,8 @@
 import unittest
 import sys
 
+from nose.tools import assert_raises
+
 from ..path import *
 from ..testcase import TestCase
 
@@ -70,18 +72,6 @@ class TCPath(TestCase):
         self.assertEqual('/foo/bar',str(Path(('','foo','bar'))))
         self.assertEqual('foo/bar',str(Path('foo/bar/')))
 
-    # I have no idea how I came to have this failing test around. I don't know. It must have been
-    # failing for a while, but was never executed.
-    # XXX filegure that out
-    # def old_add_slash_tests(self):
-    #     self.assertEqual(str(Path('foobar','/')),'foobar/')
-    #     self.assertEqual(str(Path('foo','/')),'foo/')
-    #     self.assertEqual(str(Path('foobar/','/')),'foobar/')
-    #     self.assertEqual(str(Path('','/')),'/')
-    #     self.assertEqual(str(Path('/foobar','/')),'/foobar/')
-    #     self.assertEqual(str(Path('C:\\foobar','\\')),'C:\\foobar\\')
-    #     self.assertEqual(str(Path('C:\\foobar\\','\\')),'C:\\foobar\\')
-    # 
     def test_old_compare_paths(self):
         self.assertEqual(Path('foobar'),Path('foobar'))
         self.assertEqual(Path('foobar/'),Path('foobar\\','\\'))
@@ -190,4 +180,11 @@ class TCPath(TestCase):
         #if Path() is called with a path as value, just return value.
         p = Path('foo/bar')
         self.assert_(Path(p) is p)
+    
+    def test_log_unicode_errors(self):
+        # When an there's a UnicodeDecodeError on path creation, log it so it can be possible
+        # to debug the cause of it.
+        self.mock(sys, 'getfilesystemencoding', lambda: 'ascii')
+        assert_raises(UnicodeDecodeError, Path, [u'', 'foo\xe9'])
+        assert repr('foo\xe9') in self.logged.getvalue()
     

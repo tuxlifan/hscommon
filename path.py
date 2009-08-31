@@ -7,6 +7,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
+import logging
 import os
 import sys
 from itertools import takewhile, izip
@@ -34,7 +35,11 @@ class Path(tuple):
             if isinstance(s, unicode):
                 return s
             else:
-                return unicode(s, sys.getfilesystemencoding())
+                try:
+                    return unicode(s, sys.getfilesystemencoding())
+                except UnicodeDecodeError:
+                    logging.warning("Could not decode %r", s)
+                    raise
         
         if isinstance(value, Path):
             return value
