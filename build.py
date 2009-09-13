@@ -12,9 +12,19 @@ import os.path as op
 import shutil
 import tempfile
 
+from .str import rem_file_ext
+
 def print_and_do(cmd):
     print cmd
     os.system(cmd)
+
+def build_all_qt_ui(base_dir='.'):
+    names = os.listdir(base_dir)
+    uinames = [name for name in names if name.endswith('.ui')]
+    for name in uinames:
+        path = op.join(base_dir, name)
+        destpath = rem_file_ext(path) + '_ui.py'
+        print_and_do("pyuic4 {0} > {1}".format(path, destpath))
 
 # this is all a big hack to go around the fact that py2app will include stuff in the testdata
 # folders and I haven't figured out what options prevent that.
