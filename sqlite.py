@@ -104,6 +104,7 @@ class _ActualThread(threading.Thread):
                     cur = con.execute(sql, values)
                     self.lastrowid = cur.lastrowid
                     result = FakeCursor(cur.fetchall())
+                    result.lastrowid = cur.lastrowid
                 except Exception, e:
                     result = e
             self._results.put(result)
