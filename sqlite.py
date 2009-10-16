@@ -43,17 +43,20 @@ class _ActualThread(threading.Thread):
         self._dbname = dbname
         self._autocommit = autocommit
         self._waiting_list = set()
+        self._lock = threading.Lock()
         self._run = True
         self.lastrowid = -1
         self.setDaemon(True)
         self.start()
     
     def _query(self, query):
-        wait_token = object()
-        self._waiting_list.add(wait_token)
-        self._queries.put(query)
-        self._waiting_list.remove(wait_token)
-        return self._results.get()
+        with self._lock:
+            wait_token = object()
+            self._waiting_list.add(wait_token)
+            self._queries.put(query)
+            self._waiting_list.remove(wait_token)
+            result = self._results.get()
+        return result
     
     def close(self):
         if not self._run:
