@@ -46,6 +46,9 @@ def isdir(path):
 def isfile(path):
     return os.path.isfile(unicode(path))
 
+def islink(path):
+    return os.path.islink(unicode(path))
+
 def listdir(path):
     return os.listdir(unicode(path))
 
@@ -63,6 +66,9 @@ def open(path, *args, **kwargs):
 
 def remove(path):
     return os.remove(unicode(path))
+
+def rename(path):
+    return os.rename(unicode(path))
 
 def rmdir(path):
     return os.rmdir(unicode(path))
