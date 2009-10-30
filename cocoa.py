@@ -81,6 +81,9 @@ def as_fetch(as_list, as_type, step_size=1000):
     return result
 
 def install_exception_hook():
+    if '_exceptionHandlerDelegate' in globals():
+        # already installed
+        return
     def isPythonException(exception):
         return (exception.userInfo() or {}).get(u'__pyobjc_exc_type__') is not None
 
