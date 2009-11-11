@@ -92,4 +92,12 @@ def copy(source_path, dest_path):
 
 def modified_after(first_path, second_path):
     """Returns True if first_path's mtime is higher than second_path's mtime."""
-    return io.stat(first_path).st_mtime > io.stat(second_path).st_mtime
+    try:
+        first_mtime = io.stat(first_path).st_mtime
+    except EnvironmentError:
+        return False
+    try:
+        second_mtime = io.stat(second_path).st_mtime
+    except EnvironmentError:
+        return True
+    return first_mtime > second_mtime

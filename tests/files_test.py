@@ -210,3 +210,13 @@ class TCmodified_after(TestCase):
         self.mock_osstat('second', st_mtime=42)
         assert not modified_after('first', 'second')
     
+    def test_first_file_does_not_exist(self):
+        # when the first file doesn't exist, we return False
+        self.mock_osstat('second', st_mtime=42)
+        assert not modified_after('does_not_exist', 'second') # no crash
+    
+    def test_second_file_does_not_exist(self):
+        # when the second file doesn't exist, we return True
+        self.mock_osstat('first', st_mtime=42)
+        assert modified_after('first', 'does_not_exist') # no crash
+    
