@@ -193,3 +193,20 @@ class TCmove_copy(TestCase):
         self.assert_(not io.exists(self.path + 'foo'))
         self.assert_(not io.exists(self.path + 'bar'))
     
+
+class TCmodified_after(TestCase):
+    def test_first_is_modified_after(self):
+        self.mock_osstat('first', st_mtime=42)
+        self.mock_osstat('second', st_mtime=41)
+        assert modified_after('first', 'second')
+    
+    def test_second_is_modified_after(self):
+        self.mock_osstat('first', st_mtime=42)
+        self.mock_osstat('second', st_mtime=43)
+        assert not modified_after('first', 'second')
+    
+    def test_same_mtime(self):
+        self.mock_osstat('first', st_mtime=42)
+        self.mock_osstat('second', st_mtime=42)
+        assert not modified_after('first', 'second')
+    

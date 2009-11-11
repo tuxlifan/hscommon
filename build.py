@@ -7,11 +7,14 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
+from __future__ import unicode_literals
+
 import os
 import os.path as op
 import shutil
 import tempfile
 
+from .files import modified_after
 from .str import rem_file_ext
 
 def print_and_do(cmd):
@@ -24,7 +27,10 @@ def build_all_qt_ui(base_dir='.'):
     for name in uinames:
         path = op.join(base_dir, name)
         destpath = rem_file_ext(path) + '_ui.py'
-        print_and_do("pyuic4 {0} > {1}".format(path, destpath))
+        if modified_after(path, destpath):
+            print_and_do("pyuic4 {0} > {1}".format(path, destpath))
+        else:
+            print "{0} is already compiled".format(unicode(path))
 
 # this is all a big hack to go around the fact that py2app will include stuff in the testdata
 # folders and I haven't figured out what options prevent that.

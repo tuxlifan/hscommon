@@ -89,3 +89,7 @@ def move(source_path, dest_path):
 
 def copy(source_path, dest_path):
     _move_or_copy(io.copy, source_path, dest_path)
+
+def modified_after(first_path, second_path):
+    """Returns True if first_path's mtime is higher than second_path's mtime."""
+    return io.stat(first_path).st_mtime > io.stat(second_path).st_mtime
