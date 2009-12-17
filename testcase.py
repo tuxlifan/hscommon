@@ -18,7 +18,6 @@ import threading
 import time
 from StringIO import StringIO
 import os
-import posix
 
 from .path import Path
 
@@ -28,7 +27,7 @@ class TestCase(unittest.TestCase):
     def run(self, result=None):
         self._created_directories = []
         self._mocked = []
-        self._mocked_osstat = {} # path: posix.stat_result
+        self._mocked_osstat = {} # path: os.stat_result
         self.logged = StringIO(u'')
         logger = logging.getLogger()
         for handler in logger.handlers:
@@ -99,7 +98,7 @@ class TestCase(unittest.TestCase):
                     return old_osstat(path_str)
             self.mock(os, 'stat', fake_osstat)
         st_seq = [st_mode, st_ino, st_dev, st_nlink, st_uid, st_gid, st_size, st_atime, st_mtime, st_ctime]
-        self._mocked_osstat[unicode(path)] = posix.stat_result(st_seq)
+        self._mocked_osstat[unicode(path)] = os.stat_result(st_seq)
     
     def mock_today(self, year, month, day):
         '''Mocks today's date to date(year, month, day)
