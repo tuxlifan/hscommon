@@ -13,6 +13,7 @@ import os
 import os.path as op
 import shutil
 import tempfile
+import plistlib
 
 from .files import modified_after
 from .str import rem_file_ext
@@ -31,6 +32,18 @@ def build_all_qt_ui(base_dir='.'):
             print_and_do("pyuic4 {0} > {1}".format(path, destpath))
         else:
             print "{0} is already compiled".format(unicode(path))
+
+def build_dmg(app_path, dest_path):
+    plist = plistlib.readPlist(op.join(app_path, 'Contents', 'Info.plist'))
+    workpath = tempfile.mkdtemp()
+    dmgpath = op.join(workpath, plist['CFBundleName'])
+    os.mkdir(dmgpath)
+    print_and_do('cp -R "%s" "%s"' % (app_path, dmgpath))
+    print_and_do('ln -s /Applications "%s"' % op.join(dmgpath, 'Applications'))
+    dmgname = '%s_osx_%s.dmg' % (plist['CFBundleName'].lower().replace(' ', '_'), plist['CFBundleVersion'].replace('.', '_'))
+    print 'Building %s' % dmgname
+    print_and_do('hdiutil create "%s" -format UDZO -nocrossdev -srcdir "%s"' % (op.join(dest_path, dmgname), dmgpath))
+    print 'Build Complete'
 
 # this is all a big hack to go around the fact that py2app will include stuff in the testdata
 # folders and I haven't figured out what options prevent that.
