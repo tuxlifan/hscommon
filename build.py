@@ -10,6 +10,7 @@
 from __future__ import unicode_literals
 
 import os
+import sys
 import os.path as op
 import shutil
 import tempfile
@@ -34,6 +35,7 @@ def build_all_qt_ui(base_dir='.'):
             print "{0} is already compiled".format(unicode(path))
 
 def build_dmg(app_path, dest_path):
+    print repr(op.join(app_path, 'Contents', 'Info.plist'))
     plist = plistlib.readPlist(op.join(app_path, 'Contents', 'Info.plist'))
     workpath = tempfile.mkdtemp()
     dmgpath = op.join(workpath, plist['CFBundleName'])
@@ -44,6 +46,13 @@ def build_dmg(app_path, dest_path):
     print 'Building %s' % dmgname
     print_and_do('hdiutil create "%s" -format UDZO -nocrossdev -srcdir "%s"' % (op.join(dest_path, dmgname), dmgpath))
     print 'Build Complete'
+
+def add_to_pythonpath(path):
+    abspath = op.abspath(path)
+    pythonpath = os.environ.get('PYTHONPATH', '')
+    pathsep = ';' if sys.platform == 'win32' else ':'
+    pythonpath = pathsep.join([abspath, pythonpath]) if pythonpath else abspath
+    os.environ['PYTHONPATH'] = pythonpath
 
 # this is all a big hack to go around the fact that py2app will include stuff in the testdata
 # folders and I haven't figured out what options prevent that.
