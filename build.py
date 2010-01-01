@@ -1,7 +1,7 @@
 # Created By: Virgil Dupras
 # Created On: 2009-03-03
 # $Id$
-# Copyright 2009 Hardcoded Software (http://www.hardcoded.net)
+# Copyright 2010 Hardcoded Software (http://www.hardcoded.net)
 
 # This software is licensed under the "BSD" License as described in the "LICENSE" file, 
 # which should be included with this package. The terms are also available at 
@@ -76,3 +76,14 @@ def put_testdata_back(move_log):
     for originalpath, tmppath in move_log:
         print 'Moving %s to %s' % (tmppath, originalpath)
         shutil.move(tmppath, originalpath)
+
+# This is another method to hack around those freakingly tricky data inclusion/exlusion rules
+# in setuptools. Instead of moving data out, we copy the packages *without data* in a build
+# folder and then build the plugin from there.
+
+def copy_packages(packages_names, dest):
+    ignore = shutil.ignore_patterns('.hg', 'tests', 'testdata', 'modules')
+    for packages_name in packages_names:
+        dest_path = op.join(dest, packages_name)
+        print "Copying package {0} to {1}".format(packages_name, dest_path)
+        shutil.copytree(packages_name, dest_path, ignore=ignore)
