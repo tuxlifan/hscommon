@@ -1,6 +1,5 @@
 # Created By: Virgil Dupras
 # Created On: 2008-01-11
-# $Id$
 # Copyright 2010 Hardcoded Software (http://www.hardcoded.net)
 
 # from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/81253 (modified (heavily))
