@@ -13,10 +13,10 @@ import subprocess
 import sys
 
 import objc
-from AppKit import *
+from Foundation import NSBundle, NSAutoreleasePool, NSObject, NSArray, NSDictionary
 from ExceptionHandling import NSExceptionHandler, NSLogAndHandleEveryExceptionMask
 
-from .job import Job, JobCancelled, ThreadedJobPerformer as ThreadedJobPerformerBase
+from .job import JobCancelled, ThreadedJobPerformer as ThreadedJobPerformerBase
 
 def report_crash(type, value, tb):
     mainBundle = NSBundle.mainBundle()
