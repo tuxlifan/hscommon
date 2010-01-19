@@ -125,3 +125,14 @@ def pythonify(o):
         return dict((pythonify(k), pythonify(v)) for k, v in o.items())
     logging.warning('Could not pythonify {0} (of type {1}'.format(repr(o), type(o)))
     return o
+
+if objc.__version__ == '1.4':
+    # we're 32 bit and the _C_NSInteger and _C_CGFloat consts aint there.
+    signature = objc.signature
+else:
+    def signature(signature):
+        """Returns an objc.signature with 'i' and 'f' letters changed to correct NSInteger and
+        CGFloat values.
+        """
+        signature = signature.replace('i', objc._C_NSInteger).replace('f', objc._C_CGFloat)
+        return objc.signature(signature)
