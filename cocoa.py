@@ -13,8 +13,8 @@ import subprocess
 import sys
 
 import objc
-from Foundation import NSBundle, NSAutoreleasePool, NSObject, NSArray, NSDictionary
-from ExceptionHandling import NSExceptionHandler, NSLogAndHandleEveryExceptionMask
+from HSFoundation import NSBundle, NSAutoreleasePool, NSObject, NSArray, NSDictionary
+from HSExceptionHandling import NSExceptionHandler, NSLogAndHandleEveryExceptionMask
 
 from .job import JobCancelled, ThreadedJobPerformer as ThreadedJobPerformerBase
 
