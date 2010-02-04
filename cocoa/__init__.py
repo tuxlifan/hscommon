@@ -13,10 +13,10 @@ import subprocess
 import sys
 
 import objc
-from Foundation import NSBundle, NSAutoreleasePool, NSObject, NSArray, NSDictionary
-from ExceptionHandling import NSExceptionHandler, NSLogAndHandleEveryExceptionMask
+from .objcmin import (NSBundle, NSAutoreleasePool, NSObject, NSArray, NSDictionary,
+    NSExceptionHandler, NSLogAndHandleEveryExceptionMask)
 
-from .job import JobCancelled, ThreadedJobPerformer as ThreadedJobPerformerBase
+from ..job import JobCancelled, ThreadedJobPerformer as ThreadedJobPerformerBase
 
 def report_crash(type, value, tb):
     mainBundle = NSBundle.mainBundle()
@@ -87,6 +87,7 @@ def install_exception_hook():
         return (exception.userInfo() or {}).get(u'__pyobjc_exc_type__') is not None
 
     class PyObjCExceptionDelegate(NSObject):
+        @signature('c@:@@I')
         def exceptionHandler_shouldLogException_mask_(self, sender, exception, aMask):
             if exception.name() == 'NSAccessibilityException':
                 return False # These kind of exception are really weird and happen all the time with VoiceOver on.
@@ -97,12 +98,11 @@ def install_exception_hook():
                 tb = userInfo.get(u'__pyobjc_exc_traceback__', [])
                 report_crash(type, value, tb)
             return True
-        exceptionHandler_shouldLogException_mask_ = objc.selector(exceptionHandler_shouldLogException_mask_, signature='c@:@@I')
-
+        
+        @signature('c@:@@I')
         def exceptionHandler_shouldHandleException_mask_(self, sender, exception, aMask):
             return False
-        exceptionHandler_shouldHandleException_mask_ = objc.selector(exceptionHandler_shouldHandleException_mask_, signature='c@:@@I')
-
+    
     # we need to retain this, cause the handler doesn't
     global _exceptionHandlerDelegate
     delegate = PyObjCExceptionDelegate.alloc().init()
