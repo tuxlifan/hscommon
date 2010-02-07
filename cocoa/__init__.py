@@ -13,6 +13,7 @@ import subprocess
 import sys
 
 import objc
+from .inter import signature
 from .objcmin import (NSBundle, NSAutoreleasePool, NSObject, NSArray, NSDictionary,
     NSExceptionHandler, NSLogAndHandleEveryExceptionMask)
 
@@ -32,7 +33,11 @@ def report_crash(type, value, tb):
     if app_identifier:
         s += '\nRelevant Console logs:\n\n'
         p = subprocess.Popen(['grep', app_identifier, '/var/log/system.log'], stdout=subprocess.PIPE)
-        s += p.communicate()[0]
+        try:
+            s += p.communicate()[0]
+        except IndexError:
+            # This can happen if something went wrong with the grep (permission errors?)
+            pass
     HSErrorReportWindow.showErrorReportWithContent_(s)
 
 class ThreadedJobPerformer(ThreadedJobPerformerBase):
@@ -125,14 +130,3 @@ def pythonify(o):
         return dict((pythonify(k), pythonify(v)) for k, v in o.items())
     logging.warning('Could not pythonify {0} (of type {1}'.format(repr(o), type(o)))
     return o
-
-if objc.__version__ == '1.4':
-    # we're 32 bit and the _C_NSInteger and _C_CGFloat consts aint there.
-    signature = objc.signature
-else:
-    def signature(signature):
-        """Returns an objc.signature with 'i' and 'f' letters changed to correct NSInteger and
-        CGFloat values.
-        """
-        signature = signature.replace('i', objc._C_NSInteger).replace('f', objc._C_CGFloat)
-        return objc.signature(signature)
