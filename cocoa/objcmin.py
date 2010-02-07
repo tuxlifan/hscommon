@@ -17,7 +17,7 @@ import objc
 foundation_bundle = objc.loadBundle(
         'Foundation',
         globals(),
-        bundle_identifier=u'com.apple.Foundation',
+        bundle_path=u'/System/Library/Frameworks/Foundation.framework'
 )
 appkit_bundle = objc.loadBundle(
         'AppKit',
@@ -39,6 +39,8 @@ NSBundle = objc.lookUpClass('NSBundle')
 NSAutoreleasePool = objc.lookUpClass('NSAutoreleasePool')
 NSArray = objc.lookUpClass('NSArray')
 NSDictionary = objc.lookUpClass('NSDictionary')
+NSLocale = objc.lookUpClass('NSLocale')
+NSNumberFormatter = objc.lookUpClass('NSNumberFormatter')
 
 NSWorkspace = objc.lookUpClass('NSWorkspace')
 objc.registerMetaDataForSelector('NSWorkspace', 'performFileOperation:source:destination:files:tag:',
@@ -62,6 +64,26 @@ objc.registerMetaDataForSelector('NSExceptionHandler', 'setExceptionHandlingMask
             2+0: {'type': objc._C_UINT,}
         }
     })
+    
+NSDateFormatter = objc.lookUpClass('NSDateFormatter')
+objc.registerMetaDataForSelector('NSDateFormatter', 'setDefaultFormatterBehavior:',
+    {
+        'arguments': {
+            2+0: {'type': objc._C_INT,}
+        }
+    })
+objc.registerMetaDataForSelector('NSDateFormatter', 'setDateStyle:',
+    {
+        'arguments': {
+            2+0: {'type': objc._C_INT,}
+        }
+    })
+objc.registerMetaDataForSelector('NSDateFormatter', 'setTimeStyle:',
+    {
+        'arguments': {
+            2+0: {'type': objc._C_INT,}
+        }
+    })
 
 #--- Functions
 
@@ -77,7 +99,13 @@ objc.loadBundleFunctions(foundation_bundle, globals(), FUNCTIONS)
 #--- Constants
 # I haven't figured out how to load consts/enums, so I set them manually
 
+NSCachesDirectory = 13
 NSApplicationSupportDirectory = 14
 NSUserDomainMask = 1
-NSWorkspaceRecycleOperation = 'recycle'
+NSWorkspaceRecycleOperation = u'recycle'
+NSLocaleCurrencyCode = u'currency'
 NSLogAndHandleEveryExceptionMask = 0x3ff
+NSDateFormatterBehavior10_4 = 1040
+NSDateFormatterNoStyle = 0
+NSDateFormatterShortStyle = 1
+NSNumberFormatterBehavior10_4 = 1040
