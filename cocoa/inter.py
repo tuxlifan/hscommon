@@ -28,9 +28,9 @@ else:
         signature = signature.replace('f', objc._C_CGFloat)
         return objc.signature(signature)
 
-class GUIObject(NSObject):
+class PyGUIObject(NSObject):
     def initWithCocoa_pyParent_(self, cocoa, pyparent):
-        super(GUIObject, self).init()
+        super(PyGUIObject, self).init()
         self.cocoa = cocoa
         self.py = self.py_class(self, pyparent.py)
         return self
@@ -58,7 +58,7 @@ class GUIObject(NSObject):
         self.cocoa.refresh()
     
 
-class PyOutline(GUIObject):
+class PyOutline(PyGUIObject):
     def cancelEdits(self):
         self.py.cancel_edits()
     
