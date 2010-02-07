@@ -13,6 +13,7 @@ import logging
 
 import objc
 
+from ..reg import InvalidCodeError
 from .objcmin import NSObject
 
 if objc.__version__ == '1.4':
@@ -96,4 +97,26 @@ class PyOutline(PyGUIObject):
     
     def update_selection(self):
         self.cocoa.updateSelection()
+    
+
+class PyRegistrable(NSObject):
+    def appName(self):
+        return ""
+    
+    def demoLimitDescription(self):
+        return self.py.DEMO_LIMIT_DESC
+    
+    @signature('c@:')
+    def isRegistered(self):
+        return self.py.registered
+    
+    def isCodeValid_withEmail_(self, code, email):
+        try:
+            self.py.validate_code(code, email)
+            return None
+        except InvalidCodeError as e:
+            return unicode(e)
+    
+    def setRegisteredCode_andEmail_(self, code, email):
+        self.py.set_registration(code, email)
     
