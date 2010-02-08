@@ -16,18 +16,21 @@ import objc
 
 foundation_bundle = objc.loadBundle(
         'Foundation',
-        globals(),
-        bundle_path=u'/System/Library/Frameworks/Foundation.framework'
+        {},
+        bundle_path=u'/System/Library/Frameworks/Foundation.framework',
+        scan_classes=False,
 )
 appkit_bundle = objc.loadBundle(
         'AppKit',
-        globals(),
+        {},
         bundle_path=u'/System/Library/Frameworks/AppKit.framework',
+        scan_classes=False,
 )
 exceptionhandling_bundle = objc.loadBundle(
         'ExceptionHandling',
-        globals(),
+        {},
         bundle_path=u'/System/Library/Frameworks/ExceptionHandling.framework',
+        scan_classes=False,
 )
 
 #--- Classes
@@ -109,3 +112,10 @@ NSDateFormatterBehavior10_4 = 1040
 NSDateFormatterNoStyle = 0
 NSDateFormatterShortStyle = 1
 NSNumberFormatterBehavior10_4 = 1040
+
+foundation_bundle.unload()
+del foundation_bundle
+appkit_bundle.unload()
+del appkit_bundle
+exceptionhandling_bundle.unload()
+del exceptionhandling_bundle
