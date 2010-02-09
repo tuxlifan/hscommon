@@ -47,11 +47,14 @@ def build_dmg(app_path, dest_path):
     print 'Build Complete'
 
 def add_to_pythonpath(path):
+    """Adds `path` to both PYTHONPATH env and sys.path.
+    """
     abspath = op.abspath(path)
     pythonpath = os.environ.get('PYTHONPATH', '')
     pathsep = ';' if sys.platform == 'win32' else ':'
     pythonpath = pathsep.join([abspath, pythonpath]) if pythonpath else abspath
     os.environ['PYTHONPATH'] = pythonpath
+    sys.path.insert(1, abspath)
 
 # this is all a big hack to go around the fact that py2app will include stuff in the testdata
 # folders and I haven't figured out what options prevent that.
