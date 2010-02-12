@@ -64,19 +64,25 @@ class PyOutline(PyGUIObject):
         self.py.cancel_edits()
     
     @signature('c@:@@')
-    def canEditProperty_atPath_(self, property, path):
+    def canEditProperty_atPath_(self, propname, path):
         node = self.py.get_node(path)
-        assert node is self.py.selected
-        return getattr(node, 'can_edit_' + property, False)
+        assert node is self.py.selected_node
+        return getattr(node, 'can_edit_' + propname, False)
     
     def saveEdits(self):
         self.py.save_edits()
     
     def selectedPath(self):
-        return self.py.get_path(self.py.selected)
-
+        return self.py.selected_path
+    
     def setSelectedPath_(self, path):
         self.py.selected_path = path
+    
+    def selectedPaths(self):
+        return self.py.selected_paths
+
+    def setSelectedPaths_(self, paths):
+        self.py.selected_paths = paths
 
     def property_valueAtPath_(self, property, path):
         try:
