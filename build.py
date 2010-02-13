@@ -14,13 +14,15 @@ import os.path as op
 import shutil
 import tempfile
 import plistlib
+from subprocess import Popen
 
 from .files import modified_after
 from .str import rem_file_ext
 
 def print_and_do(cmd):
     print cmd
-    os.system(cmd)
+    p = Popen(cmd, shell=True)
+    os.waitpid(p.pid, 0)
 
 def build_all_qt_ui(base_dir='.'):
     names = os.listdir(base_dir)
