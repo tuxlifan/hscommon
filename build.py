@@ -22,7 +22,7 @@ from .str import rem_file_ext
 def print_and_do(cmd):
     print cmd
     p = Popen(cmd, shell=True)
-    os.waitpid(p.pid, 0)
+    p.wait()
 
 def build_all_qt_ui(base_dir='.'):
     names = os.listdir(base_dir)
