@@ -33,6 +33,13 @@ class Patcher(object):
         self._patched_osstat = {} # path: os.stat_result
         self._target_module = target_module
     
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.unpatch()
+        return False
+    
     def patch(self, target, attrname, replace_with):
         """ Replaces 'target' attribute 'attrname' with 'replace_with' and put it back to normal at
             tearDown.
