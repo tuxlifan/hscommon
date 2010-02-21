@@ -11,7 +11,7 @@ from datetime import date
 
 from nose.tools import eq_
 
-from ..patcher import Patcher
+from ..testutil import Patcher
 
 class TestObj(object):
     attr1 = 'value1'

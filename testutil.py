@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Created By: Virgil Dupras
-# Created On: 2010-02-19
+# Created On: 2010-02-21
 # Copyright 2010 Hardcoded Software (http://www.hardcoded.net)
 # 
 # This software is licensed under the "BSD" License as described in the "LICENSE" file, 
@@ -10,6 +10,22 @@
 import datetime
 import time
 import os
+import tempfile
+
+from . import io
+from .path import Path
+
+def with_tmpdir(func):
+    def wrapper(*args, **kwargs):
+        try:
+            tmppath = Path(tempfile.mkdtemp())
+            args = args + (tmppath, )
+            func(*args, **kwargs)
+        finally:
+            if io.exists(tmppath):
+                io.rmtree(tmppath)
+    
+    return wrapper
 
 class Patcher(object):
     def __init__(self, target_module=None):
@@ -73,3 +89,19 @@ class Patcher(object):
         for target, attrname, old_value in reversed(self._patched):
             setattr(target, attrname, old_value)
     
+
+def patch_today(year, month, day):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            try:
+                p = Patcher()
+                p.patch_today(year, month, day)
+                func(*args, **kwargs)
+            finally:
+                p.unpatch()
+        
+        return wrapper
+    
+    return decorator
+
+            

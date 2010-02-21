@@ -19,7 +19,7 @@ from StringIO import StringIO
 import os
 
 from .path import Path
-from .patcher import Patcher
+from .testutil import Patcher
 
 class TestCase(unittest.TestCase):
     cls_tested_module = None
