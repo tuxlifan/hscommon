@@ -107,6 +107,7 @@ def patch_today(year, month, day):
             finally:
                 p.unpatch()
         
+        wrapper.__name__ = func.__name__
         return wrapper
     
     return decorator

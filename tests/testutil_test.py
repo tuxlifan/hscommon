@@ -11,7 +11,7 @@ from datetime import date
 
 from nose.tools import eq_
 
-from ..testutil import Patcher
+from ..testutil import Patcher, patch_today
 
 class TestObj(object):
     attr1 = 'value1'
@@ -71,3 +71,11 @@ def test_patcher_in_with_statement():
     with Patcher() as p:
         p.patch(o, 'attr1', 'mock1')
     eq_(o.attr1, 'value1')
+
+def test_patch_preserves_name():
+    # The patch decorator preserves the func name (important for test funcs!)
+    def foobar():
+        pass
+    
+    patched = patch_today(2010, 2, 23)(foobar)
+    eq_(patched.__name__, 'foobar')
