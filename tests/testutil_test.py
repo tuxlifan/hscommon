@@ -11,7 +11,7 @@ from datetime import date
 
 from nose.tools import eq_
 
-from ..testutil import Patcher, patch_today
+from ..testutil import Patcher, patch_today, with_tmpdir
 
 class TestObj(object):
     attr1 = 'value1'
@@ -79,3 +79,15 @@ def test_patch_preserves_name():
     
     patched = patch_today(2010, 2, 23)(foobar)
     eq_(patched.__name__, 'foobar')
+    patched = with_tmpdir(foobar)
+    eq_(patched.__name__, 'foobar')
+
+def test_patch_return_value():
+    # The patches func must still return their value
+    def foobar(*args):
+        return 'foobar'
+    
+    patched = patch_today(2010, 2, 23)(foobar)
+    eq_(patched(), 'foobar')
+    patched = with_tmpdir(foobar)
+    eq_(patched(), 'foobar')

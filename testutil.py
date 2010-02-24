@@ -20,11 +20,12 @@ def with_tmpdir(func):
         try:
             tmppath = Path(tempfile.mkdtemp())
             args = args + (tmppath, )
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         finally:
             if io.exists(tmppath):
                 io.rmtree(tmppath)
     
+    wrapper.__name__ = func.__name__
     return wrapper
 
 class Patcher(object):
@@ -103,7 +104,7 @@ def patch_today(year, month, day):
             try:
                 p = Patcher()
                 p.patch_today(year, month, day)
-                func(*args, **kwargs)
+                return func(*args, **kwargs)
             finally:
                 p.unpatch()
         
