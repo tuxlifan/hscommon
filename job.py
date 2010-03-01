@@ -118,12 +118,12 @@ class Job(object):
         if desc_format:
             desc = desc_format % (0, len(sequence))
         self.start_job(len(sequence), desc)
-        for i, element in enumerate(sequence):
+        for i, element in enumerate(sequence, start=1):
             yield element
-            count = i + 1
-            if desc_format and count % every == 0:
-                desc = desc_format % (count, len(sequence))
-            self.add_progress(desc=desc)
+            if i % every == 0:
+                if desc_format:
+                    desc = desc_format % (i, len(sequence))
+                self.add_progress(progress=every, desc=desc)
         if desc_format:
             desc = desc_format % (len(sequence), len(sequence))
         self.set_progress(100, desc)
@@ -165,7 +165,27 @@ class Job(object):
         self._do_update(desc)
     
 
-nulljob = Job(0xfffff, lambda p, d='':True)
+class NullJob(object):
+    def __init__(self, *args, **kwargs):
+        pass
+    
+    def add_progress(self, *args, **kwargs):
+        pass
+    
+    def iter_with_progress(self, sequence, *args, **kwargs):
+        return iter(sequence)
+    
+    def start_job(self, *args, **kwargs):
+        pass
+    
+    def start_subjob(self, *args, **kwargs):
+        return NullJob()
+    
+    def set_progress(self, *args, **kwargs):
+        pass
+    
+
+nulljob = NullJob()
 
 class ThreadedJobPerformer(object):
     """Run threaded jobs and track progress.
