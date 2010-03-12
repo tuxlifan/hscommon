@@ -11,25 +11,6 @@ from nose.tools import eq_, raises
 from ..testcase import TestCase
 from ..misc import *
 
-def testStrToFlags():
-    eq_(StrToFlags('A'),(0,6))
-    eq_(StrToFlags('A',4),(0,))
-    eq_(StrToFlags('AB'),(1,6,8,14))
-    eq_(StrToFlags('AB',8),(1,6))
-
-def testIntToFlags():
-    eq_(IntToFlags(0xff,8),(0,1,2,3,4,5,6,7))
-    eq_(IntToFlags(0x41,8),(0,6))
-    eq_(IntToFlags(0x41424344),(2,6,8,9,14,17,22,24,30))
-    eq_(IntToFlags(0x41424344,24),(2,6,8,9,14,17,22))
-    eq_(IntToFlags(0),())
-
-def testFlagsToInt():
-    eq_(FlagsToInt((0,1,2,3,4,5,6,7)), 0xff)
-    eq_(FlagsToInt((0,6)), 0x41)
-    eq_(FlagsToInt(IntToFlags(0x41424344)), 0x41424344)
-    eq_(FlagsToInt(()),0)
-
 def test_dedupe():
     reflist = [0,7,1,2,3,4,4,5,6,7,1,2,3]
     eq_(dedupe(reflist),[0,7,1,2,3,4,5,6])

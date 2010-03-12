@@ -6,50 +6,6 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-# About Flags:
-# In non-pythonic idioms, we often represent flags in integers, and test the
-# flags with binary operations like "if (FLAG & myflags):". This is not very
-# pythonic (implicitely, it is not very graceful since python is one of the
-# most graceful language ever :).
-# Ok. *MY* flags are tuples of integer. Example: (FLAG1,FLAG3,FLAG6), and these
-# integer don't need to be "masked" For example, the tuple can be (1,2,3,4,5)
-# (Normally, we would need to use (1,2,4,8,16) to avoid overlapping bits).
-# Thus, to test for a flag in *MY* system, you can write "if FLAG in flags:"
-# The functions below are to convert normal flags to my flag system.
-# IMPORTANT NOTE: My flags start at zero. Thus a normal flagset '0x3' = (0,1)
-# in my system, not (1,2).
-
-def StrToFlags(s, flagcount=0):
-    '''
-    StrToFlags('A')   = (0,6)
-    StrToFlags('A',4) = (0)
-    StrToFlags('AB')  = (1,6,8,14)
-    '''
-    flagval = 0
-    i = 0
-    for char in s:
-        flagval += ord(char) << ((len(s) - i - 1)*8)
-        i += 1
-    if flagcount == 0:
-        flagcount = len(s)*8
-    return IntToFlags(flagval,flagcount)
-
-def IntToFlags(intflags, flagcount=32):
-    '''
-    IntToFlags(0xf0,8) == (4,5,6,7)
-    IntToFlags(0xf0,6) == (4,5)
-    '''
-    return tuple([i for i in xrange(flagcount) if (intflags >> i) & 1])
-
-def FlagsToInt(flags):
-    try:
-        result = 0
-        for flag in flags:
-            result += 1 << flag
-        return result
-    except TypeError:
-        raise TypeError,"A flag must be a tuple of integers. Current: " + str(flags)
-
 def cond(condition, true_value, false_value):
     '''Return true_value if condition is true, and false_value otherwise.
     '''
