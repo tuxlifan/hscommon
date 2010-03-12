@@ -58,29 +58,6 @@ def add_to_pythonpath(path):
     os.environ['PYTHONPATH'] = pythonpath
     sys.path.insert(1, abspath)
 
-# this is all a big hack to go around the fact that py2app will include stuff in the testdata
-# folders and I haven't figured out what options prevent that.
-
-def move_testdata_out(base_dir='.'):
-    # looks into backages in 'base_dir', move them into a temp directory and return a list of path
-    # to those locations (so it can be put back)
-    result = []
-    dirnames = [n for n in os.listdir(base_dir) if op.isdir(n) and not n.startswith('.')]
-    for dirname in dirnames:
-        for nametomove in ['testdata', 'modules']:
-            testdatapath = op.join(base_dir, dirname, nametomove)
-            if op.exists(testdatapath):
-                tmppath = op.join(tempfile.mkdtemp(), nametomove)
-                print 'Moving %s to %s' % (testdatapath, tmppath)
-                shutil.move(testdatapath, tmppath)
-                result.append((testdatapath, tmppath))
-    return result
-
-def put_testdata_back(move_log):
-    for originalpath, tmppath in move_log:
-        print 'Moving %s to %s' % (tmppath, originalpath)
-        shutil.move(tmppath, originalpath)
-
 # This is another method to hack around those freakingly tricky data inclusion/exlusion rules
 # in setuptools. Instead of moving data out, we copy the packages *without data* in a build
 # folder and then build the plugin from there.
