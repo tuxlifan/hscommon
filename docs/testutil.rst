@@ -34,6 +34,40 @@ The ``Patcher`` class
 
         Undo any patching that this instance made. If this instance is used in a context manager (``with`` statement), you don't need to call this.
 
+The ``TestData`` class
+======================
+
+.. class:: TestData
+
+    This is a static class that makes usage of test data easier. When including test files with test units, it's often a pain to have access to it. You need to take ``__file__``, remove the filename element, and then combine it with subpaths. Do it in a few tests, and you'll grow bored and create a class like this. To use it in your test suite, subclass it in a core unit of your test suite, and then override ``datadirpath`` like that::
+    
+        from hsutil.testutil import TestData as TestDataBase
+        from hsutil.path import Path
+        
+        class TestData(TestDataBase):
+            @classmethod
+            def datadirpath(cls):
+                return Path(__file__)[:-1] + 'testdata_folder'
+        
+    Then, you can use it easily in your tests::
+    
+        from .base import TestData
+        
+        def test_something():
+            filepath = TestData.filepath('foo.test')
+    
+    .. classmethod:: datadirpath()
+    
+        Returns a :class:`path.Path` pointing to the folder where your test data is. You must override this when subclassing ``TestData``.
+    
+    .. classmethod:: filepath(relative_path, *args)
+    
+        Returns a :class:`path.Path` pointing to the file in ``relative_path``, which is relative to ``datadirpath``. If the path doesn't exist, we try to find them in superclasses' ``datadirpath``.
+        
+        An alternative way to call ``filepath`` is to put each elements of the path in ``*args`` like this::
+        
+            TestData.filepath('foo', 'bar', 'baz.file')
+        
 Functions
 =========
 
