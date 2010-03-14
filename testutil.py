@@ -11,6 +11,7 @@ import datetime
 import time
 import os
 import tempfile
+import os.path as op
 
 from . import io
 from .path import Path
@@ -113,4 +114,26 @@ def patch_today(year, month, day):
     
     return decorator
 
-            
+class TestData(object):
+    @classmethod
+    def datadirpath(cls):
+        return Path(__file__)[:-1] + ('tests', 'testdata')
+    
+    @classmethod
+    def filepath(cls, relative_path, *args):
+        """Returns the path of a file in testdata.
+        
+        'relative_path' can be anything that can be added to a Path
+        if args is not empty, it will be joined to relative_path
+        """
+        if args:
+            relative_path = op.join([relative_path] + list(args))
+        current_cls = cls
+        while hasattr(current_cls, 'datadirpath'):
+            testpath = current_cls.datadirpath()
+            result = unicode(testpath + relative_path)
+            if op.exists(result):
+                break
+            current_cls = current_cls.__bases__[0]
+        assert op.exists(result)
+        return result

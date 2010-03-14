@@ -19,9 +19,9 @@ from StringIO import StringIO
 import os
 
 from .path import Path
-from .testutil import Patcher
+from .testutil import Patcher, TestData
 
-class TestCase(unittest.TestCase):
+class TestCase(unittest.TestCase, TestData):
     cls_tested_module = None
     
     def run(self, result=None):
@@ -65,30 +65,6 @@ class TestCase(unittest.TestCase):
     
     def mock_today(self, *args, **kw):
         self._patcher.patch_today(*args, **kw)
-    
-    @classmethod
-    def datadirpath(cls):
-        return Path(__file__)[:-1] + ('tests', 'testdata')
-    
-    @classmethod
-    def filepath(cls, relative_path, *args):
-        """Returns the path of a file in testdata.
-        
-        'relative_path' can be anythin that can be added to a Path
-        if args is not empty, it will be joined to relative_path
-        """
-        # I know, the name is not the greatest ever, but it can't start with "test"
-        if args:
-            relative_path = op.join([relative_path] + list(args))
-        current_cls = cls
-        while hasattr(current_cls, 'datadirpath'):
-            testpath = current_cls.datadirpath()
-            result = unicode(testpath + relative_path)
-            if op.exists(result):
-                break
-            current_cls = current_cls.__bases__[0]
-        assert op.exists(result)
-        return result
     
     def tmpdir(self, ref=None):
         ''' Creates a new temp directory for you to put stuff in.
