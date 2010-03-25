@@ -16,7 +16,6 @@ import tempfile
 import plistlib
 from subprocess import Popen
 
-from .files import modified_after
 from .str import rem_file_ext
 
 def print_and_do(cmd):
@@ -25,15 +24,9 @@ def print_and_do(cmd):
     p.wait()
 
 def build_all_qt_ui(base_dir='.'):
-    names = os.listdir(base_dir)
-    uinames = [name for name in names if name.endswith('.ui')]
-    for name in uinames:
-        path = op.join(base_dir, name)
-        destpath = rem_file_ext(path) + '_ui.py'
-        if modified_after(path, destpath):
-            print_and_do("pyuic4 {0} > {1}".format(path, destpath))
-        else:
-            print "{0} is already compiled".format(unicode(path))
+    from PyQt4.uic import compileUiDir
+    mapper = lambda d, f: (d, rem_file_ext(f) + '_ui.py')
+    compileUiDir(base_dir, map=mapper)
 
 def build_dmg(app_path, dest_path):
     print repr(op.join(app_path, 'Contents', 'Info.plist'))
