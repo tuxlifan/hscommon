@@ -11,8 +11,6 @@ Introduction
 
 ``hsutil`` is a collection of tools used throughout HS apps. It manage their build process, their job progress, their tests, etc..
 
-**Note:** This documentation is still incomplete. Man is there a lot of stuff to cover!
-
 Dependencies
 ============
 
@@ -32,6 +30,12 @@ API Documentation
    files
    io
    job
+   markable
    misc
+   notify
    path
+   reg
+   sqlite
+   str
    testutil
+   weak
