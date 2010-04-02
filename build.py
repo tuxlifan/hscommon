@@ -51,13 +51,47 @@ def add_to_pythonpath(path):
     os.environ['PYTHONPATH'] = pythonpath
     sys.path.insert(1, abspath)
 
-# This is another method to hack around those freakingly tricky data inclusion/exlusion rules
-# in setuptools. Instead of moving data out, we copy the packages *without data* in a build
-# folder and then build the plugin from there.
-
+# This is a method to hack around those freakingly tricky data inclusion/exlusion rules
+# in setuptools. We copy the packages *without data* in a build folder and then build the plugin
+# from there.
 def copy_packages(packages_names, dest):
     ignore = shutil.ignore_patterns('.hg', 'tests', 'testdata', 'modules')
     for packages_name in packages_names:
         dest_path = op.join(dest, packages_name)
         print "Copying package {0} to {1}".format(packages_name, dest_path)
         shutil.copytree(packages_name, dest_path, ignore=ignore)
+
+def build_debian_changelog(yamlfile, destfile, pkgname, from_version=None):
+    """Builds a debian changelog out of a YAML changelog.
+    """
+    import yaml
+    def desc2list(desc):
+        # We take each item, enumerated with the '*' character, and transform it into a list.
+        desc = desc.replace('\n', ' ')
+        desc = desc.replace('  ', ' ')
+        result = desc.split('*')
+        return [s.strip() for s in result if s.strip()]
+    
+    ENTRY_MODEL = "{pkg} ({version}) stable; urgency=low\n\n{changes}\n -- Virgil Dupras <hsoft@hardcoded.net>  {date}\n\n"
+    CHANGE_MODEL = "  * {description}\n"
+    changelogs = yaml.load(open(yamlfile))
+    if from_version:
+        # We only want logs from a particular version
+        for index, log in enumerate(changelogs):
+            if log['version'] == from_version:
+                changelogs = changelogs[:index+1]
+                break
+    rendered_logs = []
+    for log in changelogs:
+        version = log['version']
+        logdate = log['date']
+        desc = log['description']
+        rendered_date = logdate.strftime('%a, %d %b %Y 00:00:00 +0000')
+        rendered_descs = [CHANGE_MODEL.format(description=d) for d in desc2list(desc)]
+        changes = ''.join(rendered_descs)
+        rendered_log = ENTRY_MODEL.format(pkg=pkgname, version=version, changes=changes, date=rendered_date)
+        rendered_logs.append(rendered_log)
+    result = ''.join(rendered_logs)
+    fp = open(destfile, 'w')
+    fp.write(result)
+    fp.close()
