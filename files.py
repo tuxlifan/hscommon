@@ -100,3 +100,15 @@ def modified_after(first_path, second_path):
     except EnvironmentError:
         return True
     return first_mtime > second_mtime
+
+def find_in_path(name, path=None):
+    """Search for `name` in all directories of `path` and return the absolute path of the first
+    occurrence. If `path` is None, $PATH is used.
+    """
+    if path is None:
+        path = os.environ['PATH']
+    paths = path.split(os.pathsep)
+    for path in paths:
+        if op.exists(op.join(path, name)):
+            return op.join(path, name)
+    return None
