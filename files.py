@@ -101,13 +101,14 @@ def modified_after(first_path, second_path):
         return True
     return first_mtime > second_mtime
 
-def find_in_path(name, path=None):
-    """Search for `name` in all directories of `path` and return the absolute path of the first
-    occurrence. If `path` is None, $PATH is used.
+def find_in_path(name, paths=None):
+    """Search for `name` in all directories of `paths` and return the absolute path of the first
+    occurrence. If `paths` is None, $PATH is used.
     """
-    if path is None:
-        path = os.environ['PATH']
-    paths = path.split(os.pathsep)
+    if paths is None:
+        paths = os.environ['PATH']
+    if isinstance(paths, basestring): # if it's not a string, it's already a list
+        paths = paths.split(os.pathsep)
     for path in paths:
         if op.exists(op.join(path, name)):
             return op.join(path, name)
