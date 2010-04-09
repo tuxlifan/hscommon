@@ -11,7 +11,7 @@ from hashlib import md5
 
 ALL_APPS = [
     (1, 'dupeGuru Music Edition'),
-    (3, 'musicGuru'),
+    (2, 'musicGuru'),
     (4, 'dupeGuru'),
     (5, 'dupeGuru Picture Edition'),
     (6, 'moneyGuru'),
