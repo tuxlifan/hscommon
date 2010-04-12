@@ -80,10 +80,10 @@ class PyOutline(PyGUIObject):
     
     def selectedPaths(self):
         return self.py.selected_paths
-
+    
     def setSelectedPaths_(self, paths):
         self.py.selected_paths = paths
-
+    
     def property_valueAtPath_(self, property, path):
         try:
             return getattr(self.py.get_node(path), property)
@@ -95,6 +95,74 @@ class PyOutline(PyGUIObject):
         setattr(self.py.get_node(path), property, value)
     
     #--- Python -> Cocoa
+    def start_editing(self):
+        self.cocoa.startEditing()
+    
+    def stop_editing(self):
+        self.cocoa.stopEditing()
+    
+    def update_selection(self):
+        self.cocoa.updateSelection()
+    
+
+class PyTable(PyGUIObject):
+    def add(self):
+        self.py.add()
+    
+    def cancelEdits(self):
+        self.py.cancel_edits()
+    
+    @signature('c@:@i')
+    def canEditColumn_atRow_(self, column, row):
+        return self.py.can_edit_cell(column, row)
+    
+    def changeColumns_(self, columns):
+        self.py.change_columns(list(columns))
+    
+    def deleteSelectedRows(self):
+        self.py.delete()
+    
+    @signature('i@:')
+    def numberOfRows(self):
+        return len(self.py)
+    
+    def saveEdits(self):
+        self.py.save_edits()
+    
+    def selectRows_(self, rows):
+        self.py.select(list(rows))
+    
+    def selectedRows(self):
+        return self.py.selected_indexes
+    
+    @signature('v@:@@i')
+    def setValue_forColumn_row_(self, value, column, row):
+        if column == 'from':
+            column = 'from_'
+        # this try except is important for the case while a row is in edition mode and the delete
+        # button is clicked.
+        try:
+            setattr(self.py[row], column, value)
+        except IndexError:
+            logging.warning("Trying to set an out of bounds row ({0} / {1})".format(row, len(self.py)))
+    
+    @signature('v@:@c')
+    def sortByColumn_desc_(self, column, desc):
+        self.py.sort_by(column, desc=desc)
+    
+    @signature('@@:@i')
+    def valueForColumn_row_(self, column, row):
+        if column == 'from':
+            column = 'from_'
+        try:
+            return getattr(self.py[row], column)
+        except IndexError:
+            logging.warning("Trying to get an out of bounds row ({0} / {1})".format(row, len(self.py)))    
+    
+    #--- Python -> Cocoa
+    def show_selected_row(self):
+        self.cocoa.showSelectedRow()
+    
     def start_editing(self):
         self.cocoa.startEditing()
     
