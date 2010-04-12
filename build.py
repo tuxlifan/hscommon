@@ -56,10 +56,25 @@ def add_to_pythonpath(path):
 # from there.
 def copy_packages(packages_names, dest):
     ignore = shutil.ignore_patterns('.hg', 'tests', 'testdata', 'modules', 'docs')
-    for packages_name in packages_names:
-        dest_path = op.join(dest, packages_name)
-        print "Copying package {0} to {1}".format(packages_name, dest_path)
-        shutil.copytree(packages_name, dest_path, ignore=ignore)
+    for package_name in packages_names:
+        dest_name = op.basename(package_name) # the package name can be a path as well
+        dest_path = op.join(dest, dest_name)
+        print "Copying package {0} to {1}".format(package_name, dest_path)
+        shutil.copytree(package_name, dest_path, ignore=ignore)
+
+def copy_qt_plugins(folder_names, dest): # This is only for Windows
+    from .files import find_in_path
+    qmake_path = find_in_path('qmake.exe')
+    print repr(qmake_path)
+    qt_dir = op.split(op.dirname(qmake_path))[0]
+    print repr(qt_dir)
+    qt_plugin_dir = op.join(qt_dir, 'plugins')
+    def ignore(path, names):
+        if path == qt_plugin_dir:
+            return [n for n in names if n not in folder_names]
+        else:
+            return [n for n in names if not n.endswith('.dll')]
+    shutil.copytree(qt_plugin_dir, dest, ignore=ignore)
 
 def build_debian_changelog(yamlfile, destfile, pkgname, from_version=None):
     """Builds a debian changelog out of a YAML changelog.
