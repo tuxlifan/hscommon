@@ -169,6 +169,7 @@ class RatesDB(object):
     The rates are represented as float and represent the value of the currency in CAD.
     """
     def __init__(self, db_or_path=':memory:'):
+        self._cache = {} # {(date, currency): CAD value
         self.db_or_path = db_or_path
         if isinstance(db_or_path, (basestring, Path)):
             self.con = sqlite.connect(unicode(db_or_path))
@@ -216,6 +217,9 @@ class RatesDB(object):
                 return row[0]
         return seek('<=', 'desc') or seek('>=', '') or Currency(currency_code).fallback_rate
     
+    def clear_cache(self):
+        self._cache = {}
+    
     def date_range(self, currency_code):
         """Returns (start, end) of the cached rates for currency"""
         sql = "select min(date), max(date) from rates where currency = '%s'" % currency_code
@@ -234,9 +238,25 @@ class RatesDB(object):
         The rate of the nearest date that is smaller than 'date' is returned. If
         there is none, a seek for a rate with a higher date will be made.
         """
-        str_date = '%d%02d%02d' % (date.year, date.month, date.day)
-        value1 = self._seek_value_in_CAD(str_date, currency1_code)
-        value2 = self._seek_value_in_CAD(str_date, currency2_code)
+        # This method is a bottleneck and has been optimized for speed.
+        value1 = None
+        value2 = None
+        if currency1_code == 'CAD':
+            value1 = 1
+        else:
+            value1 = self._cache.get((date, currency1_code))
+        if currency2_code == 'CAD':
+            value2 = 1
+        else:
+            value2 = self._cache.get((date, currency2_code))
+        if value1 is None or value2 is None:
+            str_date = '%d%02d%02d' % (date.year, date.month, date.day)
+            if value1 is None:
+                value1 = self._seek_value_in_CAD(str_date, currency1_code)
+                self._cache[(date, currency1_code)] = value1
+            if value2 is None:
+                value2 = self._seek_value_in_CAD(str_date, currency2_code)
+                self._cache[(date, currency2_code)] = value2
         return value1 / value2
     
     def set_CAD_value(self, date, currency_code, value):
