@@ -261,6 +261,7 @@ class RatesDB(object):
     
     def set_CAD_value(self, date, currency_code, value):
         """Sets the daily value in CAD for currency at date"""
+        self._cache[(date, currency_code)] = value
         str_date = '%d%02d%02d' % (date.year, date.month, date.day)
         sql = "replace into rates(date, currency, rate) values(?, ?, ?)"
         self._execute(sql, [str_date, currency_code, value])

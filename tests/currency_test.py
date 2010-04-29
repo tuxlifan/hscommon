@@ -63,6 +63,12 @@ class DBWithDailyRate(TestCase):
         USD.set_CAD_value(1/42, date(2008, 4, 20))
         self.assertAlmostEqual(CAD.value_in(USD, date(2008, 4, 20)), 42)
     
+    def test_set_rate_after_get(self):
+        # When setting a rate after a get of the same rate, the rate cache is correctly updated.
+        CAD.value_in(USD, date(2008, 4, 20)) # value will be cached
+        USD.set_CAD_value(1/42, date(2008, 4, 20))
+        self.assertAlmostEqual(CAD.value_in(USD, date(2008, 4, 20)), 42)
+    
 
 class DBWithTwoDailyRates(TestCase):
     def setUp(self):
