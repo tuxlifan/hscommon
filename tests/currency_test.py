@@ -20,6 +20,9 @@ from ..testutil import with_tmpdir
 def teardown():
     Currency.set_rates_db(None)
 
+FOO = Currency.register('FOO', 'Currency with start date', start_date=date(2009, 1, 12), start_rate=2)
+BAR = Currency.register('BAR', 'Currency with stop date', stop_date=date(2010, 1, 12), stop_rate=2)
+
 @with_setup(None, teardown)
 def test_currency_creation():
     # Different ways to create a currency.
@@ -35,8 +38,8 @@ def test_currency_copy():
 
 @with_setup(None, teardown)
 def test_get_rate_on_empty_db():
-    # When there is no data available, use the fallback rate.
-    eq_(CAD.value_in(USD, date(2008, 4, 20)), 1 / USD.fallback_rate)
+    # When there is no data available, use the start_rate.
+    eq_(CAD.value_in(USD, date(2008, 4, 20)), 1 / USD.start_rate)
 
 @with_setup(None, teardown)
 @with_tmpdir
@@ -82,8 +85,8 @@ def test_get_rate_with_daily_rate():
 @with_setup(setup_daily_rate, teardown)
 def test_get_rate_different_currency():
     # Use fallback rates when necessary.
-    eq_(CAD.value_in(EUR, date(2008, 4, 20)), 1 / EUR.fallback_rate)
-    eq_(EUR.value_in(USD, date(2008, 4, 20)), EUR.fallback_rate * 0.996115)
+    eq_(CAD.value_in(EUR, date(2008, 4, 20)), 1 / EUR.start_rate)
+    eq_(EUR.value_in(USD, date(2008, 4, 20)), EUR.start_rate * 0.996115)
 
 @with_setup(setup_daily_rate, teardown)
 def test_get_rate_reverse():
@@ -155,7 +158,7 @@ def test_get_rate_with_pivotal():
 @with_setup(setup_rates_of_multiple_currencies, teardown)
 def test_get_rate_doesnt_exist():
     # Don't crash when trying to do pivotal calculation with non-existing currencies.
-    eq_(USD.value_in(PLN, date(2008, 4, 20)), 1 / 0.996115 / PLN.fallback_rate)
+    eq_(USD.value_in(PLN, date(2008, 4, 20)), 1 / 0.996115 / PLN.start_rate)
 
 #--- Problems after connection
 def get_problematic_db():
@@ -186,3 +189,19 @@ def test_get_rate_with_problematic_db():
 def test_set_rate_with_problematic_db():
     db = get_problematic_db()
     db.set_CAD_value(date(2008, 4, 20), 'USD', 42) # no crash
+
+#--- DB that doesn't allow get_rate calls
+def setup_db_raising_error_on_getrate():
+    db = RatesDB()
+    def mock_get_rate(*args, **kwargs):
+        raise AssertionError()
+    db.get_rate = mock_get_rate
+    Currency.set_rates_db(db)
+
+@with_setup(setup_db_raising_error_on_getrate, teardown)
+def test_currency_with_start_date():
+    eq_(FOO.value_in(CAD, date(2009, 1, 11)), 2)
+
+@with_setup(setup_db_raising_error_on_getrate, teardown)
+def test_currency_with_stop_date():
+    eq_(BAR.value_in(CAD, date(2010, 1, 13)), 2)

@@ -47,7 +47,7 @@ class Currency(object):
         return '<Currency %s>' % self.code
 
     @staticmethod
-    def register(code, name, exponent=2, fallback_rate=1):
+    def register(code, name, exponent=2, start_date=None, start_rate=1, stop_date=None, stop_rate=1):
         """Registers a new currency and returns it."""
         assert code not in Currency.by_code
         assert name not in Currency.by_name
@@ -55,7 +55,10 @@ class Currency(object):
         currency.code = code
         currency.name = name
         currency.exponent = exponent
-        currency.fallback_rate = fallback_rate
+        currency.start_date = start_date
+        currency.start_rate = start_rate
+        currency.stop_date = stop_date
+        currency.stop_rate = stop_rate
         Currency.by_code[code] = currency
         Currency.by_name[name] = currency
         Currency.all.append(currency)
@@ -77,92 +80,97 @@ class Currency(object):
 
     def value_in(self, currency, date):
         """Returns the value of this currency in terms of the other currency on the given date."""
-        return self.get_rates_db().get_rate(date, self.code, currency.code)
-
+        if self.start_date is not None and date < self.start_date:
+            return self.start_rate
+        elif self.stop_date is not None and date > self.stop_date:
+            return self.stop_rate
+        else:
+            return self.get_rates_db().get_rate(date, self.code, currency.code)
+    
     def set_CAD_value(self, value, date):
         """Sets the currency's value in CAD on the given date."""
         self.get_rates_db().set_CAD_value(date, self.code, value)
 
 
 # In order we want to list them
-USD = Currency.register('USD', 'U.S. dollar', fallback_rate=0.9896)
-EUR = Currency.register('EUR', 'European Euro', fallback_rate=1.5611)
-GBP = Currency.register('GBP', 'U.K. pound sterling', fallback_rate=1.9619)
-CAD = Currency.register('CAD', 'Canadian dollar', fallback_rate=1)
-AUD = Currency.register('AUD', 'Australian dollar', fallback_rate=0.9507)
-JPY = Currency.register('JPY', 'Japanese yen', exponent=0, fallback_rate=0.009569)
-INR = Currency.register('INR', 'Indian rupee', fallback_rate=0.02322)
-NZD = Currency.register('NZD', 'New Zealand dollar', fallback_rate=0.7793)
-CHF = Currency.register('CHF', 'Swiss franc', fallback_rate=0.9658)
-ZAR = Currency.register('ZAR', 'South African rand', fallback_rate=0.1286)
+USD = Currency.register('USD', 'U.S. dollar', start_rate=0.9896)
+EUR = Currency.register('EUR', 'European Euro', start_rate=1.5611)
+GBP = Currency.register('GBP', 'U.K. pound sterling', start_rate=1.9619)
+CAD = Currency.register('CAD', 'Canadian dollar', start_rate=1)
+AUD = Currency.register('AUD', 'Australian dollar', start_rate=0.9507)
+JPY = Currency.register('JPY', 'Japanese yen', exponent=0, start_rate=0.009569)
+INR = Currency.register('INR', 'Indian rupee', start_rate=0.02322)
+NZD = Currency.register('NZD', 'New Zealand dollar', start_rate=0.7793)
+CHF = Currency.register('CHF', 'Swiss franc', start_rate=0.9658)
+ZAR = Currency.register('ZAR', 'South African rand', start_rate=0.1286)
 # The rest, alphabetical
-AED = Currency.register('AED', 'U.A.E. dirham', fallback_rate=0.2694)
-ANG = Currency.register('ANG', 'Neth. Antilles florin', fallback_rate=0.556)
-ARS = Currency.register('ARS', 'Argentine peso', fallback_rate=0.3079)
+AED = Currency.register('AED', 'U.A.E. dirham', start_rate=0.2694)
+ANG = Currency.register('ANG', 'Neth. Antilles florin', start_rate=0.556)
+ARS = Currency.register('ARS', 'Argentine peso', start_rate=0.3079)
 ATS = Currency.register('ATS', 'Austrian schilling')    # obsolete (euro)
-BBD = Currency.register('BBD', 'Barbadian dollar', fallback_rate=0.5003)
+BBD = Currency.register('BBD', 'Barbadian dollar', start_rate=0.5003)
 BEF = Currency.register('BEF', 'Belgian franc')   # obsolete (euro)
-BRL = Currency.register('BHD', 'Bahraini dinar', fallback_rate=3.1517, exponent=3)
-BRL = Currency.register('BRL', 'Brazilian real', fallback_rate=0.5955)
-BSD = Currency.register('BSD', 'Bahamian dollar', fallback_rate=0.9896)
-CLP = Currency.register('CLP', 'Chilean peso', exponent=0, fallback_rate=0.002082)
-CNY = Currency.register('CNY', 'Chinese renminbi', fallback_rate=0.1427)
-COP = Currency.register('COP', 'Colombian peso', fallback_rate=0.000557)
-CZK = Currency.register('CZK', 'Czech Republic koruna', fallback_rate=0.0622)
+BRL = Currency.register('BHD', 'Bahraini dinar', start_rate=3.1517, exponent=3)
+BRL = Currency.register('BRL', 'Brazilian real', start_rate=0.5955)
+BSD = Currency.register('BSD', 'Bahamian dollar', start_rate=0.9896)
+CLP = Currency.register('CLP', 'Chilean peso', exponent=0, start_rate=0.002082)
+CNY = Currency.register('CNY', 'Chinese renminbi', start_rate=0.1427)
+COP = Currency.register('COP', 'Colombian peso', start_rate=0.000557)
+CZK = Currency.register('CZK', 'Czech Republic koruna', start_rate=0.0622)
 DEM = Currency.register('DEM', 'German deutsche mark')   # obsolete (euro)
-DKK = Currency.register('DKK', 'Danish krone', fallback_rate=0.2093)
-EGP = Currency.register('EGP', 'Egyptian Pound', fallback_rate=0.2232)
+DKK = Currency.register('DKK', 'Danish krone', start_rate=0.2093)
+EGP = Currency.register('EGP', 'Egyptian Pound', start_rate=0.2232)
 ESP = Currency.register('ESP', 'Spanish peseta', exponent=0)   # obsolete (euro)
 FIM = Currency.register('FIM', 'Finnish markka')   # obsolete (euro)
-FJD = Currency.register('FJD', 'Fiji dollar', fallback_rate=0.6709)
+FJD = Currency.register('FJD', 'Fiji dollar', start_rate=0.6709)
 FRF = Currency.register('FRF', 'French franc')     # obsolete (euro)
 GHC = Currency.register('GHC', 'Ghanaian cedi (old)') # obsolete
-GHS = Currency.register('GHS', 'Ghanaian cedi (new)', fallback_rate=0.974)
+GHS = Currency.register('GHS', 'Ghanaian cedi (new)', start_rate=0.974)
 GRD = Currency.register('GRD', 'Greek drachma')   # obsolete (euro)
-GTQ = Currency.register('GTQ', 'Guatemalan quetzal', fallback_rate=0.1333)
-HKD = Currency.register('HKD', 'Hong Kong dollar', fallback_rate=0.126812)
-HNL = Currency.register('HNL', 'Honduran lempira', fallback_rate=0.05237)
-HRK = Currency.register('HRK', 'Croatian kuna', fallback_rate=0.2151)
-HUF = Currency.register('HUF', 'Hungarian forint', fallback_rate=0.006388)
-IDR = Currency.register('IDR', 'Indonesian rupiah', fallback_rate=0.000106)
+GTQ = Currency.register('GTQ', 'Guatemalan quetzal', start_rate=0.1333)
+HKD = Currency.register('HKD', 'Hong Kong dollar', start_rate=0.126812)
+HNL = Currency.register('HNL', 'Honduran lempira', start_rate=0.05237)
+HRK = Currency.register('HRK', 'Croatian kuna', start_rate=0.2151)
+HUF = Currency.register('HUF', 'Hungarian forint', start_rate=0.006388)
+IDR = Currency.register('IDR', 'Indonesian rupiah', start_rate=0.000106)
 IEP = Currency.register('IEP', 'Irish pound')    # obsolete (euro)
-ILS = Currency.register('ILS', 'Israeli new shekel', fallback_rate=0.2987)
-ISK = Currency.register('ISK', 'Icelandic krona', exponent=0, fallback_rate=0.01368)
+ILS = Currency.register('ILS', 'Israeli new shekel', start_rate=0.2987)
+ISK = Currency.register('ISK', 'Icelandic krona', exponent=0, start_rate=0.01368)
 ITL = Currency.register('ITL', 'Italian lira', exponent=0)   # obsolete (euro)
-JMD = Currency.register('JMD', 'Jamaican dollar', fallback_rate=0.01413)
-KRW = Currency.register('KRW', 'South Korean won', exponent=0, fallback_rate=0.000944)
-LKR = Currency.register('LKR', 'Sri Lanka rupee', fallback_rate=0.00919)
-LTL = Currency.register('LTL', 'Lithuanian litas', fallback_rate=0.3850)
-MAD = Currency.register('MAD', 'Moroccan dirham', fallback_rate=0.136)
+JMD = Currency.register('JMD', 'Jamaican dollar', start_rate=0.01413)
+KRW = Currency.register('KRW', 'South Korean won', exponent=0, start_rate=0.000944)
+LKR = Currency.register('LKR', 'Sri Lanka rupee', start_rate=0.00919)
+LTL = Currency.register('LTL', 'Lithuanian litas', start_rate=0.3850)
+MAD = Currency.register('MAD', 'Moroccan dirham', start_rate=0.136)
 MMK = Currency.register('MMK', 'Myanmar (Burma) kyat')
-MXN = Currency.register('MXN', 'Mexican peso', fallback_rate=0.0953)
-MYR = Currency.register('MYR', 'Malaysian ringgit', fallback_rate=0.3064)
+MXN = Currency.register('MXN', 'Mexican peso', start_rate=0.0953)
+MYR = Currency.register('MYR', 'Malaysian ringgit', start_rate=0.3064)
 NLG = Currency.register('NLG', 'Netherlands guilder')   # obsolete (euro)
-NOK = Currency.register('NOK', 'Norwegian krone', fallback_rate=0.1973)
-PAB = Currency.register('PAB', 'Panamanian balboa', fallback_rate=0.9896)
-PEN = Currency.register('PEN', 'Peruvian new sol', fallback_rate=0.3481)
-PHP = Currency.register('PHP', 'Philippine peso', fallback_rate=0.02273)
-PKR = Currency.register('PKR', 'Pakistan rupee', fallback_rate=0.01454)
-PLN = Currency.register('PLN', 'Polish zloty', fallback_rate=0.4601)
+NOK = Currency.register('NOK', 'Norwegian krone', start_rate=0.1973)
+PAB = Currency.register('PAB', 'Panamanian balboa', start_rate=0.9896)
+PEN = Currency.register('PEN', 'Peruvian new sol', start_rate=0.3481)
+PHP = Currency.register('PHP', 'Philippine peso', start_rate=0.02273)
+PKR = Currency.register('PKR', 'Pakistan rupee', start_rate=0.01454)
+PLN = Currency.register('PLN', 'Polish zloty', start_rate=0.4601)
 PTE = Currency.register('PTE', 'Portuguese escudo', exponent=0)    # obsolete (euro)
-RON = Currency.register('RON', 'Romanian new leu', fallback_rate=0.4254)
-RSD = Currency.register('RSD', 'Serbian dinar', fallback_rate=0.01912)
-RUB = Currency.register('RUB', 'Russian rouble', fallback_rate=0.04206)
-SEK = Currency.register('SEK', 'Swedish krona', fallback_rate=0.1676)
-SGD = Currency.register('SGD', 'Singapore dollar', fallback_rate=0.7266)
+RON = Currency.register('RON', 'Romanian new leu', start_rate=0.4254)
+RSD = Currency.register('RSD', 'Serbian dinar', start_rate=0.01912)
+RUB = Currency.register('RUB', 'Russian rouble', start_rate=0.04206)
+SEK = Currency.register('SEK', 'Swedish krona', start_rate=0.1676)
+SGD = Currency.register('SGD', 'Singapore dollar', start_rate=0.7266)
 SIT = Currency.register('SIT', 'Slovenian tolar')     # obsolete (euro)
-SKK = Currency.register('SKK', 'Slovak koruna', fallback_rate=0.05015)
-THB = Currency.register('THB', 'Thai baht', fallback_rate=0.03079)
-TND = Currency.register('TND', 'Tunisian dinar', exponent=3, fallback_rate=0.8516)
+SKK = Currency.register('SKK', 'Slovak koruna', start_rate=0.05015)
+THB = Currency.register('THB', 'Thai baht', start_rate=0.03079)
+TND = Currency.register('TND', 'Tunisian dinar', exponent=3, start_rate=0.8516)
 TRL = Currency.register('TRL', 'Turkish lira', exponent=0)       # obsolete
-TWD = Currency.register('TWD', 'Taiwanese new dollar', fallback_rate=0.03246)
-UAH = Currency.register('UAH', 'Ukrainian hryvnia', fallback_rate=0.1266)
+TWD = Currency.register('TWD', 'Taiwanese new dollar', start_rate=0.03246)
+UAH = Currency.register('UAH', 'Ukrainian hryvnia', start_rate=0.1266)
 VEB = Currency.register('VEB', 'Venezuelan bolivar', exponent=0)    # obsolete
-VEF = Currency.register('VEF', 'Venezuelan bolivar fuerte', fallback_rate=0.4609)
-VND = Currency.register('VND', 'Vietnamese dong', fallback_rate=6.1e-05)
-XAF = Currency.register('XAF', 'CFA franc', exponent=0, fallback_rate=0.00238)
-XCD = Currency.register('XCD', 'East Caribbean dollar', fallback_rate=0.3734)
-XPF = Currency.register('XPF', 'CFP franc', exponent=0, fallback_rate=0.01308)
+VEF = Currency.register('VEF', 'Venezuelan bolivar fuerte', start_rate=0.4609)
+VND = Currency.register('VND', 'Vietnamese dong', start_rate=6.1e-05)
+XAF = Currency.register('XAF', 'CFA franc', exponent=0, start_rate=0.00238)
+XCD = Currency.register('XCD', 'East Caribbean dollar', start_rate=0.3734)
+XPF = Currency.register('XPF', 'CFP franc', exponent=0, start_rate=0.01308)
 
 
 class RatesDB(object):
@@ -218,7 +226,7 @@ class RatesDB(object):
             row = cur.fetchone()
             if row:
                 return row[0]
-        return seek('<=', 'desc') or seek('>=', '') or Currency(currency_code).fallback_rate
+        return seek('<=', 'desc') or seek('>=', '') or Currency(currency_code).start_rate
     
     def clear_cache(self):
         self._cache = {}
