@@ -106,6 +106,14 @@ def test_set_rate_after_get():
     USD.set_CAD_value(1/42, date(2008, 4, 20))
     assert_almost_equal(CAD.value_in(USD, date(2008, 4, 20)), 42)
 
+@with_setup(setup_daily_rate, teardown)
+def test_set_rate_after_get_the_day_after():
+    # When setting a rate, the cache for the whole currency is reset, or else we get old fallback
+    # values for dates where the currency server returned no value.
+    CAD.value_in(USD, date(2008, 4, 21)) # value will be cached
+    USD.set_CAD_value(1/42, date(2008, 4, 20))
+    assert_almost_equal(CAD.value_in(USD, date(2008, 4, 21)), 42)
+
 #--- Two daily rates
 def setup_two_daily_rate():
     # Don't change the set order, it's important for the tests
