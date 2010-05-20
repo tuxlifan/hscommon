@@ -42,9 +42,12 @@ class Repeater(Broadcaster, Listener):
         Broadcaster.__init__(self)
         Listener.__init__(self, broadcaster)
     
+    def _repeat_message(self, msg):
+        if not self.REPEATED_NOTIFICATIONS or msg in self.REPEATED_NOTIFICATIONS:
+            self.notify(msg)
+    
     def dispatch(self, msg):
         if hasattr(self, msg):
             Listener.dispatch(self, msg)
-        if not self.REPEATED_NOTIFICATIONS or msg in self.REPEATED_NOTIFICATIONS:
-            self.notify(msg)
+        self._repeat_message(msg)
     
