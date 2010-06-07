@@ -18,7 +18,7 @@ from .objcmin import NSObject
 
 if objc.__version__ == '1.4':
     # we're 32 bit and the _C_NSInteger and _C_CGFloat consts aint there.
-    signature = objc.signature
+    signature = objc.typedSelector
 else:
     def signature(signature):
         """Returns an objc.signature with 'i' and 'f' letters changed to correct NSInteger and
@@ -27,7 +27,7 @@ else:
         signature = signature.replace('i', objc._C_NSInteger)
         signature = signature.replace('I', objc._C_NSUInteger)
         signature = signature.replace('f', objc._C_CGFloat)
-        return objc.signature(signature)
+        return objc.typedSelector(signature)
 
 class PyGUIObject(NSObject):
     def initWithCocoa_pyParent_(self, cocoa, pyparent):
