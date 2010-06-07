@@ -34,3 +34,20 @@ class Listener(object):
         method = getattr(self, msg)
         method()
     
+
+class Repeater(Broadcaster, Listener):
+    REPEATED_NOTIFICATIONS = None
+    
+    def __init__(self, broadcaster):
+        Broadcaster.__init__(self)
+        Listener.__init__(self, broadcaster)
+    
+    def _repeat_message(self, msg):
+        if not self.REPEATED_NOTIFICATIONS or msg in self.REPEATED_NOTIFICATIONS:
+            self.notify(msg)
+    
+    def dispatch(self, msg):
+        if hasattr(self, msg):
+            Listener.dispatch(self, msg)
+        self._repeat_message(msg)
+    
