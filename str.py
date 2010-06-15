@@ -7,6 +7,7 @@
 # http://www.hardcoded.net/licenses/bsd_license
 
 import re
+import sys
 from math import ceil
 
 from .misc import cond
@@ -192,3 +193,11 @@ def process_tokens(s, handlers, data=None):
         return result
     
     return re_process_tokens.sub(replace, s)
+
+_valid_xml_range = ur'\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD'
+if sys.maxunicode > 0x10000:
+    _valid_xml_range += u'%s-%s' % (unichr(0x10000), unichr(min(sys.maxunicode, 0x10FFFF)))
+RE_INVALID_XML_SUB = re.compile(u'[^%s]' % _valid_xml_range, re.U).sub
+
+def remove_invalid_xml(s, replace_with=u' '):
+    return RE_INVALID_XML_SUB(replace_with, s)

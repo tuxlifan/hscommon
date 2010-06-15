@@ -8,6 +8,7 @@
 
 import unittest
 import warnings
+from nose.tools import eq_
 
 from ..str import *
 
@@ -194,6 +195,13 @@ class TCprocess_tokens(unittest.TestCase):
             return param
         self.assertEqual('foo bar',process_tokens('%foobar:foo bar%',handler))
     
+
+def test_remove_invalid_xml():
+    eq_(remove_invalid_xml(u'foo\0bar\x0bbaz'), u'foo bar baz')
+    # surrogate blocks have to be replaced, but not the rest
+    eq_(remove_invalid_xml(u'foo\ud800bar\udfffbaz\ue000'), u'foo bar baz\ue000')
+    # replace with something else
+    eq_(remove_invalid_xml('foo\0baz', replace_with='bar'), 'foobarbaz')
 
 warnings.resetwarnings()
 warnings.filterwarnings('always') #So that the warning test for format_size works.
