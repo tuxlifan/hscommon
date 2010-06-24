@@ -62,3 +62,8 @@ def test_extract():
     wheat, shaft = extract(lambda n: n % 2 == 0, range(10))
     eq_(wheat, [0, 2, 4, 6, 8])
     eq_(shaft, [1, 3, 5, 7, 9])
+
+def test_minmax():
+    eq_(minmax(2, 1, 3), 2)
+    eq_(minmax(0, 1, 3), 1)
+    eq_(minmax(4, 1, 3), 3)

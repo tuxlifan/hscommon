@@ -100,3 +100,8 @@ def tryint(value, default=0):
         return int(value)
     except (TypeError, ValueError):
         return default
+
+def minmax(value, min_value, max_value):
+    """Returns `value` or one of the min/max bounds if `value` is not between them.
+    """
+    return min(max(value, min_value), max_value)
