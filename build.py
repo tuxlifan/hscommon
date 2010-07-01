@@ -17,6 +17,7 @@ import plistlib
 from subprocess import Popen
 
 from .str import rem_file_ext
+from .files import modified_after
 
 def print_and_do(cmd):
     print cmd
@@ -40,6 +41,29 @@ def build_dmg(app_path, dest_path):
     print 'Building %s' % dmgname
     print_and_do('hdiutil create "%s" -format UDZO -nocrossdev -srcdir "%s"' % (op.join(dest_path, dmgname), dmgpath))
     print 'Build Complete'
+
+def build_cocoa_localization(model_path, loc_path):
+    """Use 'ibtool --strings-file' on all xib in loc_path using 'model_path' as a model.
+    
+    For example, if you give 'en.lproj' as model_path and 'fr.lproj' as loc_path, this function
+    looks in en.lproj for all xibs. For each of them, it looks if there's a .strings file of the
+    same name in fr.lproj. If there is, we use ibtool to merge the fr strings file with the en xib
+    and write it to fr.lproj. If there's no strings file, the xib is copied over to loc_path
+    """
+    xibs = [name for name in os.listdir(model_path) if name.endswith('.xib')]
+    for xib in xibs:
+        basename = rem_file_ext(xib)
+        model_xib = op.join(model_path, xib)
+        loc_strings = op.join(loc_path, basename+'.strings')
+        dest_xib = op.join(loc_path, xib)
+        if op.exists(loc_strings):
+            if modified_after(model_xib, dest_xib) or modified_after(loc_strings, dest_xib):
+                cmd = 'ibtool --strings-file {0} --write {1} {2}'
+                print_and_do(cmd.format(loc_strings, dest_xib, model_xib))
+        else:
+            if modified_after(model_xib, dest_xib):
+                print "Copying {0}".format(model_xib)
+                shutil.copy(model_xib, dest_xib)
 
 def add_to_pythonpath(path):
     """Adds `path` to both PYTHONPATH env and sys.path.
