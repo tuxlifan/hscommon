@@ -38,7 +38,7 @@ def path2str(path):
     # still have to wrap the path around str() instead of unicode.
     if not isinstance(path, Path):
         return path
-    if path._latin1_indexes:
+    if path.bogus_encoding:
         return str(path)
     else:
         return unicode(path)

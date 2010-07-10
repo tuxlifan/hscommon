@@ -69,6 +69,7 @@ class Path(object):
             if any(separator in x for x in value):
                 #We have a component with a separator in it. Let's rejoin it, and generate another path.
                 self._path = Path(separator.join(value), separator)._path
+                self._latin1_indexes = frozenset()
                 return
             anyuni = any(isinstance(x, unicode) for x in value)
             alluni = all(isinstance(x, unicode) for x in value)
@@ -150,4 +151,8 @@ class Path(object):
     
     def __unicode__(self):
         return unicode(join(self._path))
+    
+    @property
+    def bogus_encoding(self):
+        return bool(self._latin1_indexes)
     
