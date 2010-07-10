@@ -53,8 +53,11 @@ class Path(object):
         else:
             return object.__new__(cls)
     
-    def __init__(self, value, separator=None):
-        latin1_indexes = set()
+    def __init__(self, value, separator=None, latin1_indexes=None):
+        if not latin1_indexes:
+            latin1_indexes = set()
+        else:
+            latin1_indexes = set(latin1_indexes)
         if not separator:
             separator = os.sep
         if isinstance(value, basestring):
@@ -101,7 +104,10 @@ class Path(object):
         other = Path(other)
         if other and (not other[0]):
             other = other[1:]
-        return Path(self._path + other._path)
+        latin1_indexes = self._latin1_indexes
+        for i in other._latin1_indexes:
+            latin1_indexes.add(i+len(self._path))
+        return Path(self._path + other._path, latin1_indexes=latin1_indexes)
     
     def __contains__(self, item):
         if isinstance(item, Path):
@@ -121,7 +127,13 @@ class Path(object):
                 equal_elems = list(takewhile(lambda pair: pair[0] == pair[1], izip(reversed(self._path), reversed(key.stop._path))))
                 stop = -len(equal_elems) if equal_elems else None
                 key = slice(key.start, stop, key.step)
-            return Path(self._path.__getitem__(key))
+            latin1_indexes = set()
+            start = key.start or 0
+            stop = key.stop or len(self)
+            for i in self._latin1_indexes:
+                if start <= i < stop:
+                    latin1_indexes.add(i-key.start)
+            return Path(self._path.__getitem__(key), latin1_indexes=latin1_indexes)
         else:
             return self._path.__getitem__(key)
     

@@ -188,3 +188,12 @@ class TCPath(TestCase):
         p = Path((u'\xe9', '\xe9'))
         eq_(p, (u'\xe9', '\xe9'))
         eq_(str(p), u'\xe9'.encode('utf-8') + '/\xe9')
+    
+    def test_mixed_encodings_indicators_are_preserved_between_operations(self):
+        # When combining/dividing paths with mixed encodings, indicators for this mix are preserved.
+        self.mock(sys, 'getfilesystemencoding', lambda: 'utf-8')
+        p = Path((u'\xe9', '\xe9'))
+        p2 = p + 'foo'
+        eq_(str(p2), u'\xe9'.encode('utf-8') + '/\xe9/foo')
+        p3 = p2[1:]
+        eq_(str(p3), '\xe9/foo')
