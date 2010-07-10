@@ -11,6 +11,7 @@ import os.path as op
 
 from . import io
 from . import conflict
+from .path import Path
 
 def open_if_filename(infile, mode='rb'):
     """
@@ -18,6 +19,8 @@ def open_if_filename(infile, mode='rb'):
     if it is a string, a file will be opened with mode.
     Returns a tuple (shouldbeclosed,infile) infile is a file object
     """
+    if isinstance(infile, Path):
+        return (io.open(infile, mode), True)
     if isinstance(infile, basestring):
         return (open(infile, mode), True)
     else:
