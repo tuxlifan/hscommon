@@ -16,6 +16,8 @@ import os.path
 import shutil
 import logging
 
+from .path import Path
+
 def log_io_error(func):
     """ Catches OSError, IOError and WindowsError and log them
     """
@@ -30,50 +32,61 @@ def log_io_error(func):
     
     return wrapper
 
+def path2str(path):
+    # Most of the time, we want a simple path --> unicode conversion, but in rare cases, the 
+    # filesystem encoding is all messed up. Path instances automatically take care of these, but we
+    # still have to wrap the path around str() instead of unicode.
+    if not isinstance(path, Path):
+        return path
+    if path._latin1_indexes:
+        return str(path)
+    else:
+        return unicode(path)
+
 def copy(source_path, dest_path):
-    return shutil.copy(unicode(source_path), unicode(dest_path))
+    return shutil.copy(path2str(source_path), path2str(dest_path))
 
 def copytree(source_path, dest_path, *args, **kwargs):
-    return shutil.copytree(unicode(source_path), unicode(dest_path), *args, **kwargs)
+    return shutil.copytree(path2str(source_path), path2str(dest_path), *args, **kwargs)
 
 def exists(path):
-    return os.path.exists(unicode(path))
+    return os.path.exists(path2str(path))
 
 def isdir(path):
-    return os.path.isdir(unicode(path))
+    return os.path.isdir(path2str(path))
 
 def isfile(path):
-    return os.path.isfile(unicode(path))
+    return os.path.isfile(path2str(path))
 
 def islink(path):
-    return os.path.islink(unicode(path))
+    return os.path.islink(path2str(path))
 
 def listdir(path):
-    return os.listdir(unicode(path))
+    return os.listdir(path2str(path))
 
 def mkdir(path, *args, **kwargs):
-    return os.mkdir(unicode(path), *args, **kwargs)
+    return os.mkdir(path2str(path), *args, **kwargs)
 
 def makedirs(path, *args, **kwargs):
-    return os.makedirs(unicode(path), *args, **kwargs)
+    return os.makedirs(path2str(path), *args, **kwargs)
 
 def move(source_path, dest_path):
-    return shutil.move(unicode(source_path), unicode(dest_path))
+    return shutil.move(path2str(source_path), path2str(dest_path))
 
 def open(path, *args, **kwargs):
-    return __builtin__.open(unicode(path), *args, **kwargs)
+    return __builtin__.open(path2str(path), *args, **kwargs)
 
 def remove(path):
-    return os.remove(unicode(path))
+    return os.remove(path2str(path))
 
 def rename(source_path, dest_path):
-    return os.rename(unicode(source_path), unicode(dest_path))
+    return os.rename(path2str(source_path), path2str(dest_path))
 
 def rmdir(path):
-    return os.rmdir(unicode(path))
+    return os.rmdir(path2str(path))
 
 def rmtree(path):
-    return shutil.rmtree(unicode(path))
+    return shutil.rmtree(path2str(path))
 
 def stat(path):
-    return os.stat(unicode(path))
+    return os.stat(path2str(path))

@@ -9,7 +9,7 @@
 import unittest
 import sys
 
-from nose.tools import assert_raises
+from nose.tools import assert_raises, eq_
 
 from ..path import *
 from ..testcase import TestCase
@@ -20,27 +20,27 @@ class TCPath(TestCase):
     
     def test_empty(self):
         path = Path('')
-        self.assertEqual('',str(path))
-        self.assertEqual(0,len(path))
+        eq_('',str(path))
+        eq_(0,len(path))
         path = Path(())
-        self.assertEqual('',str(path))
-        self.assertEqual(0,len(path))
+        eq_('',str(path))
+        eq_(0,len(path))
     
     def test_single(self):
         path = Path('foobar')
-        self.assertEqual('foobar',path)
-        self.assertEqual(1,len(path))
+        eq_('foobar',path)
+        eq_(1,len(path))
     
     def test_multiple(self):
         path = Path('foo/bar')
-        self.assertEqual('foo/bar',path)
-        self.assertEqual(2,len(path))
+        eq_('foo/bar',path)
+        eq_(2,len(path))
     
     def test_init_with_tuple_and_list(self):
         path = Path(('foo','bar'))
-        self.assertEqual('foo/bar',path)
+        eq_('foo/bar',path)
         path = Path(['foo','bar'])
-        self.assertEqual('foo/bar',path)
+        eq_('foo/bar',path)
     
     def test_init_with_invalid_value(self):
         try:
@@ -51,52 +51,52 @@ class TCPath(TestCase):
     
     def test_access(self):
         path = Path('foo/bar/bleh')
-        self.assertEqual('foo',path[0])
-        self.assertEqual('foo',path[-3])
-        self.assertEqual('bar',path[1])
-        self.assertEqual('bar',path[-2])
-        self.assertEqual('bleh',path[2])
-        self.assertEqual('bleh',path[-1])
+        eq_('foo',path[0])
+        eq_('foo',path[-3])
+        eq_('bar',path[1])
+        eq_('bar',path[-2])
+        eq_('bleh',path[2])
+        eq_('bleh',path[-1])
     
     def test_slicing(self):
         path = Path('foo/bar/bleh')
         subpath = path[:2]
-        self.assertEqual('foo/bar',subpath)
+        eq_('foo/bar',subpath)
         self.assert_(isinstance(subpath,Path))
     
     def test_deal_with_empty_components(self):
         """Keep ONLY a leading space, which means we want a leading slash.
         """
-        self.assertEqual('foo//bar',str(Path(('foo','','bar'))))
-        self.assertEqual('/foo/bar',str(Path(('','foo','bar'))))
-        self.assertEqual('foo/bar',str(Path('foo/bar/')))
+        eq_('foo//bar',str(Path(('foo','','bar'))))
+        eq_('/foo/bar',str(Path(('','foo','bar'))))
+        eq_('foo/bar',str(Path('foo/bar/')))
 
     def test_old_compare_paths(self):
-        self.assertEqual(Path('foobar'),Path('foobar'))
-        self.assertEqual(Path('foobar/'),Path('foobar\\','\\'))
-        self.assertEqual(Path('/foobar/'),Path('\\foobar\\','\\'))
-        self.assertEqual(Path('/foo/bar'),Path('\\foo\\bar','\\'))
-        self.assertEqual(Path('/foo/bar'),Path('\\foo\\bar\\','\\'))
+        eq_(Path('foobar'),Path('foobar'))
+        eq_(Path('foobar/'),Path('foobar\\','\\'))
+        eq_(Path('/foobar/'),Path('\\foobar\\','\\'))
+        eq_(Path('/foo/bar'),Path('\\foo\\bar','\\'))
+        eq_(Path('/foo/bar'),Path('\\foo\\bar\\','\\'))
         self.assertNotEqual(Path('/foo/bar'),Path('\\foo\\foo','\\'))
         #We also have to test __ne__
         self.assert_(not (Path('foobar') != Path('foobar')))
         self.assert_(Path('/a/b/c.x') != Path('/a/b/c.y'))
     
     def test_old_split_path(self):
-        self.assertEqual(Path('foobar'),('foobar',))
-        self.assertEqual(Path('foo/bar'),('foo','bar'))
-        self.assertEqual(Path('/foo/bar/'),('','foo','bar'))
-        self.assertEqual(Path('\\foo\\bar','\\'),('','foo','bar'))
+        eq_(Path('foobar'),('foobar',))
+        eq_(Path('foo/bar'),('foo','bar'))
+        eq_(Path('/foo/bar/'),('','foo','bar'))
+        eq_(Path('\\foo\\bar','\\'),('','foo','bar'))
     
     def test_representation(self):
-        self.assertEqual("('foo', 'bar')",repr(Path(('foo','bar'))))
+        eq_("('foo', 'bar')",repr(Path(('foo','bar'))))
     
     def test_add(self):
-        self.assertEqual('foo/bar/bar/foo',Path(('foo','bar')) + Path('bar/foo'))
-        self.assertEqual('foo/bar/bar/foo',Path('foo/bar') + 'bar/foo')
-        self.assertEqual('foo/bar/bar/foo',Path('foo/bar') + ('bar','foo'))
-        self.assertEqual('foo/bar/bar/foo',('foo','bar') + Path('bar/foo'))
-        self.assertEqual('foo/bar/bar/foo','foo/bar' + Path('bar/foo'))
+        eq_('foo/bar/bar/foo',Path(('foo','bar')) + Path('bar/foo'))
+        eq_('foo/bar/bar/foo',Path('foo/bar') + 'bar/foo')
+        eq_('foo/bar/bar/foo',Path('foo/bar') + ('bar','foo'))
+        eq_('foo/bar/bar/foo',('foo','bar') + Path('bar/foo'))
+        eq_('foo/bar/bar/foo','foo/bar' + Path('bar/foo'))
         #Invalid concatenation
         try:
             Path(('foo','bar')) + 1
@@ -108,42 +108,42 @@ class TCPath(TestCase):
         foo = Path('foo')
         bar = Path('bar')
         foobar = Path('foo/bar')
-        self.assertEqual('bar',foobar[foo:])
-        self.assertEqual('foo',foobar[:bar])
-        self.assertEqual('foo/bar',foobar[bar:])
-        self.assertEqual('foo/bar',foobar[:foo])
-        self.assertEqual((),foobar[foobar:])
-        self.assertEqual((),foobar[:foobar])
+        eq_('bar',foobar[foo:])
+        eq_('foo',foobar[:bar])
+        eq_('foo/bar',foobar[bar:])
+        eq_('foo/bar',foobar[:foo])
+        eq_((),foobar[foobar:])
+        eq_((),foobar[:foobar])
         abcd = Path('a/b/c/d')
         a = Path('a')
         b = Path('b')
         c = Path('c')
         d = Path('d')
         z = Path('z')
-        self.assertEqual('b/c',abcd[a:d])
-        self.assertEqual('b/c/d',abcd[a:d+z])
-        self.assertEqual('b/c',abcd[a:z+d])
-        self.assertEqual('a/b/c/d',abcd[:z])
+        eq_('b/c',abcd[a:d])
+        eq_('b/c/d',abcd[a:d+z])
+        eq_('b/c',abcd[a:z+d])
+        eq_('a/b/c/d',abcd[:z])
     
     def test_add_with_root_path(self):
         """if I perform /a/b/c + /d/e/f, I want /a/b/c/d/e/f, not /a/b/c//d/e/f
         """
-        self.assertEqual('/foo/bar',str(Path('/foo') + Path('/bar')))
+        eq_('/foo/bar',str(Path('/foo') + Path('/bar')))
     
     def test_create_with_tuple_that_have_slash_inside(self):
-        self.assertEqual(('','foo','bar'), Path(('/foo','bar')))
+        eq_(('','foo','bar'), Path(('/foo','bar')))
         self.mock(os, 'sep', '\\')
-        self.assertEqual(('','foo','bar'), Path(('\\foo','bar')))
+        eq_(('','foo','bar'), Path(('\\foo','bar')))
     
     def test_auto_decode_os_sep(self):
         """Path should decode any either / or os.sep, but always encode in os.sep.
         """
-        self.assertEqual(('foo\\bar','bleh'),Path('foo\\bar/bleh'))
+        eq_(('foo\\bar','bleh'),Path('foo\\bar/bleh'))
         self.mock(os, 'sep', '\\')
-        self.assertEqual(('foo','bar/bleh'),Path('foo\\bar/bleh'))
+        eq_(('foo','bar/bleh'),Path('foo\\bar/bleh'))
         path = Path('foo/bar')
-        self.assertEqual(('foo','bar'),path)
-        self.assertEqual('foo\\bar',str(path))
+        eq_(('foo','bar'),path)
+        eq_('foo\\bar',str(path))
     
     def test_contains(self):
         p = Path(('foo','bar'))
@@ -155,35 +155,36 @@ class TCPath(TestCase):
     
     def test_windows_drive_letter(self):
         p = Path(('c:',))
-        self.assertEqual('c:\\',str(p))
+        eq_('c:\\',str(p))
     
     def test_root_path(self):
         p = Path('/')
-        self.assertEqual('/',str(p))
+        eq_('/',str(p))
     
     def test_str_encodes_unicode_to_getfilesystemencoding(self):
         p = Path(('foo',u'bar\u00e9'))
-        self.assertEqual(u'foo/bar\u00e9'.encode(sys.getfilesystemencoding()),str(p))
+        eq_(u'foo/bar\u00e9'.encode(sys.getfilesystemencoding()),str(p))
     
     def test_unicode(self):
         p = Path(('foo',u'bar\u00e9'))
-        self.assertEqual(u'foo/bar\u00e9',unicode(p))
+        eq_(u'foo/bar\u00e9',unicode(p))
     
     def test_str_repr_of_mix_between_non_ascii_str_and_unicode(self):
         u = u'foo\u00e9'
         encoded = u.encode(sys.getfilesystemencoding())
         p = Path((encoded,u'bar'))
-        self.assertEqual('%s/bar' % encoded,str(p))
+        eq_('%s/bar' % encoded,str(p))
     
     def test_Path_of_a_Path_returns_self(self):
         #if Path() is called with a path as value, just return value.
         p = Path('foo/bar')
         self.assert_(Path(p) is p)
     
-    def test_log_unicode_errors(self):
-        # When an there's a UnicodeDecodeError on path creation, log it so it can be possible
-        # to debug the cause of it.
-        self.mock(sys, 'getfilesystemencoding', lambda: 'ascii')
-        assert_raises(UnicodeDecodeError, Path, [u'', 'foo\xe9'])
-        assert repr('foo\xe9') in self.logged.getvalue()
-    
+    def test_mix_encodings(self):
+        # When a string can't be decoded with the default system encoding, we use latin-1 encoding
+        # to decode it. Also, when it's time to re-encode, the Path remembers which parts of the
+        # path were decoded in latin-1 and re-encodes them in latin-1.
+        self.mock(sys, 'getfilesystemencoding', lambda: 'utf-8')
+        p = Path((u'\xe9', '\xe9'))
+        eq_(p, (u'\xe9', '\xe9'))
+        eq_(str(p), u'\xe9'.encode('utf-8') + '/\xe9')

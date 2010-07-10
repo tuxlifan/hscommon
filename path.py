@@ -11,7 +11,25 @@ import os
 import sys
 from itertools import takewhile, izip
 
-class Path(tuple):
+# Sometimes, filesystems have filenames in the wrong encoding. That's tricky. In these cases, what
+# we do is to decode them in latin-1 (which is the most common non-utf8 encoding). This encoding
+# will decode all characters, so even if this decoding might end up with messy characters, at least
+# there will be no crash. Moreover, the Path remembers which parts of itself was bogus and re-uses
+# FALLBACK_ENCODING when encoding itself. This way, we end up referring to the same file path.
+FALLBACK_ENCODING = 'latin-1'
+
+def join(values):
+    uni = not values or isinstance(values[0], unicode)
+    if len(values) == 1:
+        first = values[0]
+        if (len(first) == 2) and (first[1] == ':'): #Windows drive letter
+            return (first + u'\\') if uni else (first + '\\')
+        elif not len(first): #root directory
+            return u'/' if uni else '/'
+    sep = unicode(os.sep) if uni else str(os.sep)
+    return sep.join(values)
+
+class Path(object):
     """A handy class to work with paths.
     
     path[index] returns a string
@@ -29,19 +47,14 @@ class Path(tuple):
     be converted to str only at the last moment (when it is needed in an external function, such
     as os.rename)
     """
-    def __new__(cls, value, separator=None):
-        def unicode_if_needed(s):
-            if isinstance(s, unicode):
-                return s
-            else:
-                try:
-                    return unicode(s, sys.getfilesystemencoding())
-                except UnicodeDecodeError:
-                    logging.warning("Could not decode %r", s)
-                    raise
-        
+    def __new__(cls, value, *args, **kwargs):
         if isinstance(value, Path):
             return value
+        else:
+            return object.__new__(cls)
+    
+    def __init__(self, value, separator=None):
+        latin1_indexes = set()
         if not separator:
             separator = os.sep
         if isinstance(value, basestring):
@@ -55,46 +68,64 @@ class Path(tuple):
             #value is a tuple/list
             if any(separator in x for x in value):
                 #We have a component with a separator in it. Let's rejoin it, and generate another path.
-                return Path(separator.join(value), separator)
-            if any(isinstance(x, unicode) for x in value):
-                value = [unicode_if_needed(x) for x in value]
+                self._path = Path(separator.join(value), separator)._path
+                return
+            anyuni = any(isinstance(x, unicode) for x in value)
+            alluni = all(isinstance(x, unicode) for x in value)
+            if anyuni and not alluni:
+                univalues = []
+                for i, x in enumerate(value):
+                    if isinstance(x, unicode):
+                        univalues.append(x)
+                    else:
+                        try:
+                            univalues.append(unicode(x, sys.getfilesystemencoding()))
+                        except UnicodeDecodeError:
+                            logging.warning("Could not decode %r", x)
+                            univalues.append(unicode(x, FALLBACK_ENCODING))
+                            latin1_indexes.add(i)
+                value = univalues
         if (len(value) > 1) and (not value[-1]):
             value = value[:-1] #We never want a path to end with a '' (because Path() can be called with a trailing slash ending path)
-        return tuple.__new__(cls, value)
+        self._path = tuple(value)
+        self._latin1_indexes = frozenset(latin1_indexes)
+    
+    def __repr__(self):
+        return repr(self._path)
+    
+    def __len__(self):
+        return len(self._path)
     
     def __add__(self, other):
         other = Path(other)
         if other and (not other[0]):
             other = other[1:]
-        return Path(tuple.__add__(self, other))
+        return Path(self._path + other._path)
     
     def __contains__(self, item):
         if isinstance(item, Path):
             return item[:len(self)] == self
         else:
-            return tuple.__contains__(self, item)
+            return item in self._path
     
     def __eq__(self, other):
-        return tuple.__eq__(self, Path(other))
+        return self._path == Path(other)._path
     
     def __getitem__(self, key):
         if isinstance(key, slice):
             if isinstance(key.start, Path):
-                equal_elems = list(takewhile(lambda pair: pair[0] == pair[1], izip(self, key.start)))
+                equal_elems = list(takewhile(lambda pair: pair[0] == pair[1], izip(self._path, key.start._path)))
                 key = slice(len(equal_elems), key.stop, key.step)
             if isinstance(key.stop, Path):
-                equal_elems = list(takewhile(lambda pair: pair[0] == pair[1], izip(reversed(self), reversed(key.stop))))
+                equal_elems = list(takewhile(lambda pair: pair[0] == pair[1], izip(reversed(self._path), reversed(key.stop._path))))
                 stop = -len(equal_elems) if equal_elems else None
                 key = slice(key.start, stop, key.step)
-            return Path(tuple.__getitem__(self, key))
+            return Path(self._path.__getitem__(key))
         else:
-            return tuple.__getitem__(self, key)
-    
-    def __getslice__(self, i, j): #I have to override it because tuple uses it.
-        return Path(tuple.__getslice__(self, i, j))
+            return self._path.__getitem__(key)
     
     def __hash__(self):
-        return tuple.__hash__(self)
+        return hash(self._path)
     
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -103,14 +134,20 @@ class Path(tuple):
         return Path(other) + self
     
     def __str__(self):
-        return unicode(self).encode(sys.getfilesystemencoding())
+        if not self._latin1_indexes:
+            return unicode(self).encode(sys.getfilesystemencoding())
+        else:
+            sysenc = sys.getfilesystemencoding()
+            values = []
+            for i, x in enumerate(self._path):
+                if not isinstance(x, unicode):
+                    values.append(x)
+                elif i in self._latin1_indexes:
+                    values.append(x.encode(FALLBACK_ENCODING))
+                else:
+                    values.append(x.encode(sysenc))
+            return join(values)
     
     def __unicode__(self):
-        if len(self) == 1:
-            first = self[0]
-            if (len(first) == 2) and (first[1] == ':'): #Windows drive letter
-                return first + u'\\'
-            elif not len(first): #root directory
-                return u'/'
-        return unicode(os.sep.join(self))
+        return unicode(join(self._path))
     
