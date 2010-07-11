@@ -10,8 +10,8 @@ from datetime import datetime, date
 import logging
 import sqlite3 as sqlite
 
-from . import io
-from .path import Path
+from hsutil import io
+from hsutil.path import Path
 
 
 class Currency(object):

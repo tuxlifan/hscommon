@@ -1,15 +1,15 @@
 =============================================
-hsutil - Little tools used throughout HS apps
+hscommon - Common code used throughout HS apps
 =============================================
 
 :Author: `Hardcoded Software <http://www.hardcoded.net>`_
-:Dev website: http://hg.hardcoded.net/hsutil
+:Dev website: http://hg.hardcoded.net/hscommon
 :License: BSD License
 
 Introduction
 ============
 
-``hsutil`` is a collection of tools used throughout HS apps. It manage their build process, their job progress, their tests, etc..
+``hscommon`` is a collection of tools used throughout HS apps. It manage their build process, their job progress, their tests, etc.. Historically, the code contained here was in ``hsutil``, but I made a split so that code that was useful exclusively in HS apps would go in ``hscommon``.
 
 Dependencies
 ============
@@ -24,18 +24,9 @@ API Documentation
    
    build
    cocoa
-   conflict
    currency
-   decorators
-   files
-   io
    job
    markable
-   misc
    notify
-   path
    reg
    sqlite
-   str
-   testutil
-   weak

@@ -12,7 +12,7 @@ import os
 import os.path as op
 import sqlite3 as sqlite
 
-from ..testcase import TestCase
+from hsutil.testcase import TestCase
 from ..sqlite import ThreadedConn
 
 class TCThreadedConn(TestCase):

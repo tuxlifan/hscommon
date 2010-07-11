@@ -13,9 +13,9 @@ import sqlite3 as sqlite
 
 from nose.tools import eq_, assert_almost_equal, with_setup
 
-from .. import io
+from hsutil import io
+from hsutil.testutil import with_tmpdir
 from ..currency import Currency, RatesDB, CAD, EUR, PLN, USD
-from ..testutil import with_tmpdir
 
 def teardown():
     Currency.set_rates_db(None)
