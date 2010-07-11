@@ -33,11 +33,6 @@ class TCopen_if_filename(TestCase):
         self.assertEqual('a', file.mode)
         file.close()
     
-    def test_can_pass_Path_instance(self):
-        fp, close = open_if_filename(Path(self.filepath('utils/test.txt')))
-        self.assertTrue(close)
-        self.assertEqual('test_data', fp.read())
-        fp.close()
 
 class TCFileOrPath(TestCase):
     def test_path(self):

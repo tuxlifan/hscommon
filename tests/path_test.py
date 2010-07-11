@@ -180,20 +180,10 @@ class TCPath(TestCase):
         p = Path('foo/bar')
         self.assert_(Path(p) is p)
     
-    def test_mix_encodings(self):
-        # When a string can't be decoded with the default system encoding, we use latin-1 encoding
-        # to decode it. Also, when it's time to re-encode, the Path remembers which parts of the
-        # path were decoded in latin-1 and re-encodes them in latin-1.
-        self.mock(sys, 'getfilesystemencoding', lambda: 'utf-8')
-        p = Path((u'\xe9', '\xe9'))
-        eq_(p, (u'\xe9', '\xe9'))
-        eq_(str(p), u'\xe9'.encode('utf-8') + '/\xe9')
+    def test_log_unicode_errors(self):
+        # When an there's a UnicodeDecodeError on path creation, log it so it can be possible
+        # to debug the cause of it.
+        self.mock(sys, 'getfilesystemencoding', lambda: 'ascii')
+        assert_raises(UnicodeDecodeError, Path, [u'', 'foo\xe9'])
+        assert repr('foo\xe9') in self.logged.getvalue()
     
-    def test_mixed_encodings_indicators_are_preserved_between_operations(self):
-        # When combining/dividing paths with mixed encodings, indicators for this mix are preserved.
-        self.mock(sys, 'getfilesystemencoding', lambda: 'utf-8')
-        p = Path((u'\xe9', '\xe9'))
-        p2 = p + 'foo'
-        eq_(str(p2), u'\xe9'.encode('utf-8') + '/\xe9/foo')
-        p3 = p2[1:]
-        eq_(str(p3), '\xe9/foo')
