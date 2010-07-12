@@ -16,8 +16,8 @@ import tempfile
 import plistlib
 from subprocess import Popen
 
-from .str import rem_file_ext
-from .files import modified_after
+from hsutil.str import rem_file_ext
+from hsutil.files import modified_after
 
 def print_and_do(cmd):
     print cmd

@@ -37,7 +37,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'hsutil'
+project = u'hscommon'
 copyright = u'2010, Hardcoded Software'
 
 # The version info for the project you're documenting, acts as replacement for
