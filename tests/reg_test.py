@@ -11,7 +11,7 @@ from __future__ import unicode_literals
 
 from hashlib import md5
 
-from nose.tools import eq_, assert_raises
+from hsutil.testutil import eq_, assert_raises
 
 from ..reg import RegistrableApplication, InvalidCodeError
 

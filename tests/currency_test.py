@@ -11,10 +11,8 @@ from __future__ import division
 from datetime import date
 import sqlite3 as sqlite
 
-from nose.tools import eq_, assert_almost_equal, with_setup
-
 from hsutil import io
-from hsutil.testutil import with_tmpdir
+from hsutil.testutil import with_tmpdir, eq_, assert_almost_equal, with_setup
 from ..currency import Currency, RatesDB, CAD, EUR, PLN, USD
 
 def teardown():
