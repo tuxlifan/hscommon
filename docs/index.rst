@@ -14,7 +14,7 @@ Introduction
 Dependencies
 ============
 
-Python 2.6 is required. `Nose <http://somethingaboutorange.com/mrl/projects/nose/>`_ is required to run the tests.
+Python 2.6 is required. `py.test <http://codespeak.net/py/dist/test/>`_ is required to run the tests.
 
 API Documentation
 =================
