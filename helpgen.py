@@ -88,9 +88,29 @@ class Page(object):
         self.basepath = Path(self.name)[:-1]
         self.path = pagespath + self.basepath + '{0}.md'.format(self.basename)
         self.title = pagedata['title']
+        self.relpath = '../' * len(self.basepath)
+        self.meta = ''
+    
+    def render(self, destpath, menu, env):
+        dest = destpath + self.basepath + '{0}.htm'.format(self.basename)
+        if not io.exists(dest[:-1]):
+            io.makedirs(dest[:-1])
+        mdcontents = unicode(io.open(self.path).read(), 'utf-8')
+        mdcontents = mdcontents.format(**env)
+        main_contents = markdown.markdown(mdcontents)
+        rendered = MAIN_CONTENTS.format(meta=self.meta, title=self.title, relpath=self.relpath,
+            menu=menu, contents=main_contents)
+        fp = io.open(dest, 'w')
+        fp.write(rendered.encode('utf-8'))
+        fp.close()
+    
+
+class MainPage(Page):
+    def __init__(self, pagedata, pagespath):
+        Page.__init__(self, pagedata, pagespath)
         self.menutitle = pagedata['menutitle']
         self.menudesc = pagedata.get('menudesc', self.title)
-        self.relpath = '../' * len(self.basepath)
+        self.subpages = [Page(data, pagespath) for data in pagedata.get('subpages', [])]
     
     def build_menu(self, pages):
         menu_items = []
@@ -102,13 +122,11 @@ class Page(object):
             menu_items.append(contents)
         return ''.join(menu_items)
     
-    def render(self, pages, env, meta):
+    def render(self, destpath, pages, env):
         menu = self.build_menu(pages)
-        mdcontents = unicode(io.open(self.path).read(), 'utf-8')
-        mdcontents = mdcontents.format(**env)
-        main_contents = markdown.markdown(mdcontents)
-        return MAIN_CONTENTS.format(meta=meta, title=self.title, relpath=self.relpath, menu=menu,
-            contents=main_contents)
+        for page in self.subpages:
+            page.render(destpath, menu, env)
+        Page.render(self, destpath, menu, env)
     
 
 def render_changelog(changelog, tixurl):
@@ -135,23 +153,20 @@ def gen(basepath, destpath, profile=None):
     changelogpath = basepath + conf['changelog']
     changelogdata = yaml.load(io.open(changelogpath))
     changelog = render_changelog(changelogdata, tixurl)
-    envpath = basepath + conf['env']
-    env = yaml.load(io.open(envpath))
+    if 'env' in conf:
+        envpath = basepath + conf['env']
+        env = yaml.load(io.open(envpath))
+    else:
+        env = {}
     env['changelog'] = changelog
     pagespath = basepath + conf['pages']
     pagedatas = yaml.load(io.open(pagespath))
-    pages = [Page(pagedata, pagespath=pagespath[:-1]) for pagedata in pagedatas]
+    pages = [MainPage(pagedata, pagespath=pagespath[:-1]) for pagedata in pagedatas]
     skelpath = basepath + Path(conf['skeleton'])
     if not io.exists(destpath):
         print "Copying skeleton"
         io.copytree(skelpath, destpath)
+    pages[0].meta = conf.get('firstpage_meta', '')
     for i, page in enumerate(pages):
         print "Rendering {0}".format(page.name)
-        dest = destpath + page.basepath + '{0}.htm'.format(page.basename)
-        if not io.exists(dest[:-1]):
-            io.makedirs(dest[:-1])
-        meta = conf.get('firstpage_meta', '') if i == 0 else ''
-        rendered = page.render(pages, env, meta)
-        fp = io.open(dest, 'w')
-        fp.write(rendered.encode('utf-8'))
-        fp.close()
+        page.render(destpath, pages, env)
