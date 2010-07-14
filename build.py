@@ -81,10 +81,15 @@ def add_to_pythonpath(path):
 def copy_packages(packages_names, dest):
     ignore = shutil.ignore_patterns('.hg', 'tests', 'testdata', 'modules', 'docs')
     for package_name in packages_names:
+        if op.exists(package_name):
+            source_path = package_name
+        else:
+            mod = __import__(package_name)
+            source_path = op.dirname(mod.__file__)
         dest_name = op.basename(package_name) # the package name can be a path as well
         dest_path = op.join(dest, dest_name)
-        print "Copying package {0} to {1}".format(package_name, dest_path)
-        shutil.copytree(package_name, dest_path, ignore=ignore)
+        print "Copying package at {0} to {1}".format(source_path, dest_path)
+        shutil.copytree(source_path, dest_path, ignore=ignore)
 
 def copy_qt_plugins(folder_names, dest): # This is only for Windows
     from .files import find_in_path
