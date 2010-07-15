@@ -92,7 +92,7 @@ def copy_packages(packages_names, dest):
         shutil.copytree(source_path, dest_path, ignore=ignore)
 
 def copy_qt_plugins(folder_names, dest): # This is only for Windows
-    from .files import find_in_path
+    from hsutil.files import find_in_path
     qmake_path = find_in_path('qmake.exe')
     print repr(qmake_path)
     qt_dir = op.split(op.dirname(qmake_path))[0]
