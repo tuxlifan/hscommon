@@ -128,5 +128,7 @@ def pythonify(o):
         return [pythonify(item) for item in o]
     elif isinstance(o, NSDictionary):
         return dict((pythonify(k), pythonify(v)) for k, v in o.items())
+    elif isinstance(o, (bool, int, list, dict, basestring)):
+        return o # already pythonified
     logging.warning('Could not pythonify {0} (of type {1}'.format(repr(o), type(o)))
     return o
