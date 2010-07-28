@@ -116,9 +116,6 @@ class PyTable(PyGUIObject):
     def canEditColumn_atRow_(self, column, row):
         return self.py.can_edit_cell(column, row)
     
-    def changeColumns_(self, columns):
-        self.py.change_columns(list(columns))
-    
     def deleteSelectedRows(self):
         self.py.delete()
     
