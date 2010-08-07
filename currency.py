@@ -258,8 +258,8 @@ class RatesDB(object):
     def __init__(self, db_or_path=':memory:'):
         self._cache = {} # {(date, currency): CAD value
         self.db_or_path = db_or_path
-        if isinstance(db_or_path, (basestring, Path)):
-            self.con = sqlite.connect(unicode(db_or_path))
+        if isinstance(db_or_path, (str, Path)):
+            self.con = sqlite.connect(str(db_or_path))
         else:
             self.con = db_or_path
         self._execute("select * from rates where 1=2")
@@ -283,10 +283,10 @@ class RatesDB(object):
                 create_tables()
         except sqlite.DatabaseError: # corrupt db
             logging.warning("Corrupt currency database at {0}. Starting over.".format(repr(self.db_or_path)))
-            if isinstance(self.db_or_path, (basestring, Path)):
+            if isinstance(self.db_or_path, (str, Path)):
                 self.con.close()
                 io.remove(Path(self.db_or_path))
-                self.con = sqlite.connect(unicode(self.db_or_path))
+                self.con = sqlite.connect(str(self.db_or_path))
             else:
                 logging.warning("Can't re-use the file, using a memory table")
                 self.con = sqlite.connect(':memory:')

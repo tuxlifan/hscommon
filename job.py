@@ -232,7 +232,7 @@ class ThreadedJobPerformer(object):
         """
         if self._last_error is not None:
             type, value, tb = self._last_error
-            raise type, value, tb
+            raise type(value).with_traceback(tb)
     
     def _update_progress(self, newprogress, newdesc=''):
         self.last_progress = newprogress

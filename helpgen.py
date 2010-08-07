@@ -7,7 +7,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from __future__ import unicode_literals
+
 
 import re
 import yaml
@@ -95,7 +95,7 @@ class Page(object):
         dest = destpath + self.basepath + '{0}.htm'.format(self.basename)
         if not io.exists(dest[:-1]):
             io.makedirs(dest[:-1])
-        mdcontents = unicode(io.open(self.path).read(), 'utf-8')
+        mdcontents = str(io.open(self.path).read(), 'utf-8')
         mdcontents = mdcontents.format(**env)
         main_contents = markdown.markdown(mdcontents)
         rendered = MAIN_CONTENTS.format(meta=self.meta, title=self.title, relpath=self.relpath,
@@ -164,9 +164,9 @@ def gen(basepath, destpath, profile=None):
     pages = [MainPage(pagedata, pagespath=pagespath[:-1]) for pagedata in pagedatas]
     skelpath = basepath + Path(conf['skeleton'])
     if not io.exists(destpath):
-        print "Copying skeleton"
+        print("Copying skeleton")
         io.copytree(skelpath, destpath)
     pages[0].meta = conf.get('firstpage_meta', '')
     for i, page in enumerate(pages):
-        print "Rendering {0}".format(page.name)
+        print("Rendering {0}".format(page.name))
         page.render(destpath, pages, env)

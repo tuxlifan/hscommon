@@ -117,11 +117,11 @@ class TCThreadedConn(TestCase):
     
     def test_non_ascii_dbname(self):
         tmpdir = self.tmpdir()
-        ThreadedConn(op.join(tmpdir, u'foo\u00e9.db'), True)
+        ThreadedConn(op.join(tmpdir, 'foo\u00e9.db'), True)
     
     def test_non_ascii_dbdir(self):
         # when this test fails, it doesn't fail gracefully, it brings the whole test suite with it.
         tmpdir = self.tmpdir()
-        os.mkdir(op.join(tmpdir, u'foo\u00e9'))
-        ThreadedConn(op.join(tmpdir, u'foo\u00e9', 'foo.db'), True)
+        os.mkdir(op.join(tmpdir, 'foo\u00e9'))
+        ThreadedConn(op.join(tmpdir, 'foo\u00e9', 'foo.db'), True)
     

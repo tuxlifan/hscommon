@@ -12,7 +12,7 @@ from ..markable import *
 class TCMarkable(unittest.TestCase):
     def gen(self):
         ml = MarkableList()
-        ml.extend(range(10))
+        ml.extend(list(range(10)))
         return ml
 
     def test_unmarked(self):
@@ -151,7 +151,7 @@ class TCMarkable(unittest.TestCase):
             def _is_markable(self, o):
                 return o != 4
         ml = MyMarkableList()
-        ml.extend(range(10))
+        ml.extend(list(range(10)))
         ml.mark_invert()
         self.assert_(ml.is_marked(1))
         self.assert_(not ml.is_marked(4))

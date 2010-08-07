@@ -7,7 +7,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/hs_license
 
-from __future__ import unicode_literals
+
 
 from hashlib import md5
 
@@ -16,14 +16,14 @@ from hsutil.testutil import eq_, assert_raises
 from ..reg import RegistrableApplication, InvalidCodeError
 
 def md5s(s):
-    return md5(s).hexdigest()
+    return md5(s.encode('utf-8')).hexdigest()
 
 def assert_valid(appid, code, email):
     app = RegistrableApplication(appid)
     try:
         app.validate_code(code, email)
     except InvalidCodeError as e:
-        raise AssertionError("Registration failed: {0}".format(unicode(e)))
+        raise AssertionError("Registration failed: {0}".format(str(e)))
 
 def assert_invalid(appid, code, email, msg_contains=None):
     app = RegistrableApplication(appid)
@@ -31,7 +31,7 @@ def assert_invalid(appid, code, email, msg_contains=None):
         app.validate_code(code, email)
     except InvalidCodeError as e:
         if msg_contains:
-            assert msg_contains in unicode(e)
+            assert msg_contains in str(e)
     else:
         raise AssertionError("InvalidCodeError not raised")
 

@@ -6,7 +6,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from __future__ import unicode_literals
+
 
 import os
 import sys
@@ -20,7 +20,7 @@ from hsutil.str import rem_file_ext
 from hsutil.files import modified_after
 
 def print_and_do(cmd):
-    print cmd
+    print(cmd)
     p = Popen(cmd, shell=True)
     p.wait()
 
@@ -30,7 +30,7 @@ def build_all_qt_ui(base_dir='.'):
     compileUiDir(base_dir, map=mapper)
 
 def build_dmg(app_path, dest_path):
-    print repr(op.join(app_path, 'Contents', 'Info.plist'))
+    print(repr(op.join(app_path, 'Contents', 'Info.plist')))
     plist = plistlib.readPlist(op.join(app_path, 'Contents', 'Info.plist'))
     workpath = tempfile.mkdtemp()
     dmgpath = op.join(workpath, plist['CFBundleName'])
@@ -38,9 +38,9 @@ def build_dmg(app_path, dest_path):
     print_and_do('cp -R "%s" "%s"' % (app_path, dmgpath))
     print_and_do('ln -s /Applications "%s"' % op.join(dmgpath, 'Applications'))
     dmgname = '%s_osx_%s.dmg' % (plist['CFBundleName'].lower().replace(' ', '_'), plist['CFBundleVersion'].replace('.', '_'))
-    print 'Building %s' % dmgname
+    print('Building %s' % dmgname)
     print_and_do('hdiutil create "%s" -format UDZO -nocrossdev -srcdir "%s"' % (op.join(dest_path, dmgname), dmgpath))
-    print 'Build Complete'
+    print('Build Complete')
 
 def build_cocoa_localization(model_path, loc_path):
     """Use 'ibtool --strings-file' on all xib in loc_path using 'model_path' as a model.
@@ -62,7 +62,7 @@ def build_cocoa_localization(model_path, loc_path):
                 print_and_do(cmd.format(loc_strings, dest_xib, model_xib))
         else:
             if modified_after(model_xib, dest_xib):
-                print "Copying {0}".format(model_xib)
+                print("Copying {0}".format(model_xib))
                 shutil.copy(model_xib, dest_xib)
 
 def add_to_pythonpath(path):
@@ -88,15 +88,15 @@ def copy_packages(packages_names, dest):
             source_path = op.dirname(mod.__file__)
         dest_name = op.basename(package_name) # the package name can be a path as well
         dest_path = op.join(dest, dest_name)
-        print "Copying package at {0} to {1}".format(source_path, dest_path)
+        print("Copying package at {0} to {1}".format(source_path, dest_path))
         shutil.copytree(source_path, dest_path, ignore=ignore)
 
 def copy_qt_plugins(folder_names, dest): # This is only for Windows
     from hsutil.files import find_in_path
     qmake_path = find_in_path('qmake.exe')
-    print repr(qmake_path)
+    print(repr(qmake_path))
     qt_dir = op.split(op.dirname(qmake_path))[0]
-    print repr(qt_dir)
+    print(repr(qt_dir))
     qt_plugin_dir = op.join(qt_dir, 'plugins')
     def ignore(path, names):
         if path == qt_plugin_dir:

@@ -156,7 +156,7 @@ class TCJob(unittest.TestCase):
     
     def test_iter_with_progress(self):
         j = job.Job(1, self.callback)
-        seq = range(5)
+        seq = list(range(5))
         for i in j.iter_with_progress(seq):
             self.assertEqual(self.lastprogress, i * 20)
         self.assertEqual(self.lastprogress, 100)
@@ -164,7 +164,7 @@ class TCJob(unittest.TestCase):
     def test_iter_with_progress_desc(self):
         # It's possible to pass a desc format to iter_with_progress
         j = job.Job(1, self.callback)
-        seq = range(5)
+        seq = list(range(5))
         for i in j.iter_with_progress(seq, 'Processed %d items of %d'):
             self.assertEqual(self.lastdesc, 'Processed %d items of 5' % i)
         self.assertEqual(self.lastdesc, 'Processed 5 items of 5')
@@ -172,7 +172,7 @@ class TCJob(unittest.TestCase):
     def test_iter_with_progress_desc_every(self):
         # It's possible to pass a 'every' arg to iter_with_progress, which is less taxing
         j = job.Job(1, self.callback)
-        seq = range(5)
+        seq = list(range(5))
         for i in j.iter_with_progress(seq, 'Processed %d items of %d', 2):
             if i % 2 == 0:
                 self.assertEqual(self.lastdesc, 'Processed %d items of 5' % i)

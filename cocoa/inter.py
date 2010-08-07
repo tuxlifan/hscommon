@@ -88,8 +88,8 @@ class PyOutline(PyGUIObject):
         try:
             return getattr(self.py.get_node(path), property)
         except IndexError:
-            logging.warning(u"%r doesn't have a node at path %r", self.py, path)
-            return u''
+            logging.warning("%r doesn't have a node at path %r", self.py, path)
+            return ''
     
     def setProperty_value_atPath_(self, property, value, path):
         setattr(self.py.get_node(path), property, value)
@@ -186,7 +186,7 @@ class PyRegistrable(NSObject):
             self.py.validate_code(code, email)
             return None
         except InvalidCodeError as e:
-            return unicode(e)
+            return str(e)
     
     def setRegisteredCode_andEmail_(self, code, email):
         self.py.set_registration(code, email)

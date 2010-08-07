@@ -17,19 +17,19 @@ import objc
 foundation_bundle = objc.loadBundle(
         'Foundation',
         {},
-        bundle_path=u'/System/Library/Frameworks/Foundation.framework',
+        bundle_path='/System/Library/Frameworks/Foundation.framework',
         scan_classes=False,
 )
 appkit_bundle = objc.loadBundle(
         'AppKit',
         {},
-        bundle_path=u'/System/Library/Frameworks/AppKit.framework',
+        bundle_path='/System/Library/Frameworks/AppKit.framework',
         scan_classes=False,
 )
 exceptionhandling_bundle = objc.loadBundle(
         'ExceptionHandling',
         {},
-        bundle_path=u'/System/Library/Frameworks/ExceptionHandling.framework',
+        bundle_path='/System/Library/Frameworks/ExceptionHandling.framework',
         scan_classes=False,
 )
 
@@ -94,7 +94,7 @@ def S(*args):
     return ''.join(args)
 
 FUNCTIONS = [
-    (u'NSSearchPathForDirectoriesInDomains', S('@', objc._C_NSUInteger, objc._C_NSUInteger, 'Z')),
+    ('NSSearchPathForDirectoriesInDomains', S('@', objc._C_NSUInteger, objc._C_NSUInteger, 'Z')),
 ]
 
 objc.loadBundleFunctions(foundation_bundle, globals(), FUNCTIONS)
@@ -105,8 +105,8 @@ objc.loadBundleFunctions(foundation_bundle, globals(), FUNCTIONS)
 NSCachesDirectory = 13
 NSApplicationSupportDirectory = 14
 NSUserDomainMask = 1
-NSWorkspaceRecycleOperation = u'recycle'
-NSLocaleCurrencyCode = u'currency'
+NSWorkspaceRecycleOperation = 'recycle'
+NSLocaleCurrencyCode = 'currency'
 NSLogAndHandleEveryExceptionMask = 0x3ff
 NSDateFormatterBehavior10_4 = 1040
 NSDateFormatterNoStyle = 0

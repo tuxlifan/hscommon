@@ -36,7 +36,8 @@ class RegistrableApplication(object):
             return False
         appid = str(appid)
         for i in range(100):
-            digest = md5(appid + email + str(i) + 'aybabtu').hexdigest()
+            blob = appid + email + str(i) + 'aybabtu'
+            digest = md5(blob.encode('utf-8')).hexdigest()
             if digest == code:
                 return True
         return False

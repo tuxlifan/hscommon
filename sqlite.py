@@ -10,7 +10,7 @@ import sys
 import os
 import os.path as op
 import threading
-from Queue import Queue
+from queue import Queue
 import time
 import sqlite3 as sqlite
 
@@ -107,7 +107,7 @@ class _ActualThread(threading.Thread):
                     self.lastrowid = cur.lastrowid
                     result = FakeCursor(cur.fetchall())
                     result.lastrowid = cur.lastrowid
-                except Exception, e:
+                except Exception as e:
                     result = e
             self._results.put(result)
         con.close()
@@ -115,7 +115,6 @@ class _ActualThread(threading.Thread):
 
 class ThreadedConn(object):
     def __init__(self, dbname, autocommit):
-        dbname = dbname.encode(sys.getfilesystemencoding())
         self._t = _ActualThread(dbname, autocommit)
         self.lastrowid = -1
     

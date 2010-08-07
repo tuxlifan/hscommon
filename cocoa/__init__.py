@@ -89,7 +89,7 @@ def install_exception_hook():
         # already installed
         return
     def isPythonException(exception):
-        return (exception.userInfo() or {}).get(u'__pyobjc_exc_type__') is not None
+        return (exception.userInfo() or {}).get('__pyobjc_exc_type__') is not None
 
     class PyObjCExceptionDelegate(NSObject):
         @signature('c@:@@I')
@@ -98,9 +98,9 @@ def install_exception_hook():
                 return False # These kind of exception are really weird and happen all the time with VoiceOver on.
             if isPythonException(exception):
                 userInfo = exception.userInfo()
-                type = userInfo[u'__pyobjc_exc_type__']
-                value = userInfo[u'__pyobjc_exc_value__']
-                tb = userInfo.get(u'__pyobjc_exc_traceback__', [])
+                type = userInfo['__pyobjc_exc_type__']
+                value = userInfo['__pyobjc_exc_value__']
+                tb = userInfo.get('__pyobjc_exc_traceback__', [])
                 report_crash(type, value, tb)
             return True
         
@@ -121,14 +121,14 @@ def pythonify(o):
     if o is None:
         return None
     elif isinstance(o, objc.pyobjc_unicode):
-        return unicode(o)
+        return str(o)
     elif isinstance(o, (objc._pythonify.OC_PythonLong, objc._pythonify.OC_PythonInt)):
         return int(o)
     elif isinstance(o, NSArray):
         return [pythonify(item) for item in o]
     elif isinstance(o, NSDictionary):
-        return dict((pythonify(k), pythonify(v)) for k, v in o.items())
-    elif isinstance(o, (bool, int, list, dict, basestring)):
+        return dict((pythonify(k), pythonify(v)) for k, v in list(o.items()))
+    elif isinstance(o, (bool, int, list, dict, str)):
         return o # already pythonified
     logging.warning('Could not pythonify {0} (of type {1}'.format(repr(o), type(o)))
     return o
