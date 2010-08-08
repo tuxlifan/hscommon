@@ -95,13 +95,13 @@ class Page(object):
         dest = destpath + self.basepath + '{0}.htm'.format(self.basename)
         if not io.exists(dest[:-1]):
             io.makedirs(dest[:-1])
-        mdcontents = str(io.open(self.path).read(), 'utf-8')
+        mdcontents = io.open(self.path, 'rt', encoding='utf-8').read()
         mdcontents = mdcontents.format(**env)
         main_contents = markdown.markdown(mdcontents)
         rendered = MAIN_CONTENTS.format(meta=self.meta, title=self.title, relpath=self.relpath,
             menu=menu, contents=main_contents)
-        fp = io.open(dest, 'w')
-        fp.write(rendered.encode('utf-8'))
+        fp = io.open(dest, 'wt', encoding='utf-8')
+        fp.write(rendered)
         fp.close()
     
 
