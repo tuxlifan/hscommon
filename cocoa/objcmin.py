@@ -46,55 +46,55 @@ NSLocale = objc.lookUpClass('NSLocale')
 NSNumberFormatter = objc.lookUpClass('NSNumberFormatter')
 
 NSWorkspace = objc.lookUpClass('NSWorkspace')
-objc.registerMetaDataForSelector('NSWorkspace', 'performFileOperation:source:destination:files:tag:',
+objc.registerMetaDataForSelector(b'NSWorkspace', b'performFileOperation:source:destination:files:tag:',
     {
-        'retval': {'type': objc._C_NSBOOL},
-        'arguments': {
-            2+4: {'type_modifier': objc._C_OUT,}
+        b'retval': {b'type': objc._C_NSBOOL},
+        b'arguments': {
+            2+4: {b'type_modifier': objc._C_OUT,}
         }
     })
-objc.registerMetaDataForSelector('NSWorkspace', 'typeOfFile:error:',
+objc.registerMetaDataForSelector(b'NSWorkspace', b'typeOfFile:error:',
     {
-        'arguments': {
-            2+1: {'type_modifier': objc._C_OUT,}
+        b'arguments': {
+            2+1: {b'type_modifier': objc._C_OUT,}
         }
     })
 
 NSExceptionHandler = objc.lookUpClass('NSExceptionHandler')
-objc.registerMetaDataForSelector('NSExceptionHandler', 'setExceptionHandlingMask:',
+objc.registerMetaDataForSelector(b'NSExceptionHandler', b'setExceptionHandlingMask:',
     {
-        'arguments': {
-            2+0: {'type': objc._C_UINT,}
+        b'arguments': {
+            2+0: {b'type': objc._C_UINT,}
         }
     })
     
 NSDateFormatter = objc.lookUpClass('NSDateFormatter')
-objc.registerMetaDataForSelector('NSDateFormatter', 'setDefaultFormatterBehavior:',
+objc.registerMetaDataForSelector(b'NSDateFormatter', b'setDefaultFormatterBehavior:',
     {
-        'arguments': {
-            2+0: {'type': objc._C_INT,}
+        b'arguments': {
+            2+0: {b'type': objc._C_INT,}
         }
     })
-objc.registerMetaDataForSelector('NSDateFormatter', 'setDateStyle:',
+objc.registerMetaDataForSelector(b'NSDateFormatter', b'setDateStyle:',
     {
-        'arguments': {
-            2+0: {'type': objc._C_INT,}
+        b'arguments': {
+            2+0: {b'type': objc._C_INT,}
         }
     })
-objc.registerMetaDataForSelector('NSDateFormatter', 'setTimeStyle:',
+objc.registerMetaDataForSelector(b'NSDateFormatter', b'setTimeStyle:',
     {
-        'arguments': {
-            2+0: {'type': objc._C_INT,}
+        b'arguments': {
+            2+0: {b'type': objc._C_INT,}
         }
     })
 
 #--- Functions
 
 def S(*args):
-    return ''.join(args)
+    return b''.join(args)
 
 FUNCTIONS = [
-    ('NSSearchPathForDirectoriesInDomains', S('@', objc._C_NSUInteger, objc._C_NSUInteger, 'Z')),
+    ('NSSearchPathForDirectoriesInDomains', S(b'@', objc._C_NSUInteger, objc._C_NSUInteger, b'Z')),
 ]
 
 objc.loadBundleFunctions(foundation_bundle, globals(), FUNCTIONS)

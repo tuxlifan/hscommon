@@ -16,18 +16,15 @@ import objc
 from ..reg import InvalidCodeError
 from .objcmin import NSObject
 
-if objc.__version__ == '1.4':
-    # we're 32 bit and the _C_NSInteger and _C_CGFloat consts aint there.
-    signature = objc.typedSelector
-else:
-    def signature(signature):
-        """Returns an objc.signature with 'i' and 'f' letters changed to correct NSInteger and
-        CGFloat values.
-        """
-        signature = signature.replace('i', objc._C_NSInteger)
-        signature = signature.replace('I', objc._C_NSUInteger)
-        signature = signature.replace('f', objc._C_CGFloat)
-        return objc.typedSelector(signature)
+def signature(signature):
+    """Returns an objc.signature with 'i' and 'f' letters changed to correct NSInteger and
+    CGFloat values.
+    """
+    signature = bytes(signature, encoding='ascii')
+    signature = signature.replace(b'i', objc._C_NSInteger)
+    signature = signature.replace(b'I', objc._C_NSUInteger)
+    signature = signature.replace(b'f', objc._C_CGFloat)
+    return objc.typedSelector(signature)
 
 class PyGUIObject(NSObject):
     def initWithCocoa_pyParent_(self, cocoa, pyparent):
