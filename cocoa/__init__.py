@@ -26,7 +26,6 @@ def report_crash(type, value, tb):
     s = "Application Identifier: {0}".format(app_identifier)
     s += "\nApplication Version: {0}\n\n".format(app_version)
     s += ''.join(traceback.format_exception(type, value, tb))
-    logging.error(s)
     HSErrorReportWindow = mainBundle.classNamed_('HSErrorReportWindow')
     if HSErrorReportWindow is None:
         logging.error(s)
