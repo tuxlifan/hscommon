@@ -45,46 +45,49 @@ NSDictionary = objc.lookUpClass('NSDictionary')
 NSLocale = objc.lookUpClass('NSLocale')
 NSNumberFormatter = objc.lookUpClass('NSNumberFormatter')
 
+# It's a little strange, but it seems like registerMetaDataForSelector required bytes for the first
+# 2 arguments, but it needs str in its metadata dicts.
+
 NSWorkspace = objc.lookUpClass('NSWorkspace')
 objc.registerMetaDataForSelector(b'NSWorkspace', b'performFileOperation:source:destination:files:tag:',
     {
-        b'retval': {b'type': objc._C_NSBOOL},
-        b'arguments': {
-            2+4: {b'type_modifier': objc._C_OUT,}
+        'retval': {'type': objc._C_NSBOOL},
+        'arguments': {
+            2+4: {'type_modifier': objc._C_OUT,}
         }
     })
 objc.registerMetaDataForSelector(b'NSWorkspace', b'typeOfFile:error:',
     {
-        b'arguments': {
-            2+1: {b'type_modifier': objc._C_OUT,}
+        'arguments': {
+            2+1: {'type_modifier': objc._C_OUT,}
         }
     })
 
 NSExceptionHandler = objc.lookUpClass('NSExceptionHandler')
 objc.registerMetaDataForSelector(b'NSExceptionHandler', b'setExceptionHandlingMask:',
     {
-        b'arguments': {
-            2+0: {b'type': objc._C_UINT,}
+        'arguments': {
+            2+0: {'type': objc._C_UINT,}
         }
     })
     
 NSDateFormatter = objc.lookUpClass('NSDateFormatter')
 objc.registerMetaDataForSelector(b'NSDateFormatter', b'setDefaultFormatterBehavior:',
     {
-        b'arguments': {
-            2+0: {b'type': objc._C_INT,}
+        'arguments': {
+            2+0: {'type': objc._C_INT,}
         }
     })
 objc.registerMetaDataForSelector(b'NSDateFormatter', b'setDateStyle:',
     {
-        b'arguments': {
-            2+0: {b'type': objc._C_INT,}
+        'arguments': {
+            2+0: {'type': objc._C_INT,}
         }
     })
 objc.registerMetaDataForSelector(b'NSDateFormatter', b'setTimeStyle:',
     {
-        b'arguments': {
-            2+0: {b'type': objc._C_INT,}
+        'arguments': {
+            2+0: {'type': objc._C_INT,}
         }
     })
 

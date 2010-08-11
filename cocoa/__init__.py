@@ -26,6 +26,7 @@ def report_crash(type, value, tb):
     s = "Application Identifier: {0}".format(app_identifier)
     s += "\nApplication Version: {0}\n\n".format(app_version)
     s += ''.join(traceback.format_exception(type, value, tb))
+    logging.error(s)
     HSErrorReportWindow = mainBundle.classNamed_('HSErrorReportWindow')
     if HSErrorReportWindow is None:
         logging.error(s)
@@ -34,7 +35,7 @@ def report_crash(type, value, tb):
         s += '\nRelevant Console logs:\n\n'
         p = subprocess.Popen(['grep', app_identifier, '/var/log/system.log'], stdout=subprocess.PIPE)
         try:
-            s += p.communicate()[0]
+            s += str(p.communicate()[0], encoding='utf-8')
         except IndexError:
             # This can happen if something went wrong with the grep (permission errors?)
             pass
