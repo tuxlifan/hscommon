@@ -27,7 +27,7 @@ def print_and_do(cmd):
 def build_all_qt_ui(base_dir='.'):
     from PyQt4.uic import compileUiDir
     mapper = lambda d, f: (d, rem_file_ext(f) + '_ui.py')
-    compileUiDir(base_dir, map=mapper)
+    compileUiDir(base_dir, map=mapper, from_imports=True)
 
 def build_dmg(app_path, dest_path):
     print(repr(op.join(app_path, 'Contents', 'Info.plist')))
