@@ -122,7 +122,7 @@ def pythonify(o):
         return None
     elif isinstance(o, objc.pyobjc_unicode):
         return str(o)
-    elif isinstance(o, (objc._pythonify.OC_PythonLong, objc._pythonify.OC_PythonInt)):
+    elif isinstance(o, (objc._pythonify.OC_PythonLong)):
         return int(o)
     elif isinstance(o, NSArray):
         return [pythonify(item) for item in o]
