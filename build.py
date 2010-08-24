@@ -24,10 +24,10 @@ def print_and_do(cmd):
     p = Popen(cmd, shell=True)
     p.wait()
 
-def build_all_qt_ui(base_dir='.'):
+def build_all_qt_ui(base_dir='.', from_imports=False):
     from PyQt4.uic import compileUiDir
     mapper = lambda d, f: (d, rem_file_ext(f) + '_ui.py')
-    compileUiDir(base_dir, map=mapper, from_imports=True)
+    compileUiDir(base_dir, map=mapper, from_imports=from_imports)
 
 def build_dmg(app_path, dest_path):
     print(repr(op.join(app_path, 'Contents', 'Info.plist')))
