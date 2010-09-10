@@ -4,6 +4,8 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
+from collections import defaultdict
+
 class Broadcaster(object):
     def __init__(self):
         self.listeners = set()
@@ -23,6 +25,17 @@ class Broadcaster(object):
 class Listener(object):
     def __init__(self, broadcaster):
         self.broadcaster = broadcaster
+        self._bound_notifications = defaultdict(list)
+    
+    def bind_messages(self, messages, func):
+        """Binds multiple message to the same function.
+        
+        Often, we perform the same thing on multiple messages. Instead of having the same function
+        repeated again and agin in our class, we can use this method to bind multiple messages to
+        the same function.
+        """
+        for message in messages:
+            self._bound_notifications[message].append(func)
     
     def connect(self):
         self.broadcaster.add_listener(self)
@@ -31,8 +44,12 @@ class Listener(object):
         self.broadcaster.remove_listener(self)
     
     def dispatch(self, msg):
-        method = getattr(self, msg)
-        method()
+        if msg in self._bound_notifications:
+            for func in self._bound_notifications[msg]:
+                func()
+        if hasattr(self, msg):
+            method = getattr(self, msg)
+            method()
     
 
 class Repeater(Broadcaster, Listener):
@@ -47,7 +64,6 @@ class Repeater(Broadcaster, Listener):
             self.notify(msg)
     
     def dispatch(self, msg):
-        if hasattr(self, msg):
-            Listener.dispatch(self, msg)
+        Listener.dispatch(self, msg)
         self._repeat_message(msg)
     

@@ -130,3 +130,12 @@ def test_repeater_doesnt_try_to_dispatch_to_self_if_it_cant():
     l.connect()
     b.notify('hello') # no crash
     eq_(l.hello_count, 1)
+
+def test_bind_messages():
+    b, l = create_pair()
+    l.bind_messages({'foo', 'bar'}, l.hello)
+    l.connect()
+    b.notify('foo')
+    b.notify('bar')
+    b.notify('hello') # Normal dispatching still work
+    eq_(l.hello_count, 3)
