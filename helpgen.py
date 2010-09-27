@@ -145,22 +145,22 @@ def gen(basepath, destpath, profile=None):
     basepath = Path(basepath)
     destpath = Path(destpath)
     configpath = basepath + 'conf.yaml'
-    confall = yaml.load(io.open(configpath))
+    confall = yaml.load(io.open(configpath, 'rt', encoding='utf-8'))
     conf = confall['base']
     if profile and profile in confall:
         conf.update(confall[profile])
     tixurl = conf['tixurl']
     changelogpath = basepath + conf['changelog']
-    changelogdata = yaml.load(io.open(changelogpath))
+    changelogdata = yaml.load(io.open(changelogpath, 'rt', encoding='utf-8'))
     changelog = render_changelog(changelogdata, tixurl)
     if 'env' in conf:
         envpath = basepath + conf['env']
-        env = yaml.load(io.open(envpath))
+        env = yaml.load(io.open(envpath, 'rt', encoding='utf-8'))
     else:
         env = {}
     env['changelog'] = changelog
     pagespath = basepath + conf['pages']
-    pagedatas = yaml.load(io.open(pagespath))
+    pagedatas = yaml.load(io.open(pagespath, 'rt', encoding='utf-8'))
     pages = [MainPage(pagedata, pagespath=pagespath[:-1]) for pagedata in pagedatas]
     skelpath = basepath + Path(conf['skeleton'])
     if not io.exists(destpath):
