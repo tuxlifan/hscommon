@@ -167,12 +167,9 @@ class PyTable(PyGUIObject):
         self.cocoa.updateSelection()
     
 
-class PyRegistrable(NSObject):
+class PyFairware(NSObject):
     def appName(self):
         return ""
-    
-    def demoLimitDescription(self):
-        return self.py.DEMO_LIMIT_DESC
     
     @signature('c@:')
     def isRegistered(self):
@@ -187,4 +184,7 @@ class PyRegistrable(NSObject):
     
     def setRegisteredCode_andEmail_(self, code, email):
         self.py.set_registration(code, email)
+    
+    def unpaidHours(self):
+        return self.py.unpaid_hours
     

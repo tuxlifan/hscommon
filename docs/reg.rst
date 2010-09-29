@@ -23,7 +23,3 @@
 .. exception:: InvalidCodeError
 
     Raised during :meth:`RegistrableApplication.validate_code`.
-
-.. exception:: RegistrationRequired
-
-    An exception used in HS apps to indicate to the GUI that demo limits have been reached.
