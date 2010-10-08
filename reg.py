@@ -11,6 +11,7 @@ from hashlib import md5
 import json
 from urllib.request import urlopen, URLError
 import logging
+import socket
 
 ALL_APPS = [
     (1, 'dupeGuru'),
@@ -96,7 +97,7 @@ class RegistrableApplication(object):
             url = 'http://open.hardcoded.net/backend/unpaid/{0}'.format(self.appid)
             try:
                 connection = urlopen(url)
-            except URLError:
+            except (URLError, socket.error):
                 logging.warning("Couldn't connect to open.hardcoded.net")
                 self._unpaid_hours = 0
             else:
