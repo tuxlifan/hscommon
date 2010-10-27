@@ -129,14 +129,15 @@ class PyTable(PyGUIObject):
     def selectedRows(self):
         return self.py.selected_indexes
     
+    def selectionAsCSV(self):
+        return self.py.selection_as_csv()
+    
     @signature('v@:@@i')
     def setValue_forColumn_row_(self, value, column, row):
-        if column == 'from':
-            column = 'from_'
         # this try except is important for the case while a row is in edition mode and the delete
         # button is clicked.
         try:
-            setattr(self.py[row], column, value)
+            self.py[row].set_cell_value(column, value)
         except IndexError:
             logging.warning("Trying to set an out of bounds row ({0} / {1})".format(row, len(self.py)))
     
@@ -146,10 +147,8 @@ class PyTable(PyGUIObject):
     
     @signature('@@:@i')
     def valueForColumn_row_(self, column, row):
-        if column == 'from':
-            column = 'from_'
         try:
-            return getattr(self.py[row], column)
+            return self.py[row].get_cell_value(column)
         except IndexError:
             logging.warning("Trying to get an out of bounds row ({0} / {1})".format(row, len(self.py)))    
     
