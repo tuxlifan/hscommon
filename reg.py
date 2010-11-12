@@ -8,17 +8,22 @@
 
 import re
 from hashlib import md5
+import json
+from urllib.request import urlopen, URLError
+import logging
+import socket
 
 ALL_APPS = [
-    (1, 'dupeGuru Music Edition'),
-    (2, 'musicGuru'),
-    (4, 'dupeGuru'),
-    (5, 'dupeGuru Picture Edition'),
-    (6, 'moneyGuru'),
+    (1, 'dupeGuru'),
+    (2, 'moneyGuru'),
+    (3, 'musicGuru'),
 ]
 
-class RegistrationRequired(Exception):
-    """Registration is required to continue"""
+OLDAPPIDS = {
+    1: {1, 4, 5},
+    2: {6, },
+    3: {2, },
+}
 
 class InvalidCodeError(Exception):
     """The supplied code is invalid."""
@@ -29,6 +34,7 @@ class RegistrableApplication(object):
         self.registered = False
         self.register_code = ''
         self.register_email = ''
+        self._unpaid_hours = None
     
     @staticmethod
     def _is_code_valid(appid, code, email):
@@ -52,6 +58,10 @@ class RegistrableApplication(object):
         email = email.strip().lower()
         if self._is_code_valid(self.appid, code, email):
             return
+        # Check if it's not an old reg code
+        for oldappid in OLDAPPIDS[self.appid]:
+            if self._is_code_valid(oldappid, code, email):
+                return
         # let's see if the user didn't mix the fields up
         if self._is_code_valid(self.appid, email, code):
             msg = "Invalid Code. It seems like you inverted the 'Registration Code' and"\
@@ -80,4 +90,18 @@ class RegistrableApplication(object):
             self._setup_as_registered()
         except InvalidCodeError:
             pass
+    
+    @property
+    def unpaid_hours(self):
+        if self._unpaid_hours is None:
+            url = 'http://open.hardcoded.net/backend/unpaid/{0}'.format(self.appid)
+            try:
+                connection = urlopen(url)
+                response = str(connection.read(), 'latin-1')
+                self._unpaid_hours = json.loads(response)
+                connection.close()
+            except (URLError, socket.error, ValueError): # ValueError is for json.loads()
+                logging.warning("Couldn't connect to open.hardcoded.net")
+                self._unpaid_hours = 0
+        return self._unpaid_hours
     

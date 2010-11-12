@@ -3,9 +3,9 @@
 # Created On: 2010-02-06
 # Copyright 2010 Hardcoded Software (http://www.hardcoded.net)
 # 
-# This software is licensed under the "HS" License as described in the "LICENSE" file, 
+# This software is licensed under the "BSD" License as described in the "LICENSE" file, 
 # which should be included with this package. The terms are also available at 
-# http://www.hardcoded.net/licenses/hs_license
+# http://www.hardcoded.net/licenses/bsd_license
 
 # Interfaces for proxies in cocoalib
 
@@ -129,14 +129,15 @@ class PyTable(PyGUIObject):
     def selectedRows(self):
         return self.py.selected_indexes
     
+    def selectionAsCSV(self):
+        return self.py.selection_as_csv()
+    
     @signature('v@:@@i')
     def setValue_forColumn_row_(self, value, column, row):
-        if column == 'from':
-            column = 'from_'
         # this try except is important for the case while a row is in edition mode and the delete
         # button is clicked.
         try:
-            setattr(self.py[row], column, value)
+            self.py[row].set_cell_value(column, value)
         except IndexError:
             logging.warning("Trying to set an out of bounds row ({0} / {1})".format(row, len(self.py)))
     
@@ -146,10 +147,8 @@ class PyTable(PyGUIObject):
     
     @signature('@@:@i')
     def valueForColumn_row_(self, column, row):
-        if column == 'from':
-            column = 'from_'
         try:
-            return getattr(self.py[row], column)
+            return self.py[row].get_cell_value(column)
         except IndexError:
             logging.warning("Trying to get an out of bounds row ({0} / {1})".format(row, len(self.py)))    
     
@@ -167,12 +166,9 @@ class PyTable(PyGUIObject):
         self.cocoa.updateSelection()
     
 
-class PyRegistrable(NSObject):
+class PyFairware(NSObject):
     def appName(self):
         return ""
-    
-    def demoLimitDescription(self):
-        return self.py.DEMO_LIMIT_DESC
     
     @signature('c@:')
     def isRegistered(self):
@@ -187,4 +183,7 @@ class PyRegistrable(NSObject):
     
     def setRegisteredCode_andEmail_(self, code, email):
         self.py.set_registration(code, email)
+    
+    def unpaidHours(self):
+        return self.py.unpaid_hours
     
