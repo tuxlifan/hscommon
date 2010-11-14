@@ -51,8 +51,8 @@ def test_suggest_other_apps():
     # If a code is valid for another app, say so in the error message.
     email = 'foo@bar.com'
     appid = 42
-    # 6 is moneyGuru's appid
-    code = md5s('6' + email + '43' + 'aybabtu')
+    # 2 is moneyGuru's appid
+    code = md5s('2' + email + '43' + 'aybabtu')
     assert_invalid(appid, code, email, msg_contains="moneyGuru")
 
 def test_invert_code_and_email():

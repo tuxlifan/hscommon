@@ -52,14 +52,12 @@ class RegistrableApplication(object):
         pass # virtual
     
     def validate_code(self, code, email):
-        DEFAULT_MSG = "Your code is invalid. Make sure that you wrote the good code. Also make sure "\
-            "that the e-mail you gave is the same as the e-mail you used for your purchase."
         code = code.strip().lower()
         email = email.strip().lower()
         if self._is_code_valid(self.appid, code, email):
             return
         # Check if it's not an old reg code
-        for oldappid in OLDAPPIDS[self.appid]:
+        for oldappid in OLDAPPIDS.get(self.appid, []):
             if self._is_code_valid(oldappid, code, email):
                 return
         # let's see if the user didn't mix the fields up
@@ -79,6 +77,8 @@ class RegistrableApplication(object):
                 msg = "This code is a {0} code. You're running the wrong application. You can "\
                     "download the correct application at http://www.hardcoded.net".format(appname)
                 raise InvalidCodeError(msg)
+        DEFAULT_MSG = "Your code is invalid. Make sure that you wrote the good code. Also make sure "\
+            "that the e-mail you gave is the same as the e-mail you used for your purchase."
         raise InvalidCodeError(DEFAULT_MSG)
     
     def set_registration(self, code, email):
