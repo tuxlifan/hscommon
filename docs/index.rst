@@ -25,7 +25,6 @@ API Documentation
    build
    cocoa
    currency
-   job
    markable
    notify
    reg
