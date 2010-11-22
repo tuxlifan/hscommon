@@ -13,11 +13,13 @@ import subprocess
 import sys
 
 import objc
+from jobprogress.job import JobCancelled
+from jobprogress.performer import ThreadedJobPerformer as ThreadedJobPerformerBase
+
 from .inter import signature
 from .objcmin import (NSBundle, NSAutoreleasePool, NSObject, NSArray, NSDictionary,
     NSExceptionHandler, NSLogAndHandleEveryExceptionMask)
 
-from ..job import JobCancelled, ThreadedJobPerformer as ThreadedJobPerformerBase
 
 def report_crash(type, value, tb):
     mainBundle = NSBundle.mainBundle()
