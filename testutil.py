@@ -6,7 +6,25 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
+import py.path
 from hsutil.testutil import eq_
+
+class TestData:
+    def __init__(self, datadirpath):
+        self.datadirpath = py.path.local(datadirpath)
+    
+    def filepath(self, relative_path, *args):
+        """Returns the path of a file in testdata.
+        
+        'relative_path' can be anything that can be added to a Path
+        if args is not empty, it will be joined to relative_path
+        """
+        if args:
+            relative_path = py.path.local(relative_path).join(args)
+        resultpath = self.datadirpath.join(relative_path)
+        assert resultpath.check()
+        return resultpath
+    
 
 class CallLogger:
     """This is a dummy object that logs all calls made to it.
