@@ -10,6 +10,7 @@ import re
 from hashlib import md5
 import json
 from urllib.request import urlopen, URLError
+from http.client import HTTPException
 import logging
 import socket
 
@@ -28,7 +29,7 @@ OLDAPPIDS = {
 class InvalidCodeError(Exception):
     """The supplied code is invalid."""
 
-class RegistrableApplication(object):
+class RegistrableApplication:
     def __init__(self, appid):
         self.appid = appid
         self.registered = False
@@ -100,7 +101,7 @@ class RegistrableApplication(object):
                 response = str(connection.read(), 'latin-1')
                 self._unpaid_hours = json.loads(response)
                 connection.close()
-            except (URLError, socket.error, ValueError): # ValueError is for json.loads()
+            except (URLError, HTTPException, socket.error, ValueError): # ValueError is for json.loads()
                 logging.warning("Couldn't connect to open.hardcoded.net")
                 self._unpaid_hours = 0
         return self._unpaid_hours
