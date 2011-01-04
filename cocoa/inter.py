@@ -174,6 +174,10 @@ class PyFairware(NSObject):
     def isRegistered(self):
         return self.py.registered
     
+    @signature('c@:')
+    def isFirstRun(self):
+        return self.py.is_first_run
+    
     def isCodeValid_withEmail_(self, code, email):
         try:
             self.py.validate_code(code, email)

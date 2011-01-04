@@ -35,6 +35,7 @@ class RegistrableApplication:
         self.registered = False
         self.register_code = ''
         self.register_email = ''
+        self.is_first_run = False # has to be set by the app.
         self._unpaid_hours = None
     
     @staticmethod
