@@ -9,12 +9,12 @@ hscommon - Common code used throughout HS apps
 Introduction
 ============
 
-``hscommon`` is a collection of tools used throughout HS apps. It manage their build process, their job progress, their tests, etc.. Historically, the code contained here was in ``hsutil``, but I made a split so that code that was useful exclusively in HS apps would go in ``hscommon``.
+``hscommon`` is a collection of tools used throughout HS apps.
 
 Dependencies
 ============
 
-Python 2.6 is required. `py.test <http://codespeak.net/py/dist/test/>`_ is required to run the tests.
+Python 3.1 is required. `py.test <http://pytest.org/>`_ is required to run the tests.
 
 API Documentation
 =================
@@ -24,9 +24,11 @@ API Documentation
    
    build
    cocoa
+   conflict
    currency
    markable
    notify
    path
    reg
    sqlite
+   util

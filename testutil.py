@@ -10,9 +10,11 @@ import os
 import py.path
 
 def eq_(a, b, msg=None):
+    __tracebackhide__ = True
     assert a == b, msg or "%r != %r" % (a, b)
 
 def assert_almost_equal(a, b, places=7):
+    __tracebackhide__ = True
     assert round(a, ndigits=places) == round(b, ndigits=places)
 
 class TestData:
@@ -54,6 +56,7 @@ class CallLogger:
         `expected` is an iterable of strings representing method names.
         If `verify_order` is True, the order of the calls matters.
         """
+        __tracebackhide__ = True
         if verify_order:
             eq_(self.calls, expected)
         else:
@@ -68,6 +71,7 @@ class CallLogger:
         `not_expected` can be used for a more explicit check (rather than calling `check_gui_calls`
         with an empty `expected`) to assert that calls have *not* been made.
         """
+        __tracebackhide__ = True
         if expected is not None:
             not_called = set(expected) - set(self.calls)
             assert not not_called, "These calls haven't been made: {0}".format(not_called)
@@ -153,3 +157,56 @@ def patch_osstat(monkeypatch, path, st_mode=16877, st_ino=742635, st_dev=2348810
         monkeypatch.setattr(os, 'stat', fake_osstat)
     st_seq = [st_mode, st_ino, st_dev, st_nlink, st_uid, st_gid, st_size, st_atime, st_mtime, st_ctime]
     monkeypatch._patched_osstat[str(path)] = os.stat_result(st_seq)
+
+def _unify_args(func, args, kwargs, args_to_ignore=None):
+    ''' Unify args and kwargs in the same dictionary.
+    
+        The result is kwargs with args added to it. func.func_code.co_varnames is used to determine
+        under what key each elements of arg will be mapped in kwargs.
+        
+        if you want some arguments not to be in the results, supply a list of arg names in 
+        args_to_ignore.
+        
+        if f is a function that takes *args, func_code.co_varnames is empty, so args will be put 
+        under 'args' in kwargs.
+        
+        def foo(bar, baz)
+        _unifyArgs(foo, (42,), {'baz': 23}) --> {'bar': 42, 'baz': 23}
+        _unifyArgs(foo, (42,), {'baz': 23}, ['bar']) --> {'baz': 23}
+    '''
+    result = kwargs.copy()
+    if hasattr(func, '__code__'): # built-in functions don't have func_code
+        args = list(args)
+        if getattr(func, '__self__', None) is not None: # bound method, we have to add self to args list
+            args = [func.__self__] + args
+        defaults = list(func.__defaults__) if func.__defaults__ is not None else []
+        arg_count = func.__code__.co_argcount
+        arg_names = list(func.__code__.co_varnames)
+        if len(args) < arg_count: # We have default values
+            required_arg_count = arg_count - len(args)
+            args = args + defaults[-required_arg_count:]
+        for arg_name, arg in zip(arg_names, args):
+            # setdefault is used because if the arg is already in kwargs, we don't want to use default values
+            result.setdefault(arg_name, arg)
+    else:
+        #'func' has a *args argument
+        result['args'] = args
+    if args_to_ignore:
+        for kw in args_to_ignore:
+            del result[kw]
+    return result
+
+def log_calls(func):
+    ''' Logs all func calls' arguments under func.calls.
+    
+        func.calls is a list of _unify_args() result (dict).
+        
+        Mostly used for unit testing.
+    '''
+    def wrapper(*args, **kwargs):
+        unifiedArgs = _unify_args(func, args, kwargs)
+        wrapper.calls.append(unifiedArgs)
+        return func(*args, **kwargs)
+    
+    wrapper.calls = []
+    return wrapper
