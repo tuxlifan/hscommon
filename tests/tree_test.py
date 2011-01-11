@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Created By: Virgil Dupras
 # Created On: 2010-02-12
 # Copyright 2010 Hardcoded Software (http://www.hardcoded.net)
@@ -7,8 +6,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from hsutil.testutil import eq_
-
+from ..testutil import eq_
 from ..gui.tree import Tree, Node
 
 def tree_with_some_nodes():

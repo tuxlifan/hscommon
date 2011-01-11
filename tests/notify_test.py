@@ -4,8 +4,7 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from hsutil.testutil import eq_
-
+from ..testutil import eq_
 from ..notify import Broadcaster, Listener, Repeater
 
 class HelloListener(Listener):
