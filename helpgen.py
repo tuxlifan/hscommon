@@ -80,11 +80,13 @@ def tixgen(tixurl):
     return lambda text: R.sub(repl, text)
 
 class Page:
-    def __init__(self, pagedata, pagespath):
+    def __init__(self, pagedata, pagespath, fallbackpath):
         self.name = pagedata['name']
         self.basename = Path(self.name)[-1]
         self.basepath = Path(self.name)[:-1]
-        self.path = pagespath + self.basepath + '{0}.md'.format(self.basename)
+        self.path = pagespath + self.basepath + '{}.md'.format(self.basename)
+        if not io.exists(self.path):
+            self.path = fallbackpath + self.basepath + '{}.md'.format(self.basename)
         self.title = pagedata['title']
         self.relpath = '../' * len(self.basepath)
         self.meta = ''
@@ -104,8 +106,8 @@ class Page:
     
 
 class MainPage(Page):
-    def __init__(self, pagedata, pagespath):
-        Page.__init__(self, pagedata, pagespath)
+    def __init__(self, pagedata, pagespath, fallbackpath):
+        Page.__init__(self, pagedata, pagespath, fallbackpath)
         self.menutitle = pagedata['menutitle']
         self.menudesc = pagedata.get('menudesc', self.title)
         self.subpages = [Page(data, pagespath) for data in pagedata.get('subpages', [])]
@@ -157,8 +159,12 @@ def gen(basepath, destpath, profile=None):
         env = {}
     env['changelog'] = changelog
     pagespath = basepath + conf['pages']
+    if 'basepages' in conf:
+        fallbackpath = basepath + conf['basepages']
+    else:
+        fallbackpath = None
     pagedatas = yaml.load(io.open(pagespath, 'rt', encoding='utf-8'))
-    pages = [MainPage(pagedata, pagespath=pagespath[:-1]) for pagedata in pagedatas]
+    pages = [MainPage(pagedata, pagespath=pagespath[:-1], fallbackpath=fallbackpath) for pagedata in pagedatas]
     skelpath = basepath + Path(conf['skeleton'])
     if not io.exists(destpath):
         print("Copying skeleton")
