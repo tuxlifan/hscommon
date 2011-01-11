@@ -13,6 +13,7 @@ import shutil
 import tempfile
 import plistlib
 from subprocess import Popen
+import re
 
 from .util import rem_file_ext, modified_after, find_in_path
 
@@ -99,10 +100,9 @@ def copy_qt_plugins(folder_names, dest): # This is only for Windows
             return [n for n in names if not n.endswith('.dll')]
     shutil.copytree(qt_plugin_dir, dest, ignore=ignore)
 
-def build_debian_changelog(yamlfile, destfile, pkgname, from_version=None):
+def build_debian_changelog(changelogpath, destfile, pkgname, from_version=None):
     """Builds a debian changelog out of a YAML changelog.
     """
-    import yaml
     def desc2list(desc):
         # We take each item, enumerated with the '*' character, and transform it into a list.
         desc = desc.replace('\n', ' ')
@@ -112,7 +112,7 @@ def build_debian_changelog(yamlfile, destfile, pkgname, from_version=None):
     
     ENTRY_MODEL = "{pkg} ({version}) stable; urgency=low\n\n{changes}\n -- Virgil Dupras <hsoft@hardcoded.net>  {date}\n\n"
     CHANGE_MODEL = "  * {description}\n"
-    changelogs = yaml.load(open(yamlfile))
+    changelogs = read_changelog_file(changelogpath)
     if from_version:
         # We only want logs from a particular version
         for index, log in enumerate(changelogs):
@@ -133,3 +133,22 @@ def build_debian_changelog(yamlfile, destfile, pkgname, from_version=None):
     fp = open(destfile, 'w')
     fp.write(result)
     fp.close()
+
+re_changelog_header = re.compile(r'=== ([\d.]*) \(([\d\-]*)\)')
+def read_changelog_file(filename):
+    def iter_by_three(it):
+        while True:
+            version = next(it)
+            date = next(it)
+            description = next(it)
+            yield version, date, description
+    
+    with open(filename, 'rt', encoding='utf-8') as fp:
+        contents = fp.read()
+    splitted = re_changelog_header.split(contents)[1:] # the first item is empty
+    # splitted = [version1, date1, desc1, version2, date2, ...]
+    result = []
+    for version, date, description in iter_by_three(iter(splitted)):
+        d = {'date': date, 'version': version, 'description': description.strip()}
+        result.append(d)
+    return result

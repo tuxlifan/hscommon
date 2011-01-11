@@ -12,6 +12,7 @@ import markdown
 
 from . import io
 from .path import Path
+from .build import read_changelog_file
 
 MAIN_CONTENTS = """
 <?xml version="1.0" encoding="utf-8"?>
@@ -147,8 +148,7 @@ def gen(basepath, destpath, profile=None):
     if profile and profile in confall:
         conf.update(confall[profile])
     tixurl = conf['tixurl']
-    changelogpath = basepath + conf['changelog']
-    changelogdata = yaml.load(io.open(changelogpath, 'rt', encoding='utf-8'))
+    changelogdata = read_changelog_file(str(basepath + conf['changelog']))
     changelog = render_changelog(changelogdata, tixurl)
     if 'env' in conf:
         envpath = basepath + conf['env']
