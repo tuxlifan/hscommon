@@ -9,8 +9,8 @@
 from datetime import date
 import sqlite3 as sqlite
 
-from hsutil import io
-from hsutil.testutil import eq_, assert_almost_equal
+from .. import io
+from ..testutil import eq_, assert_almost_equal
 from ..currency import Currency, RatesDB, CAD, EUR, PLN, USD
 
 def teardown_function(function):

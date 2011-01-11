@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Created By: Virgil Dupras
 # Created On: 2010-06-28
 # Copyright 2010 Hardcoded Software (http://www.hardcoded.net)
@@ -7,14 +6,12 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-
-
 import re
 import yaml
 import markdown
 
-from hsutil import io
-from hsutil.path import Path
+from . import io
+from .path import Path
 
 MAIN_CONTENTS = """
 <?xml version="1.0" encoding="utf-8"?>
@@ -81,7 +78,7 @@ def tixgen(tixurl):
     repl = '[#\\1]({0})'.format(urlpattern)
     return lambda text: R.sub(repl, text)
 
-class Page(object):
+class Page:
     def __init__(self, pagedata, pagespath):
         self.name = pagedata['name']
         self.basename = Path(self.name)[-1]

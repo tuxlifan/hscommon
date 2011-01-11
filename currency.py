@@ -10,11 +10,10 @@ from datetime import datetime, date
 import logging
 import sqlite3 as sqlite
 
-from hsutil import io
-from hsutil.path import Path
+from . import io
+from .path import Path
 
-
-class Currency(object):
+class Currency:
     all = []
     by_code = {}
     by_name = {}
@@ -249,7 +248,7 @@ XCD = Currency.register('XCD', 'East Caribbean dollar',
 XPF = Currency.register('XPF', 'CFP franc',
     exponent=0, start_date=date(1998, 1, 2), start_rate=0.01299, latest_rate=0.01114)
 
-class RatesDB(object):
+class RatesDB:
     """Stores exchange rates for currencies.
     
     The currencies are identified with ISO 4217 code (USD, CAD, EUR, etc.).

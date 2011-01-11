@@ -24,5 +24,5 @@ HS applications embed Python code in a pure Objective-C app through PyObjC (I wr
 The :mod:`cocoa.objcmin` submodule
 ==================================
 
-Doing stuff like ``import AppKit`` or ``import Foundation`` with PyObjC consumes a lot of memory because it parses all available classes' metadata and keep them in memory. When embedding PyObjC, apps need to use a lot less of that metadata. To save memory usage, I looked at all Objective-C classes and methods I was using in all HS Python code and I manually defined metadata for those in this module. This way, a lot less memory is used. So, instead of doing ``from Foundation import NSObject``, in HS app we must do ``from hsutil.cocoa.objcmin import NSObject``
+Doing stuff like ``import AppKit`` or ``import Foundation`` with PyObjC consumes a lot of memory because it parses all available classes' metadata and keep them in memory. When embedding PyObjC, apps need to use a lot less of that metadata. To save memory usage, I looked at all Objective-C classes and methods I was using in all HS Python code and I manually defined metadata for those in this module. This way, a lot less memory is used. So, instead of doing ``from Foundation import NSObject``, in HS app we must do ``from hscommon.cocoa.objcmin import NSObject``
 

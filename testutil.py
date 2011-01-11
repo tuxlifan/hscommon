@@ -6,8 +6,14 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
+import os
 import py.path
-from hsutil.testutil import eq_
+
+def eq_(a, b, msg=None):
+    assert a == b, msg or "%r != %r" % (a, b)
+
+def assert_almost_equal(a, b, places=7):
+    assert round(a, ndigits=places) == round(b, ndigits=places)
 
 class TestData:
     def __init__(self, datadirpath):
@@ -122,3 +128,28 @@ def with_app(appfunc):
         wrapper.__name__ = func.__name__
         return wrapper
     return decorator
+
+def patch_osstat(monkeypatch, path, st_mode=16877, st_ino=742635, st_dev=234881026, st_nlink=51,
+    st_uid=501, st_gid=20, st_size=1734, st_atime=1257942648, st_mtime=1257873561, 
+    st_ctime=1257873561):
+    """ Patches os.stat for `path`.
+    
+    Patching os.stat can be tricky, because it can mess much more than what you're trying to test.
+    Also, it can be cumbersome to do it. This method lets you do it easily. Just specify a path
+    for which you want to patch os.stat, and specify the values through **kwargs. The defaults
+    here are just some stats (that make sense) to fill up.
+    
+    Example call: patch_osstat(monkeypatch, Path('foo/bar'), st_mtime=42)
+    """
+    # This function is here temporarily. Evenutally, I'll make a pytest-monkeypatch-plus package
+    if not hasattr(monkeypatch, '_patched_osstat'): # first osstat mock, actually install the mock
+        monkeypatch._patched_osstat = {} # path: os.stat_result
+        old_osstat = os.stat
+        def fake_osstat(path_str):
+            try:
+                return monkeypatch._patched_osstat[path_str]
+            except KeyError:
+                return old_osstat(path_str)
+        monkeypatch.setattr(os, 'stat', fake_osstat)
+    st_seq = [st_mode, st_ino, st_dev, st_nlink, st_uid, st_gid, st_size, st_atime, st_mtime, st_ctime]
+    monkeypatch._patched_osstat[str(path)] = os.stat_result(st_seq)

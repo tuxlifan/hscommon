@@ -113,7 +113,7 @@ class _ActualThread(threading.Thread):
         con.close()
     
 
-class ThreadedConn(object):
+class ThreadedConn:
     def __init__(self, dbname, autocommit):
         self._t = _ActualThread(dbname, autocommit)
         self.lastrowid = -1

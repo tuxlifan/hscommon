@@ -6,7 +6,7 @@
 
 from collections import defaultdict
 
-class Broadcaster(object):
+class Broadcaster:
     def __init__(self):
         self.listeners = set()
     
@@ -22,7 +22,7 @@ class Broadcaster(object):
         self.listeners.discard(listener)
     
 
-class Listener(object):
+class Listener:
     def __init__(self, broadcaster):
         self.broadcaster = broadcaster
         self._bound_notifications = defaultdict(list)

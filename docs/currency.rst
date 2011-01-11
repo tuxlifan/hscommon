@@ -11,7 +11,7 @@ The ``Currency`` class
 
     A ``Currency`` instance is created with either a 3-letter ISO code or with a full name. If it's present in the database, an instance will be returned. If not, ``ValueError`` is raised. The easiest way to access a currency instance, however, if by using module-level constants. For example::
 
-        >>> from hsutil.currency import USD, EUR
+        >>> from hscommon.currency import USD, EUR
         >>> from datetime import date
         >>> USD.value_in(EUR, date.today())
         0.6339119851386843

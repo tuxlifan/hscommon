@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# hsutil documentation build configuration file, created by
+# hscommon documentation build configuration file, created by
 # sphinx-quickstart on Fri Mar 12 16:00:37 2010.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -158,7 +158,7 @@ html_theme = 'default'
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'hsutildoc'
+htmlhelp_basename = 'hscommondoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -172,7 +172,7 @@ htmlhelp_basename = 'hsutildoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'hsutil.tex', 'hsutil Documentation',
+  ('index', 'hscommon.tex', 'hscommon Documentation',
    'Hardcoded Software', 'manual'),
 ]
 

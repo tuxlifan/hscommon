@@ -1,6 +1,6 @@
-=============================================
+==============================================
 hscommon - Common code used throughout HS apps
-=============================================
+==============================================
 
 :Author: `Hardcoded Software <http://www.hardcoded.net>`_
 :Dev website: http://hg.hardcoded.net/hscommon
@@ -27,5 +27,6 @@ API Documentation
    currency
    markable
    notify
+   path
    reg
    sqlite

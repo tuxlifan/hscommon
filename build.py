@@ -6,8 +6,6 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-
-
 import os
 import sys
 import os.path as op
@@ -16,8 +14,7 @@ import tempfile
 import plistlib
 from subprocess import Popen
 
-from hsutil.str import rem_file_ext
-from hsutil.files import modified_after
+from .util import rem_file_ext, modified_after, find_in_path
 
 def print_and_do(cmd):
     print(cmd)
@@ -92,11 +89,8 @@ def copy_packages(packages_names, dest):
         shutil.copytree(source_path, dest_path, ignore=ignore)
 
 def copy_qt_plugins(folder_names, dest): # This is only for Windows
-    from hsutil.files import find_in_path
     qmake_path = find_in_path('qmake.exe')
-    print(repr(qmake_path))
     qt_dir = op.split(op.dirname(qmake_path))[0]
-    print(repr(qt_dir))
     qt_plugin_dir = op.join(qt_dir, 'plugins')
     def ignore(path, names):
         if path == qt_plugin_dir:
