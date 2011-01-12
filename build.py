@@ -22,6 +22,13 @@ def print_and_do(cmd):
     p = Popen(cmd, shell=True)
     p.wait()
 
+def ensure_empty_folder(path):
+    """Make sure that the path exists and that it's an empty folder.
+    """
+    if op.exists(path):
+        shutil.rmtree(path)
+    os.mkdir(path)
+
 def build_all_qt_ui(base_dir='.', from_imports=False):
     from PyQt4.uic import compileUiDir
     mapper = lambda d, f: (d, rem_file_ext(f) + '_ui.py')
