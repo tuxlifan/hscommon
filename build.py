@@ -15,6 +15,7 @@ import plistlib
 from subprocess import Popen
 import re
 import importlib
+from datetime import datetime
 
 from .util import rem_file_ext, modified_after, find_in_path
 
@@ -149,7 +150,7 @@ def build_debian_changelog(changelogpath, destfile, pkgname, from_version=None):
     rendered_logs = []
     for log in changelogs:
         version = log['version']
-        logdate = log['date']
+        logdate = datetime.strptime(log['date'], '%Y-%m-%d').date()
         desc = log['description']
         rendered_date = logdate.strftime('%a, %d %b %Y 00:00:00 +0000')
         rendered_descs = [CHANGE_MODEL.format(description=d) for d in desc2list(desc)]
