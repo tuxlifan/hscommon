@@ -10,7 +10,7 @@ import os.path as op
 import shutil
 import re
 
-from .build import print_and_do, read_changelog_file
+from .build import print_and_do, read_changelog_file, filereplace
 
 CHANGELOG_FORMAT = """
 {version} ({date})
@@ -27,17 +27,6 @@ def tixgen(tixurl):
     R = re.compile(r'#(\d+)')
     repl = '`#\\1 <{}>`__'.format(urlpattern)
     return lambda text: R.sub(repl, text)
-
-def filereplace(filename, **kwargs):
-    fp = open(filename, 'rt', encoding='utf-8')
-    contents = fp.read()
-    fp.close()
-    # We can't use str.format() because in some files, there might be {} characters that mess with it.
-    for key, item in kwargs.items():
-        contents = contents.replace('{{{}}}'.format(key), item) 
-    fp = open(filename, 'wt', encoding='utf-8')
-    fp.write(contents)
-    fp.close()
 
 def gen(basepath, buildpath, destpath, changelogpath, tixurl, confrepl=None):
     """Generate sphinx docs with all bells and whistles.

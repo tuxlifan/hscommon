@@ -14,6 +14,7 @@ import tempfile
 import plistlib
 from subprocess import Popen
 import re
+import importlib
 
 from .util import rem_file_ext, modified_after, find_in_path
 
@@ -28,6 +29,25 @@ def ensure_empty_folder(path):
     if op.exists(path):
         shutil.rmtree(path)
     os.mkdir(path)
+
+def filereplace(filename, outfilename=None, **kwargs):
+    """Reads `filename`, replaces all {variables} in kwargs, and writes the result to `outfilename`.
+    """
+    if outfilename is None:
+        outfilename = filename
+    fp = open(filename, 'rt', encoding='utf-8')
+    contents = fp.read()
+    fp.close()
+    # We can't use str.format() because in some files, there might be {} characters that mess with it.
+    for key, item in kwargs.items():
+        contents = contents.replace('{{{}}}'.format(key), item) 
+    fp = open(outfilename, 'wt', encoding='utf-8')
+    fp.write(contents)
+    fp.close()
+
+def get_module_version(modulename):
+    mod = importlib.import_module(modulename)
+    return mod.__version__
 
 def build_all_qt_ui(base_dir='.', from_imports=False):
     from PyQt4.uic import compileUiDir
