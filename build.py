@@ -91,6 +91,15 @@ def build_cocoa_localization(model_path, loc_path):
                 print("Copying {0}".format(model_xib))
                 shutil.copy(model_xib, dest_xib)
 
+def build_all_cocoa_locs(basedir):
+    locs = [name for name in os.listdir(basedir) if name.endswith('.lproj')]
+    locs.remove('en.lproj')
+    model_path = op.join(basedir, 'en.lproj')
+    for loc in locs:
+        loc_path = op.join(basedir, loc)
+        print("Building {0} localizations".format(loc_path))
+        build_cocoa_localization(model_path, loc_path)
+
 def add_to_pythonpath(path):
     """Adds `path` to both PYTHONPATH env and sys.path.
     """
