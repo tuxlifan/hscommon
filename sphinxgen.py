@@ -28,11 +28,10 @@ def tixgen(tixurl):
     repl = '`#\\1 <{}>`__'.format(urlpattern)
     return lambda text: R.sub(repl, text)
 
-def gen(basepath, buildpath, destpath, changelogpath, tixurl, confrepl=None):
+def gen(basepath, destpath, changelogpath, tixurl, confrepl=None):
     """Generate sphinx docs with all bells and whistles.
     
     basepath: The base sphinx source path.
-    buildpath: The path shinx source will be copied to for in-source replacements
     destpath: The final path of html files
     changelogpath: The path to the changelog file to insert in changelog.rst.
     tixurl: The URL (with one formattable argument for the tix number) to the ticket system.
@@ -40,9 +39,6 @@ def gen(basepath, buildpath, destpath, changelogpath, tixurl, confrepl=None):
     """
     if confrepl is None:
         confrepl = {}
-    if op.exists(buildpath):
-        shutil.rmtree(buildpath)
-    shutil.copytree(basepath, buildpath)
     changelog = read_changelog_file(changelogpath)
     tix = tixgen(tixurl)
     rendered_logs = []
@@ -52,7 +48,11 @@ def gen(basepath, buildpath, destpath, changelogpath, tixurl, confrepl=None):
             description=description)
         rendered_logs.append(rendered)
     confrepl['version'] = changelog[0]['version']
-    filereplace(op.join(buildpath, 'changelog.rst'), changelog='\n'.join(rendered_logs))
-    filereplace(op.join(buildpath, 'conf.py'), **confrepl)
-    cmd = 'sphinx-build "{}" "{}"'.format(buildpath, destpath)
+    changelog_in = op.join(basepath, 'changelog.tmpl')
+    changelog_out = op.join(basepath, 'changelog.rst')
+    filereplace(changelog_in, changelog_out, changelog='\n'.join(rendered_logs))
+    conf_in = op.join(basepath, 'conf.tmpl')
+    conf_out = op.join(basepath, 'conf.py')
+    filereplace(conf_in, conf_out, **confrepl)
+    cmd = 'sphinx-build "{}" "{}"'.format(basepath, destpath)
     print_and_do(cmd)
