@@ -128,6 +128,8 @@ def copy_packages(packages_names, dest):
             source_path = op.dirname(mod.__file__)
         dest_name = op.basename(package_name) # the package name can be a path as well
         dest_path = op.join(dest, dest_name)
+        if op.exists(dest_path):
+            shutil.rmtree(dest_path)
         print("Copying package at {0} to {1}".format(source_path, dest_path))
         shutil.copytree(source_path, dest_path, ignore=ignore)
 
