@@ -98,7 +98,10 @@ class RegistrableApplication:
         if self._unpaid_hours is None:
             url = 'http://open.hardcoded.net/backend/unpaid/{0}'.format(self.appid)
             try:
-                connection = urlopen(url)
+                # The timeout is there to avoid delaying the launching of the app too much. Ideally,
+                # this operation should be async, but that's for another time.
+                # XXX Make unpaid hours fetching (and display of fairware dialog) async.
+                connection = urlopen(url, timeout=5)
                 response = str(connection.read(), 'latin-1')
                 self._unpaid_hours = json.loads(response)
                 connection.close()
