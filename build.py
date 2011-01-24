@@ -180,7 +180,7 @@ def build_debian_changelog(changelogpath, destfile, pkgname, from_version=None):
     rendered_logs = []
     for log in changelogs:
         version = log['version']
-        logdate = datetime.strptime(log['date'], '%Y-%m-%d').date()
+        logdate = log['date']
         desc = log['description']
         rendered_date = logdate.strftime('%a, %d %b %Y 00:00:00 +0000')
         rendered_descs = [CHANGE_MODEL.format(description=d) for d in desc2list(desc)]
@@ -206,7 +206,8 @@ def read_changelog_file(filename):
     splitted = re_changelog_header.split(contents)[1:] # the first item is empty
     # splitted = [version1, date1, desc1, version2, date2, ...]
     result = []
-    for version, date, description in iter_by_three(iter(splitted)):
-        d = {'date': date, 'version': version, 'description': description.strip()}
+    for version, date_str, description in iter_by_three(iter(splitted)):
+        date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        d = {'date': date, 'date_str': date_str, 'version': version, 'description': description.strip()}
         result.append(d)
     return result
