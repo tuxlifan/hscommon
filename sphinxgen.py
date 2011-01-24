@@ -7,7 +7,6 @@
 # http://www.hardcoded.net/licenses/bsd_license
 
 import os.path as op
-import shutil
 import re
 
 from .build import print_and_do, read_changelog_file, filereplace
@@ -44,7 +43,10 @@ def gen(basepath, destpath, changelogpath, tixurl, confrepl=None):
     rendered_logs = []
     for log in changelog:
         description = tix(log['description'])
-        rendered = CHANGELOG_FORMAT.format(version=log['version'], date=log['date'],
+        # The format of the changelog descriptions is in markdown, but since we only use bulled list
+        # and links, it's not worth depending on the markdown package. A simple regexp suffice.
+        description = re.sub(r'\[(.*?)\]\((.*?)\)', '`\\1 <\\2>`__', description)
+        rendered = CHANGELOG_FORMAT.format(version=log['version'], date=log['date_str'],
             description=description)
         rendered_logs.append(rendered)
     confrepl['version'] = changelog[0]['version']
