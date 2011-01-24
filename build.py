@@ -55,10 +55,24 @@ def build_all_qt_ui(base_dir='.', from_imports=False):
     mapper = lambda d, f: (d, rem_file_ext(f) + '_ui.py')
     compileUiDir(base_dir, map=mapper, from_imports=from_imports)
 
-def build_all_qt_locs(basedir):
+def build_all_qt_locs(basedir, extradirs=None):
+    """Builds all .ts files in `basedir` and create a .qm file with the same name.
+    
+    If extradirs is not None, for each .ts file in basedir a .ts file with the same name is sought
+    for in extradirs and added to the resulting .qm file.
+    """
+    if extradirs is None:
+        extradirs = []
     tsfiles = [fn for fn in os.listdir(basedir) if fn.endswith('.ts')]
     for ts in tsfiles:
-        print_and_do('lrelease {0}'.format(op.join(basedir, ts)))
+        files_in_cmd = [op.join(basedir, ts)]
+        for extradir in extradirs:
+            extrats = op.join(extradir, ts)
+            if op.exists(extrats):
+                files_in_cmd.append(extrats)
+        tsfiles_cmd = ' '.join(files_in_cmd)
+        destfile = op.join(basedir, ts.replace('.ts', '.qm'))
+        print_and_do('lrelease {} -qm {}'.format(tsfiles_cmd, destfile))
 
 def build_dmg(app_path, dest_path):
     print(repr(op.join(app_path, 'Contents', 'Info.plist')))
