@@ -115,42 +115,23 @@ class TestApp:
         return gui
     
 
-def with_app(appfunc):
-    # This decorator sends the app resulting from the `appfunc` call as an argument to the decorated
-    # `func`. `appfunc` must return a TestApp instance. Additionally, `appfunc` can also return a
-    # tuple (app, patcher). In this case, the patcher will perform unpatching after having called
-    # the decorated func.
+# To use @with_app, you have to import pytest_funcarg__app in your conftest.py file.
+
+def with_app(setupfunc):
     def decorator(func):
-        def wrapper(): # a test is not supposed to take args
-            appresult = appfunc()
-            if isinstance(appresult, tuple):
-                app, patcher = appresult
-            else:
-                app = appresult
-                patcher = None
-            assert isinstance(app, TestApp)
-            try:
-                func(app)
-            finally:
-                if patcher is not None:
-                    patcher.unpatch()
-        
-        wrapper.__name__ = func.__name__
-        return wrapper
+        func.setupfunc = setupfunc
+        return func
     return decorator
 
-def with_tmpdir(func):
-    def wrapper(*args, **kwargs):
-        try:
-            tmppath = Path(tempfile.mkdtemp())
-            args = args + (tmppath, )
-            return func(*args, **kwargs)
-        finally:
-            if io.exists(tmppath):
-                io.rmtree(tmppath)
-    
-    wrapper.__name__ = func.__name__
-    return wrapper
+def pytest_funcarg__app(request):
+    setupfunc = request.function.setupfunc
+    setupresult = setupfunc()
+    if isinstance(setupresult, tuple): # legacy
+        app, patcher = setupresult
+        request.addfinalizer(patcher.unpatch)
+    else:
+        app = setupresult
+    return app
 
 class Patcher:
     def __init__(self, target_module=None):
@@ -223,20 +204,16 @@ def patch_osstat(monkeypatch, path, st_mode=16877, st_ino=742635, st_dev=2348810
     st_seq = [st_mode, st_ino, st_dev, st_nlink, st_uid, st_gid, st_size, st_atime, st_mtime, st_ctime]
     monkeypatch._patched_osstat[str(path)] = os.stat_result(st_seq)
 
-def patch_today(year, month, day):
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            try:
-                p = Patcher()
-                p.patch_today(year, month, day)
-                return func(*args, **kwargs)
-            finally:
-                p.unpatch()
-        
-        wrapper.__name__ = func.__name__
-        return wrapper
-    
-    return decorator
+def patch_today(monkeypatch, year, month, day):
+    """Patches today's date to date(year, month, day)
+    """
+    # For the patching to work system wide, time.time() must be patched. However, there is no way
+    # to get a time.time() value out of a datetime, so a timedelta must be used
+    new_today = datetime.date(year, month, day)
+    today = datetime.date.today()
+    time_now = time.time()
+    delta = today - new_today
+    monkeypatch.setattr(time, 'time', lambda: time_now - (delta.days * 24 * 60 * 60))
 
 def _unify_args(func, args, kwargs, args_to_ignore=None):
     ''' Unify args and kwargs in the same dictionary.
