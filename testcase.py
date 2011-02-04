@@ -16,10 +16,56 @@ import tempfile
 import threading
 import time
 from io import StringIO
-import os
 
 from .path import Path
-from .testutil import Patcher, TestData
+from .testutil import TestData
+
+class Patcher:
+    def __init__(self, target_module=None):
+        self._patched = []
+        self._patched_osstat = {} # path: os.stat_result
+        self._target_module = target_module
+    
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.unpatch()
+        return False
+    
+    def patch(self, target, attrname, replace_with):
+        """ Replaces 'target' attribute 'attrname' with 'replace_with' and put it back to normal at
+            tearDown.
+            
+            The very nice thing about patch() is that it will scan target_module for the patch
+            target and patch it as well. This is to fix the "from" imports problem (Where even
+            if you patch(os, 'path'), if the tested module imported it with "from os import path",
+            the patch will not work).
+        """
+        oldvalue = getattr(target, attrname)
+        self._patched.append((target, attrname, oldvalue))
+        setattr(target, attrname, replace_with)
+        if (self._target_module is not None) and (self._target_module is not target):
+            for key, value in self._target_module.__dict__.items():
+                if value is oldvalue:
+                    self.patch(self._target_module, key, replace_with)
+    
+    def patch_today(self, year, month, day):
+        """Patches today's date to date(year, month, day)
+        """
+        # For the patching to work system wide, time.time() must be patched. However, there is no way
+        # to get a time.time() value out of a datetime, so a timedelta must be used
+        new_today = datetime.date(year, month, day)
+        today = datetime.date.today()
+        time_now = time.time()
+        delta = today - new_today
+        self.patch(time, 'time', lambda: time_now - (delta.days * 24 * 60 * 60))
+    
+    def unpatch(self):
+        # We use reversed() so the original value is put back, even if we patch twice.
+        for target, attrname, old_value in reversed(self._patched):
+            setattr(target, attrname, old_value)
+    
 
 class TestCase(unittest.TestCase, TestData):
     cls_tested_module = None

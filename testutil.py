@@ -9,11 +9,7 @@
 import os
 import datetime
 import time
-import tempfile
 import py.path
-
-from . import io
-from .path import Path
 
 def eq_(a, b, msg=None):
     __tracebackhide__ = True
@@ -116,7 +112,6 @@ class TestApp:
     
 
 # To use @with_app, you have to import pytest_funcarg__app in your conftest.py file.
-
 def with_app(setupfunc):
     def decorator(func):
         func.setupfunc = setupfunc
@@ -125,59 +120,18 @@ def with_app(setupfunc):
 
 def pytest_funcarg__app(request):
     setupfunc = request.function.setupfunc
-    setupresult = setupfunc()
+    if hasattr(setupfunc, '__code__'):
+        argnames = setupfunc.__code__.co_varnames[:setupfunc.__code__.co_argcount]
+        args = [request.getfuncargvalue(argname) for argname in argnames]
+    else:
+        args = []
+    setupresult = setupfunc(*args)
     if isinstance(setupresult, tuple): # legacy
         app, patcher = setupresult
         request.addfinalizer(patcher.unpatch)
     else:
         app = setupresult
     return app
-
-class Patcher:
-    def __init__(self, target_module=None):
-        self._patched = []
-        self._patched_osstat = {} # path: os.stat_result
-        self._target_module = target_module
-    
-    def __enter__(self):
-        return self
-    
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.unpatch()
-        return False
-    
-    def patch(self, target, attrname, replace_with):
-        """ Replaces 'target' attribute 'attrname' with 'replace_with' and put it back to normal at
-            tearDown.
-            
-            The very nice thing about patch() is that it will scan target_module for the patch
-            target and patch it as well. This is to fix the "from" imports problem (Where even
-            if you patch(os, 'path'), if the tested module imported it with "from os import path",
-            the patch will not work).
-        """
-        oldvalue = getattr(target, attrname)
-        self._patched.append((target, attrname, oldvalue))
-        setattr(target, attrname, replace_with)
-        if (self._target_module is not None) and (self._target_module is not target):
-            for key, value in self._target_module.__dict__.items():
-                if value is oldvalue:
-                    self.patch(self._target_module, key, replace_with)
-    
-    def patch_today(self, year, month, day):
-        """Patches today's date to date(year, month, day)
-        """
-        # For the patching to work system wide, time.time() must be patched. However, there is no way
-        # to get a time.time() value out of a datetime, so a timedelta must be used
-        new_today = datetime.date(year, month, day)
-        today = datetime.date.today()
-        time_now = time.time()
-        delta = today - new_today
-        self.patch(time, 'time', lambda: time_now - (delta.days * 24 * 60 * 60))
-    
-    def unpatch(self):
-        # We use reversed() so the original value is put back, even if we patch twice.
-        for target, attrname, old_value in reversed(self._patched):
-            setattr(target, attrname, old_value)
 
 def patch_osstat(monkeypatch, path, st_mode=16877, st_ino=742635, st_dev=234881026, st_nlink=51,
     st_uid=501, st_gid=20, st_size=1734, st_atime=1257942648, st_mtime=1257873561, 
