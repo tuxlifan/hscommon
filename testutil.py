@@ -33,11 +33,11 @@ class TestData:
         'relative_path' can be anything that can be added to a Path
         if args is not empty, it will be joined to relative_path
         """
-        if args:
-            relative_path = py.path.local(relative_path).join(args)
         resultpath = self.datadirpath.join(relative_path)
+        if args:
+            resultpath = resultpath.join(*args)
         assert resultpath.check()
-        return resultpath
+        return str(resultpath)
     
 
 class CallLogger:
