@@ -23,6 +23,19 @@ def nonone(value, replace_value):
     else:
         return value
 
+def tryint(value, default=0):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+def minmax(value, min_value, max_value):
+    """Returns `value` or one of the min/max bounds if `value` is not between them.
+    """
+    return min(max(value, min_value), max_value)
+
+#--- Sequence related
+
 def dedupe(iterable):
     '''Returns a list of elements in iterable with all dupes removed.
     '''
@@ -56,11 +69,32 @@ def first(iterable):
     except StopIteration:
         return None
 
-def tryint(value, default=0):
+def stripfalse(seq):
+    """Returns a sequence with all false elements stripped out of seq.
+    """
+    return [x for x in seq if x]
+
+def extract(predicate, iterable):
+    """Separates the wheat from the shaft (`predicate` defines what's the wheat), and returns both.
+    """
+    wheat = []
+    shaft = []
+    for item in iterable:
+        if predicate(item):
+            wheat.append(item)
+        else:
+            shaft.append(item)
+    return wheat, shaft
+
+def allsame(iterable):
+    """Returns whether all elements of 'iterable' are the same.
+    """
+    it = iter(iterable)
     try:
-        return int(value)
-    except (TypeError, ValueError):
-        return default
+        first_item = next(it)
+    except StopIteration:
+        raise ValueError("iterable cannot be empty")
+    return all(element == first_item for element in it)
 
 #--- String related
 
