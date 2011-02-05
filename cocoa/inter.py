@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Created By: Virgil Dupras
 # Created On: 2010-02-06
 # Copyright 2010 Hardcoded Software (http://www.hardcoded.net)
@@ -140,6 +139,10 @@ class PyTable(PyGUIObject):
             self.py[row].set_cell_value(column, value)
         except IndexError:
             logging.warning("Trying to set an out of bounds row ({0} / {1})".format(row, len(self.py)))
+        except AttributeError:
+            msgfmt = "Trying to set an attribute that can't: {} with value {} at row {}"
+            logging.warning(msgfmt.format(column, value, row))
+            raise
     
     @signature('v@:@c')
     def sortByColumn_desc_(self, column, desc):
