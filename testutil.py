@@ -9,6 +9,7 @@
 import os
 import datetime
 import time
+import threading
 import py.path
 
 def eq_(a, b, msg=None):
@@ -168,6 +169,19 @@ def patch_today(monkeypatch, year, month, day):
     time_now = time.time()
     delta = today - new_today
     monkeypatch.setattr(time, 'time', lambda: time_now - (delta.days * 24 * 60 * 60))
+
+def jointhreads():
+    """Join all threads to the main thread"""
+    for thread in threading.enumerate():
+        if hasattr(thread, 'BUGGY'):
+            continue
+        if thread.getName() != 'MainThread' and thread.isAlive():
+            if hasattr(thread, 'close'):
+                thread.close()
+            thread.join(1)
+            if thread.isAlive():
+                print("Thread problem. Some thread doesn't want to stop.")
+                thread.BUGGY = True
 
 def _unify_args(func, args, kwargs, args_to_ignore=None):
     ''' Unify args and kwargs in the same dictionary.

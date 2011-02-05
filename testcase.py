@@ -13,12 +13,11 @@ import logging
 import os.path as op
 import shutil
 import tempfile
-import threading
 import time
 from io import StringIO
 
 from .path import Path
-from .testutil import TestData
+from .testutil import TestData, jointhreads
 
 class Patcher:
     def __init__(self, target_module=None):
@@ -97,17 +96,7 @@ class TestCase(unittest.TestCase, TestData):
         self._patcher.unpatch()
     
     def jointhreads(self):
-        """Join all threads to the main thread"""
-        for thread in threading.enumerate():
-            if hasattr(thread, 'BUGGY'):
-                continue
-            if thread.getName() != 'MainThread' and thread.isAlive():
-                if hasattr(thread, 'close'):
-                    thread.close()
-                thread.join(1)
-                if thread.isAlive():
-                    print("Thread problem. Some thread doesn't want to stop.")
-                    thread.BUGGY = True
+        jointhreads()
     
     def mock(self, *args, **kw):
         self._patcher.patch(*args, **kw)
