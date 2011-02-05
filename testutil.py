@@ -122,15 +122,15 @@ def pytest_funcarg__app(request):
     setupfunc = request.function.setupfunc
     if hasattr(setupfunc, '__code__'):
         argnames = setupfunc.__code__.co_varnames[:setupfunc.__code__.co_argcount]
-        args = [request.getfuncargvalue(argname) for argname in argnames]
+        def getarg(name):
+            if name == 'self':
+                return request.function.__self__
+            else:
+                return request.getfuncargvalue(name)
+        args = [getarg(argname) for argname in argnames]
     else:
         args = []
-    setupresult = setupfunc(*args)
-    if isinstance(setupresult, tuple): # legacy
-        app, patcher = setupresult
-        request.addfinalizer(patcher.unpatch)
-    else:
-        app = setupresult
+    app = setupfunc(*args)
     return app
 
 def patch_osstat(monkeypatch, path, st_mode=16877, st_ino=742635, st_dev=234881026, st_nlink=51,
