@@ -102,6 +102,14 @@ class PyOutline(PyGUIObject):
     
 
 class PyTable(PyGUIObject):
+    #--- Helpers
+    def _getrow(self, row):
+        try:
+            return self.py[row]
+        except IndexError:
+            logging.warning("Trying to get an out of bounds row ({0} / {1})".format(row, len(self.py)))
+    
+    #--- Cocoa --> Python
     def add(self):
         self.py.add()
     
@@ -136,9 +144,7 @@ class PyTable(PyGUIObject):
         # this try except is important for the case while a row is in edition mode and the delete
         # button is clicked.
         try:
-            self.py[row].set_cell_value(column, value)
-        except IndexError:
-            logging.warning("Trying to set an out of bounds row ({0} / {1})".format(row, len(self.py)))
+            self._getrow(row).set_cell_value(column, value)
         except AttributeError:
             msgfmt = "Trying to set an attribute that can't: {} with value {} at row {}"
             logging.warning(msgfmt.format(column, value, row))
@@ -150,10 +156,7 @@ class PyTable(PyGUIObject):
     
     @signature('@@:@i')
     def valueForColumn_row_(self, column, row):
-        try:
-            return self.py[row].get_cell_value(column)
-        except IndexError:
-            logging.warning("Trying to get an out of bounds row ({0} / {1})".format(row, len(self.py)))    
+        return self._getrow(row).get_cell_value(column)
     
     #--- Python -> Cocoa
     def show_selected_row(self):
