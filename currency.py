@@ -31,7 +31,7 @@ class Currency:
             try:
                 return cls.by_name[name]
             except KeyError:
-                raise ValueError('Unknown currncy name: %r' % name)
+                raise ValueError('Unknown currency name: %r' % name)
 
     def __getnewargs__(self):
         return (self.code,)
@@ -187,6 +187,8 @@ LKR = Currency.register('LKR', 'Sri Lanka rupee',
     start_date=date(1998, 1, 2), start_rate=0.02304, latest_rate=0.0089)
 LTL = Currency.register('LTL', 'Lithuanian litas',
     start_date=date(2010, 4, 29), start_rate=0.384, latest_rate=0.384)
+LVL = Currency.register('LVL', 'Latvian lats',
+    start_date=date(2011, 2, 6), start_rate=1.9136, latest_rate=1.9136)
 MAD = Currency.register('MAD', 'Moroccan dirham',
     start_date=date(1998, 1, 2), start_rate=0.1461, latest_rate=0.1195)
 MMK = Currency.register('MMK', 'Myanmar (Burma) kyat',
@@ -195,6 +197,9 @@ MXN = Currency.register('MXN', 'Mexican peso',
     start_date=date(1998, 1, 2), start_rate=0.1769, latest_rate=0.08156)
 MYR = Currency.register('MYR', 'Malaysian ringgit',
     start_date=date(1998, 1, 2), start_rate=0.3594, latest_rate=0.3149)
+# MZN in not supported in any of my sources, so I'm just creating it with a fixed rate.
+MZN = Currency.register('MZN', 'Mozambican metical',
+    start_date=date(2011, 2, 6), start_rate=0.03, stop_date=date(2011, 2, 5), latest_rate=0.03)
 NLG = Currency.register('NLG', 'Netherlands guilder',
     start_date=date(1998, 1, 2), start_rate=0.7013, stop_date=date(2001, 12, 31), latest_rate=0.6437) # obsolete (euro)
 NOK = Currency.register('NOK', 'Norwegian krone',
