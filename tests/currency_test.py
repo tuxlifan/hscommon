@@ -13,11 +13,20 @@ from .. import io
 from ..testutil import eq_, assert_almost_equal
 from ..currency import Currency, RatesDB, CAD, EUR, PLN, USD
 
+def setup_module(module):
+    global FOO
+    global BAR
+    FOO = Currency.register('FOO', 'Currency with start date', start_date=date(2009, 1, 12), start_rate=2)
+    BAR = Currency.register('BAR', 'Currency with stop date', stop_date=date(2010, 1, 12), latest_rate=2)
+
+def teardown_module(module):
+    # We must unset our test currencies or else we might mess up with other tests.
+    from .. import currency
+    import imp
+    imp.reload(currency)
+
 def teardown_function(function):
     Currency.set_rates_db(None)
-
-FOO = Currency.register('FOO', 'Currency with start date', start_date=date(2009, 1, 12), start_rate=2)
-BAR = Currency.register('BAR', 'Currency with stop date', stop_date=date(2010, 1, 12), latest_rate=2)
 
 def test_currency_creation():
     # Different ways to create a currency.
