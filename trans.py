@@ -37,6 +37,18 @@ def set_tr(new_tr):
     global _trfunc
     _trfunc = new_tr
 
+def get_locale_name(lang):
+    if sys.platform == 'win32':
+        LANG2LOCALENAME = {'fr': 'fra_fra', 'de': 'deu_deu', 'it': 'ita_ita'}
+    else:
+        LANG2LOCALENAME = {'fr': 'fr_FR', 'de': 'de_DE', 'it': 'it_IT'}
+    if lang not in LANG2LOCALENAME:
+        return None
+    result = LANG2LOCALENAME[lang]
+    if sys.platform == 'linux2':
+        result += '.UTF-8'
+    return result
+
 def install_cocoa_trans():
     from .cocoa.objcmin import NSBundle
     mainBundle = NSBundle.mainBundle()
@@ -44,26 +56,20 @@ def install_cocoa_trans():
         return mainBundle.localizedStringForKey_value_table_(s, s, context)
     set_tr(cocoa_tr)
     currentLang = NSBundle.preferredLocalizationsFromArray_(mainBundle.localizations())[0]
-    LANG2LOCALENAME = {'fr': 'fr_FR', 'de': 'de_DE'}
-    if currentLang in LANG2LOCALENAME:
-        locale.setlocale(locale.LC_ALL, LANG2LOCALENAME[currentLang])
+    localename = get_locale_name(currentLang)
+    if localename is not None:
+        locale.setlocale(locale.LC_ALL, localename)
 
 def install_qt_trans(lang=None):
     from PyQt4.QtCore import QCoreApplication, QTranslator, QLocale
-    if sys.platform == 'win32':
-        LANG2LOCALENAME = {'fr': 'fra_fra', 'de': 'deu_deu'}
-    elif sys.platform == 'darwin':
-        LANG2LOCALENAME = {'fr': 'fr_FR', 'de': 'de_DE'}
-    else:
-        LANG2LOCALENAME = {'fr': 'fr_FR.UTF-8', 'de': 'de_DE.UTF-8'}
     if not lang:
         lang = str(QLocale.system().name())[:2]
-    if lang in LANG2LOCALENAME:
-        localeName = LANG2LOCALENAME[lang]
+    localename = get_locale_name(lang)
+    if localename is not None:
         try:
-            locale.setlocale(locale.LC_ALL, str(localeName))
+            locale.setlocale(locale.LC_ALL, localename)
         except locale.Error:
-            logging.warning("Couldn't set locale %s", localeName)
+            logging.warning("Couldn't set locale %s", localename)
     else:
         lang = 'en'
     qtr1 = QTranslator(QCoreApplication.instance())
