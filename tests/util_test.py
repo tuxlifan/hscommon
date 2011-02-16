@@ -10,7 +10,7 @@ from io import StringIO
 
 from pytest import raises
 
-from ..testutil import eq_, patch_osstat
+from ..testutil import eq_
 from .. import io
 from ..path import Path
 from ..util import *
@@ -178,29 +178,29 @@ def test_multi_replace():
 #--- Files
 
 class TestCase_modified_after:
-    def test_first_is_modified_after(self, monkeypatch):
-        patch_osstat(monkeypatch, 'first', st_mtime=42)
-        patch_osstat(monkeypatch, 'second', st_mtime=41)
+    def test_first_is_modified_after(self, monkeyplus):
+        monkeyplus.patch_osstat('first', st_mtime=42)
+        monkeyplus.patch_osstat('second', st_mtime=41)
         assert modified_after('first', 'second')
     
-    def test_second_is_modified_after(self, monkeypatch):
-        patch_osstat(monkeypatch, 'first', st_mtime=42)
-        patch_osstat(monkeypatch, 'second', st_mtime=43)
+    def test_second_is_modified_after(self, monkeyplus):
+        monkeyplus.patch_osstat('first', st_mtime=42)
+        monkeyplus.patch_osstat('second', st_mtime=43)
         assert not modified_after('first', 'second')
     
-    def test_same_mtime(self, monkeypatch):
-        patch_osstat(monkeypatch, 'first', st_mtime=42)
-        patch_osstat(monkeypatch, 'second', st_mtime=42)
+    def test_same_mtime(self, monkeyplus):
+        monkeyplus.patch_osstat('first', st_mtime=42)
+        monkeyplus.patch_osstat('second', st_mtime=42)
         assert not modified_after('first', 'second')
     
-    def test_first_file_does_not_exist(self, monkeypatch):
+    def test_first_file_does_not_exist(self, monkeyplus):
         # when the first file doesn't exist, we return False
-        patch_osstat(monkeypatch, 'second', st_mtime=42)
+        monkeyplus.patch_osstat('second', st_mtime=42)
         assert not modified_after('does_not_exist', 'second') # no crash
     
-    def test_second_file_does_not_exist(self, monkeypatch):
+    def test_second_file_does_not_exist(self, monkeyplus):
         # when the second file doesn't exist, we return True
-        patch_osstat(monkeypatch, 'first', st_mtime=42)
+        monkeyplus.patch_osstat('first', st_mtime=42)
         assert modified_after('first', 'does_not_exist') # no crash
     
 
