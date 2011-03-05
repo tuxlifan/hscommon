@@ -24,11 +24,11 @@ def tr(s, context=None):
         else:
             return _trfunc(s)
 
-def trmsg(s):
+def trmsg(s, context='message'):
     # Long messages in HS translations are referred to by identifiers (SomethingMsg). We really don't
     # want to not have an entry for them in the language database, so if the trfunc returns the same
     # string, we log a warning.
-    result = tr(s, 'message')
+    result = tr(s, context)
     if result == s:
         logging.warning("Message '{}' couldn't be found in the translation database.".format(s))
     return result

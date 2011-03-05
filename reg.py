@@ -94,6 +94,10 @@ class RegistrableApplication:
             pass
     
     @property
+    def should_show_fairware_reminder(self):
+        return (not self.registered) and (self.unpaid_hours >= 1)
+    
+    @property
     def unpaid_hours(self):
         if self._unpaid_hours is None:
             url = 'http://open.hardcoded.net/backend/unpaid/{0}'.format(self.appid)
