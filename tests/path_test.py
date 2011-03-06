@@ -189,3 +189,21 @@ def test_log_unicode_errors(force_ossep, monkeypatch, capsys):
         Path(['', b'foo\xe9'])
     out, err = capsys.readouterr()
     assert repr(b'foo\xe9') in err
+
+def test_has_drive_letter(monkeypatch):
+    monkeypatch.setattr(os, 'sep', '\\')
+    p = Path('foo\\bar')
+    assert not p.has_drive_letter()
+    p = Path('C:\\')
+    assert p.has_drive_letter()
+    p = Path('z:\\foo')
+    assert p.has_drive_letter()
+
+def test_remove_drive_letter(monkeypatch):
+    monkeypatch.setattr(os, 'sep', '\\')
+    p = Path('foo\\bar')
+    eq_(p.remove_drive_letter(), Path('foo\\bar'))
+    p = Path('C:\\')
+    eq_(p.remove_drive_letter(), Path(''))
+    p = Path('z:\\foo')
+    eq_(p.remove_drive_letter(), Path('foo'))

@@ -113,6 +113,18 @@ class Path(tuple):
                 return '/'
         return os.sep.join(self)
     
+    def has_drive_letter(self):
+        if not self:
+            return False
+        first = self[0]
+        return (len(first) == 2) and (first[1] == ':')
+    
+    def remove_drive_letter(self):
+        if self.has_drive_letter():
+            return self[1:]
+        else:
+            return self
+    
     def tobytes(self):
         return str(self).encode(sys.getfilesystemencoding())
     
