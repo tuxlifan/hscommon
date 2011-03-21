@@ -107,7 +107,8 @@ class PyTable(PyGUIObject):
         try:
             return self.py[row]
         except IndexError:
-            logging.warning("Trying to get an out of bounds row ({0} / {1})".format(row, len(self.py)))
+            msg = "Trying to get an out of bounds row ({} / {}) on table {}"
+            logging.warning(msg.format(row, len(self.py), self.py.__class__.__name__))
     
     #--- Cocoa --> Python
     def add(self):
@@ -146,8 +147,8 @@ class PyTable(PyGUIObject):
         try:
             self._getrow(row).set_cell_value(column, value)
         except AttributeError:
-            msgfmt = "Trying to set an attribute that can't: {} with value {} at row {}"
-            logging.warning(msgfmt.format(column, value, row))
+            msg = "Trying to set an attribute that can't: {} with value {} at row {} on table {}"
+            logging.warning(msg.format(column, value, row, self.py.__class__.__name__))
             raise
     
     @signature('v@:@c')
