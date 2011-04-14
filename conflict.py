@@ -40,7 +40,7 @@ def _smart_move_or_copy(operation, source_path, dest_path):
     ''' Use move() or copy() to move and copy file with the conflict management, but without the
         slowness of the fs system.
     '''
-    if io.isdir(dest_path):
+    if io.isdir(dest_path) and not io.isdir(source_path):
         dest_path = dest_path + source_path[-1]
     if io.exists(dest_path):
         filename = dest_path[-1]
@@ -53,4 +53,10 @@ def smart_move(source_path, dest_path):
     _smart_move_or_copy(io.move, source_path, dest_path)
 
 def smart_copy(source_path, dest_path):
-    _smart_move_or_copy(io.copy, source_path, dest_path)
+    try:
+        _smart_move_or_copy(io.copy, source_path, dest_path)
+    except IOError as e:
+        if e.errno == 21: # it's a directory
+            _smart_move_or_copy(io.copytree, source_path, dest_path)
+        else:
+            raise

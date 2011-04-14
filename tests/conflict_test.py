@@ -94,3 +94,11 @@ class TestCase_move_copy:
         assert not io.exists(self.path + 'foo')
         assert not io.exists(self.path + 'bar')
     
+    def test_copy_folder(self, tmpdir):
+        # smart_copy also works on folders
+        path = Path(str(tmpdir))
+        io.mkdir(path + 'foo')
+        io.mkdir(path + 'bar')
+        smart_copy(path + 'foo', path + 'bar') # no crash
+        assert io.exists(path + '[000] bar')
+    
