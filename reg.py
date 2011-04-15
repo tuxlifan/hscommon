@@ -6,10 +6,12 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
+import sys
 import re
 from hashlib import md5
 import json
 from urllib.request import urlopen, URLError
+from urllib.parse import urlencode
 from http.client import HTTPException
 import logging
 import socket
@@ -83,13 +85,21 @@ class RegistrableApplication:
             "that the e-mail you gave is the same as the e-mail you used for your purchase."
         raise InvalidCodeError(DEFAULT_MSG)
     
-    def set_registration(self, code, email):
+    def set_registration(self, code, email, register_os=False):
         try:
             self.validate_code(code, email)
             self.registration_code = code
             self.registration_email = email
             self.registered = True
             self._setup_as_registered()
+            if register_os:
+                url = 'http://open.hardcoded.net/backend/register/'
+                data = {'email': email, 'osname': sys.platform}
+                encoded = bytes(urlencode(data), encoding='ascii')
+                try:
+                    urlopen(url, data=encoded)
+                except URLError:
+                    pass
         except InvalidCodeError:
             pass
     

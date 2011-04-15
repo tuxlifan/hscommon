@@ -192,8 +192,9 @@ class PyFairware(NSObject):
         except InvalidCodeError as e:
             return str(e)
     
-    def setRegisteredCode_andEmail_(self, code, email):
-        self.py.set_registration(code, email)
+    @signature('v@:@@c')
+    def setRegisteredCode_andEmail_registerOS_(self, code, email, registerOS):
+        self.py.set_registration(code, email, registerOS)
     
     def unpaidHours(self):
         return self.py.unpaid_hours
