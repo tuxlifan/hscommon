@@ -38,7 +38,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'hscommon'
-copyright = '2010, Hardcoded Software'
+copyright = '2011, Hardcoded Software'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
