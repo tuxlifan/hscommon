@@ -155,7 +155,7 @@ FRF = Currency.register('FRF', 'French franc',
     start_date=date(1998, 1, 2), start_rate=0.2362, stop_date=date(2001, 12, 31), latest_rate=0.2163) # obsolete (euro)
 GHC = Currency.register('GHC', 'Ghanaian cedi (old)',
     start_date=date(1998, 1, 2), start_rate=0.00063, stop_date=date(2007, 6, 29), latest_rate=0.000115) # obsolete
-GHS = Currency.register('GHS', 'Ghanaian cedi (new)',
+GHS = Currency.register('GHS', 'Ghanaian cedi',
     start_date=date(2007, 7, 3), start_rate=1.1397, latest_rate=0.7134)
 GRD = Currency.register('GRD', 'Greek drachma',
     start_date=date(1998, 1, 2), start_rate=0.005, stop_date=date(2001, 12, 31), latest_rate=0.004163) # obsolete (euro)
