@@ -44,6 +44,7 @@ NSArray = objc.lookUpClass('NSArray')
 NSDictionary = objc.lookUpClass('NSDictionary')
 NSLocale = objc.lookUpClass('NSLocale')
 NSNumberFormatter = objc.lookUpClass('NSNumberFormatter')
+NSAlert = objc.lookUpClass('NSAlert')
 
 # It's a little strange, but it seems like registerMetaDataForSelector required bytes for the first
 # 2 arguments, but it needs str in its metadata dicts.
