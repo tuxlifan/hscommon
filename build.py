@@ -12,7 +12,7 @@ import os.path as op
 import shutil
 import tempfile
 import plistlib
-from subprocess import Popen
+from subprocess import Popen, PIPE
 import re
 import importlib
 from datetime import datetime
@@ -49,6 +49,13 @@ def filereplace(filename, outfilename=None, **kwargs):
 def get_module_version(modulename):
     mod = importlib.import_module(modulename)
     return mod.__version__
+
+def get_xcode_version():
+    p = Popen(['xcodebuild', '-version'], stdout=PIPE)
+    s = p.communicate()[0].decode('latin-1')
+    assert s.startswith('Xcode ')
+    startpos = len('Xcode ')
+    return s[startpos:startpos+3]
 
 def build_all_qt_ui(base_dir='.', from_imports=False):
     from PyQt4.uic import compileUiDir
