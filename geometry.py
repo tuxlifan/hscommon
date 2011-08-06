@@ -124,8 +124,8 @@ class Rect:
         pt2 = Point(pt4.x, pt1.y)
         pt3 = Point(pt1.x, pt4.y)
         l1 = Line(pt1, pt2)
-        l2 = Line(pt2, pt3)
+        l2 = Line(pt2, pt4)
         l3 = Line(pt3, pt4)
-        l4 = Line(pt4, pt1)
+        l4 = Line(pt1, pt3)
         return l1, l2, l3, l4
     
