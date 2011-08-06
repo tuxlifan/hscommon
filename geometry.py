@@ -93,6 +93,12 @@ class Rect:
         yield self.h
     
     @classmethod
+    def from_center(cls, center, width, height):
+        x = center.x - width / 2
+        y = center.y - height / 2
+        return cls(x, y, width, height)
+    
+    @classmethod
     def from_corners(cls, pt1, pt2):
         x1, y1 = pt1
         x2, y2 = pt2
