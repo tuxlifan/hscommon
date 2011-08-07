@@ -135,3 +135,13 @@ class Rect:
         l4 = Line(pt1, pt3)
         return l1, l2, l3, l4
     
+    def scaled_rect(self, dx, dy):
+        """Returns a rect that has the same borders at self, but grown/shrunk by dx/dy on each side.
+        """
+        x, y, w, h = self
+        x -= dx
+        y -= dy
+        w += dx * 2
+        h += dy * 2
+        return Rect(x, y, w, h)
+    
