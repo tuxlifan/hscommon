@@ -107,6 +107,15 @@ class Rect:
     def center(self):
         return Point(self.x + self.w/2, self.y + self.h/2)
     
+    def contains_point(self, point):
+        x, y = point
+        (x1, y1), (x2, y2) = self.corners()
+        return (x1 <= x <= x2) and (y1 <= y <= y2)
+    
+    def contains_rect(self, rect):
+        pt1, pt2 = rect.corners()
+        return self.contains_point(pt1) and self.contains_point(pt2)
+    
     def corners(self):
         return Point(self.x, self.y), Point(self.x+self.w, self.y+self.h)
     
