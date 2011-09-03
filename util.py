@@ -96,6 +96,21 @@ def allsame(iterable):
         raise ValueError("iterable cannot be empty")
     return all(element == first_item for element in it)
 
+def trailiter(iterable, skipfirst=False):
+    """Yields (prev_element, element), starting with (None, first_element).
+    
+    If skipfirst is True, there will be no (None, item1) element and we'll start
+    directly with (item1, item2).
+    """
+    it = iter(iterable)
+    if skipfirst:
+        prev = next(it)
+    else:
+        prev = None
+    for item in it:
+        yield prev, item
+        prev = item
+
 #--- String related
 
 def escape(s, to_escape, escape_with='\\'):

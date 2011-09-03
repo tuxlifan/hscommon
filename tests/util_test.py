@@ -59,6 +59,13 @@ def test_allsame():
     # Works on non-sequence as well
     assert allsame(iter([42, 42, 42]))
 
+def test_trailiter():
+    eq_(list(trailiter([])), [])
+    eq_(list(trailiter(['foo'])), [(None, 'foo')])
+    eq_(list(trailiter(['foo', 'bar'])), [(None, 'foo'), ('foo', 'bar')])
+    eq_(list(trailiter(['foo', 'bar'], skipfirst=True)), [('foo', 'bar')])
+    eq_(list(trailiter([], skipfirst=True)), []) # no crash
+
 #--- String
 
 def test_escape():
