@@ -39,9 +39,9 @@ def set_tr(new_tr):
 
 def get_locale_name(lang):
     if sys.platform == 'win32':
-        LANG2LOCALENAME = {'fr': 'fra_fra', 'de': 'deu_deu', 'it': 'ita_ita'}
+        LANG2LOCALENAME = {'fr': 'fra_fra', 'de': 'deu_deu', 'it': 'ita_ita', 'zh': 'zho_zho'}
     else:
-        LANG2LOCALENAME = {'fr': 'fr_FR', 'de': 'de_DE', 'it': 'it_IT'}
+        LANG2LOCALENAME = {'fr': 'fr_FR', 'de': 'de_DE', 'it': 'it_IT', 'zh': 'zh_CN'}
     if lang not in LANG2LOCALENAME:
         return None
     result = LANG2LOCALENAME[lang]
