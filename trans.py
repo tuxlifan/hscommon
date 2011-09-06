@@ -40,9 +40,9 @@ def set_tr(new_tr):
 def get_locale_name(lang):
     if sys.platform == 'win32':
         # http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
-        LANG2LOCALENAME = {'fr': 'fra', 'de': 'deu', 'it': 'ita', 'zh': 'chs'}
+        LANG2LOCALENAME = {'fr': 'fra', 'de': 'deu', 'it': 'ita', 'zh_CN': 'chs'}
     else:
-        LANG2LOCALENAME = {'fr': 'fr_FR', 'de': 'de_DE', 'it': 'it_IT', 'zh': 'zh_CN'}
+        LANG2LOCALENAME = {'fr': 'fr_FR', 'de': 'de_DE', 'it': 'it_IT', 'zh_CN': 'zh_CN'}
     if lang not in LANG2LOCALENAME:
         return None
     result = LANG2LOCALENAME[lang]
