@@ -8,6 +8,8 @@
 
 from collections import MutableSequence, namedtuple
 
+from .selectable_list import Selectable
+
 # We used to directly subclass list, but it caused problems at some point with deepcopy
 
 # Adding and removing footer here and there might seem (and is) hackish, but it's much simpler than
@@ -16,10 +18,10 @@ from collections import MutableSequence, namedtuple
 # Moreover, the most frequent operation on a table is __getitem__, and making checks to know whether
 # the key is a header or footer at each call would make that operation, which is the most used,
 # slower.
-class Table(MutableSequence):
+class Table(MutableSequence, Selectable):
     def __init__(self):
+        Selectable.__init__(self)
         self._rows = []
-        self._selected_indexes = []
         self._header = None
         self._footer = None
     
@@ -46,15 +48,6 @@ class Table(MutableSequence):
     
     def __setitem__(self, key, value):
         self._rows.__setitem__(key, value)
-    
-    def _check_selection_range(self):
-        if not self:
-            self._selected_indexes = []
-        if not self._selected_indexes:
-            return
-        self._selected_indexes = [index for index in self._selected_indexes if index < len(self)]
-        if not self._selected_indexes:
-            self._selected_indexes = [len(self) - 1]
     
     def append(self, item):
         if self._footer is not None:
@@ -147,25 +140,7 @@ class Table(MutableSequence):
     @property
     def selected_rows(self):
         return [self[index] for index in self.selected_indexes]
-    
-    @property
-    def selected_index(self):
-        return self._selected_indexes[0] if self._selected_indexes else None
-    
-    @selected_index.setter
-    def selected_index(self, value):
-        self.selected_indexes = [value]
-    
-    @property
-    def selected_indexes(self):
-        return self._selected_indexes
-    
-    @selected_indexes.setter
-    def selected_indexes(self, value):
-        self._selected_indexes = value
-        self._selected_indexes.sort()
-        self._check_selection_range()
-    
+
 
 SortDescriptor = namedtuple('SortDescriptor', 'column desc')
 # Subclasses of this class must have a "view" attribute
@@ -198,10 +173,6 @@ class GUITable(Table):
                 self.select(previous_selection)
             else:
                 self.select([len(self) - 1])
-    
-    def _update_selection(self):
-        # Takes the table's selection and does appropriates updates on the Document's side.
-        pass
     
     #--- Public
     def add(self):
@@ -262,10 +233,6 @@ class GUITable(Table):
         row = self.edited
         self.edited = None
         row.save()
-    
-    def select(self, row_indexes):
-        self.selected_indexes = row_indexes
-        self._update_selection()
     
     def sort_by(self, column_name, desc=False):
         Table.sort_by(self, column_name=column_name, desc=desc)

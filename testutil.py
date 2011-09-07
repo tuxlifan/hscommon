@@ -17,6 +17,13 @@ def assert_almost_equal(a, b, places=7):
     __tracebackhide__ = True
     assert round(a, ndigits=places) == round(b, ndigits=places)
 
+def callcounter():
+    def f(*args, **kwargs):
+        f.callcount += 1
+    
+    f.callcount = 0
+    return f
+
 class TestData:
     def __init__(self, datadirpath):
         self.datadirpath = py.path.local(datadirpath)
@@ -100,6 +107,7 @@ class TestApp:
         if view is None:
             view = CallLogger()
         if parent is None:
+            # XXX change this to something less moneyguru-centric
             parent = self.mw
         if holder is None:
             holder = self
