@@ -9,6 +9,7 @@
 from collections import Sequence, MutableSequence
 
 from ..util import minmax
+from .base import NoopGUI
 
 class Selectable(Sequence):
     def __init__(self):
@@ -67,6 +68,7 @@ class SelectableList(MutableSequence, Selectable):
     def __delitem__(self, key):
         self._items.__delitem__(key)
         self._check_selection_range()
+        self._on_change()
     
     def __getitem__(self, key):
         return self._items.__getitem__(key)
@@ -76,15 +78,33 @@ class SelectableList(MutableSequence, Selectable):
     
     def __setitem__(self, key, value):
         self._items.__setitem__(key, value)
+        self._on_change()
     
     #--- Override
     def append(self, item):
         self._items.append(item)
+        self._on_change()
     
     def insert(self, index, item):
         self._items.insert(index, item)
+        self._on_change()
     
     def remove(self, row):
         self._items.remove(row)
         self._check_selection_range()
+        self._on_change()
     
+    #--- Virtual
+    def _on_change(self):
+        pass
+    
+
+class GUISelectableList(SelectableList):
+    def __init__(self, items=None, view=None):
+        SelectableList.__init__(self, items)
+        if view is None:
+            view = NoopGUI()
+        self.view = view
+    
+    def _on_change(self):
+        self.view.refresh()
