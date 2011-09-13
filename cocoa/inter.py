@@ -32,6 +32,18 @@ class PyGUIObject(NSObject):
         self.py = self.py_class(self, pyparent.py)
         return self
     
+    def initWithPy_(self, py):
+        # Use this for 2-steps instantiation, for example if our py instance is driven by the core
+        # instead of the GUI. However, make sure to call bindCocoa_() before actual usage.
+        super(PyGUIObject, self).init()
+        self.cocoa = None
+        self.py = py
+        return self
+    
+    def bindCocoa_(self, cocoa):
+        self.cocoa = cocoa
+        self.py.view = self
+    
     def connect(self):
         if hasattr(self.py, 'connect'):
             self.py.connect()
@@ -172,6 +184,29 @@ class PyTable(PyGUIObject):
     def update_selection(self):
         self.cocoa.updateSelection()
     
+
+class PySelectableList(PyGUIObject):
+    def items(self):
+        # Should normally always return strings
+        return self.py[:]
+    
+    @signature('v@:i')
+    def selectIndex_(self, index):
+        self.py.select(index)
+    
+    @signature('i@:')
+    def selectedIndex(self):
+        result = self.py.selected_index
+        if result is None:
+            result = -1
+        return result
+    
+    def selectedIndexes(self):
+        return self.py.selected_indexes
+    
+    def selectIndexes_(self, indexes):
+        self.py.select(indexes)
+
 
 class PyFairware(NSObject):
     def appName(self):
