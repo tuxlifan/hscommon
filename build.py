@@ -17,6 +17,7 @@ import re
 import importlib
 from datetime import datetime
 
+from .plat import ISWINDOWS
 from .util import rem_file_ext, modified_after, find_in_path
 
 def print_and_do(cmd):
@@ -132,7 +133,7 @@ def add_to_pythonpath(path):
     """
     abspath = op.abspath(path)
     pythonpath = os.environ.get('PYTHONPATH', '')
-    pathsep = ';' if sys.platform == 'win32' else ':'
+    pathsep = ';' if ISWINDOWS else ':'
     pythonpath = pathsep.join([abspath, pythonpath]) if pythonpath else abspath
     os.environ['PYTHONPATH'] = pythonpath
     sys.path.insert(1, abspath)

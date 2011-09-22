@@ -13,6 +13,8 @@ import sys
 import locale
 import logging
 
+from .plat import ISWINDOWS, ISLINUX
+
 _trfunc = None
 
 def tr(s, context=None):
@@ -38,7 +40,7 @@ def set_tr(new_tr):
     _trfunc = new_tr
 
 def get_locale_name(lang):
-    if sys.platform == 'win32':
+    if ISWINDOWS:
         # http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
         LANG2LOCALENAME = {'fr': 'fra', 'de': 'deu', 'it': 'ita', 'zh_CN': 'chs'}
     else:
@@ -46,7 +48,7 @@ def get_locale_name(lang):
     if lang not in LANG2LOCALENAME:
         return None
     result = LANG2LOCALENAME[lang]
-    if sys.platform == 'linux2':
+    if ISLINUX:
         result += '.UTF-8'
     return result
 
