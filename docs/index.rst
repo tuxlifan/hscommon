@@ -26,7 +26,6 @@ API Documentation
    cocoa
    conflict
    currency
-   markable
    notify
    path
    reg
