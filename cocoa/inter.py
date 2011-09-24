@@ -13,7 +13,7 @@ import logging
 import objc
 
 from ..reg import InvalidCodeError
-from .objcmin import NSObject
+from .objcmin import NSObject, NSUserDefaults, NSArray, NSDictionary
 
 def signature(signature):
     """Returns an objc.signature with 'i' and 'f' letters changed to correct NSInteger and
@@ -24,6 +24,24 @@ def signature(signature):
     signature = signature.replace(b'I', objc._C_NSUInteger)
     signature = signature.replace(b'f', objc._C_CGFloat)
     return objc.typedSelector(signature)
+
+def pythonify(o):
+    """Changes 'o' into a python class (pyobjc_unicode --> u'', NSDictionary --> {}, NSArray --> [])
+    """
+    if o is None:
+        return None
+    elif isinstance(o, objc.pyobjc_unicode):
+        return str(o)
+    elif isinstance(o, (objc._pythonify.OC_PythonLong)):
+        return int(o)
+    elif isinstance(o, NSArray):
+        return [pythonify(item) for item in o]
+    elif isinstance(o, NSDictionary):
+        return dict((pythonify(k), pythonify(v)) for k, v in list(o.items()))
+    elif isinstance(o, (bool, int, list, dict, str)):
+        return o # already pythonified
+    logging.warning('Could not pythonify {0} (of type {1}'.format(repr(o), type(o)))
+    return o
 
 class PyGUIObject(NSObject):
     def initWithCocoa_pyParent_(self, cocoa, pyparent):
@@ -209,6 +227,9 @@ class PySelectableList(PyGUIObject):
 
 
 class PyFairware(NSObject):
+    def initialRegistrationSetup(self):
+        self.py.initial_registration_setup()
+    
     def appName(self):
         return ""
     
@@ -229,8 +250,26 @@ class PyFairware(NSObject):
     
     @signature('v@:@@c')
     def setRegisteredCode_andEmail_registerOS_(self, code, email, registerOS):
-        self.py.set_registration(code, email, registerOS)
+        self.py.set_registration(code, email)
+        if registerOS:
+            self.py.register_os()
+        self.py.write_registration_to_defaults()
     
     def unpaidHours(self):
         return self.py.unpaid_hours
+    
+    #--- Python --> Cocoa
+    def get_default(self, key_name):
+        raw = NSUserDefaults.standardUserDefaults().objectForKey_(key_name)
+        result = pythonify(raw)
+        return result
+    
+    def set_default(self, key_name, value):
+        NSUserDefaults.standardUserDefaults().setObject_forKey_(value, key_name)
+    
+    def setup_as_registered(self):
+        self.cocoa.setupAsRegistered()
+    
+    def show_fairware_nag(self):
+        self.cocoa.showFairwareNag()
     

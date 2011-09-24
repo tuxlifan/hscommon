@@ -32,11 +32,18 @@ class InvalidCodeError(Exception):
     """The supplied code is invalid."""
 
 class RegistrableApplication:
-    def __init__(self, appid):
+    #--- View interface
+    # get_default(key_name)
+    # set_default(key_name, value)
+    # setup_as_registered()
+    # show_fairware_nag()
+    
+    def __init__(self, view, appid):
+        self.view = view
         self.appid = appid
         self.registered = False
-        self.register_code = ''
-        self.register_email = ''
+        self.registration_code = ''
+        self.registration_email = ''
         self.is_first_run = False # has to be set by the app.
         self._unpaid_hours = None
     
@@ -52,8 +59,14 @@ class RegistrableApplication:
                 return True
         return False
     
-    def _setup_as_registered(self):
-        pass # virtual
+    def initial_registration_setup(self):
+        # Should be called only after the app is finished launching
+        code = self.view.get_default('RegistrationCode')
+        email = self.view.get_default('RegistrationEmail')
+        if code and email:
+            self.set_registration(code, email)
+        if self.should_show_fairware_reminder:
+            self.view.show_fairware_nag()
     
     def validate_code(self, code, email):
         code = code.strip().lower()
@@ -85,23 +98,31 @@ class RegistrableApplication:
             "that the e-mail you gave is the same as the e-mail you used for your purchase."
         raise InvalidCodeError(DEFAULT_MSG)
     
-    def set_registration(self, code, email, register_os=False):
+    def set_registration(self, code, email):
         try:
             self.validate_code(code, email)
             self.registration_code = code
             self.registration_email = email
             self.registered = True
-            self._setup_as_registered()
-            if register_os:
-                url = 'http://open.hardcoded.net/backend/register/'
-                data = {'email': email, 'osname': sys.platform}
-                encoded = bytes(urlencode(data), encoding='ascii')
-                try:
-                    urlopen(url, data=encoded)
-                except URLError:
-                    pass
+            self.view.setup_as_registered()
         except InvalidCodeError:
             pass
+    
+    def register_os(self):
+        if not self.registered:
+            return
+        url = 'http://open.hardcoded.net/backend/register/'
+        data = {'email': self.registration_email, 'osname': sys.platform}
+        encoded = bytes(urlencode(data), encoding='ascii')
+        try:
+            urlopen(url, data=encoded)
+        except URLError:
+            pass
+    
+    def write_registration_to_defaults(self):
+        if self.registered:
+            self.view.set_default('RegistrationCode', self.registration_code)
+            self.view.set_default('RegistrationEmail', self.registration_email)
     
     @property
     def should_show_fairware_reminder(self):

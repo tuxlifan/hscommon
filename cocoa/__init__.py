@@ -17,8 +17,8 @@ from jobprogress.job import JobCancelled
 from jobprogress.performer import ThreadedJobPerformer as ThreadedJobPerformerBase
 
 from .inter import signature
-from .objcmin import (NSBundle, NSAutoreleasePool, NSObject, NSArray, NSDictionary,
-    NSExceptionHandler, NSLogAndHandleEveryExceptionMask)
+from .objcmin import (NSBundle, NSAutoreleasePool, NSObject, NSExceptionHandler,
+    NSLogAndHandleEveryExceptionMask)
 
 
 def report_crash(type, value, tb):
@@ -116,21 +116,3 @@ def install_exception_hook():
     NSExceptionHandler.defaultExceptionHandler().setExceptionHandlingMask_(NSLogAndHandleEveryExceptionMask)
     NSExceptionHandler.defaultExceptionHandler().setDelegate_(delegate)
     _exceptionHandlerDelegate = delegate
-
-def pythonify(o):
-    """Changes 'o' into a python class (pyobjc_unicode --> u'', NSDictionary --> {}, NSArray --> [])
-    """
-    if o is None:
-        return None
-    elif isinstance(o, objc.pyobjc_unicode):
-        return str(o)
-    elif isinstance(o, (objc._pythonify.OC_PythonLong)):
-        return int(o)
-    elif isinstance(o, NSArray):
-        return [pythonify(item) for item in o]
-    elif isinstance(o, NSDictionary):
-        return dict((pythonify(k), pythonify(v)) for k, v in list(o.items()))
-    elif isinstance(o, (bool, int, list, dict, str)):
-        return o # already pythonified
-    logging.warning('Could not pythonify {0} (of type {1}'.format(repr(o), type(o)))
-    return o

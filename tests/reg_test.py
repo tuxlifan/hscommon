@@ -8,20 +8,21 @@
 
 from hashlib import md5
 
+from ..testutil import CallLogger
 from ..reg import RegistrableApplication, InvalidCodeError
 
 def md5s(s):
     return md5(s.encode('utf-8')).hexdigest()
 
 def assert_valid(appid, code, email):
-    app = RegistrableApplication(appid)
+    app = RegistrableApplication(CallLogger(), appid)
     try:
         app.validate_code(code, email)
     except InvalidCodeError as e:
         raise AssertionError("Registration failed: {0}".format(str(e)))
 
 def assert_invalid(appid, code, email, msg_contains=None):
-    app = RegistrableApplication(appid)
+    app = RegistrableApplication(CallLogger(), appid)
     try:
         app.validate_code(code, email)
     except InvalidCodeError as e:
