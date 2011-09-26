@@ -170,7 +170,11 @@ class RegistrableApplication:
     
     @property
     def should_show_fairware_reminder(self):
-        return (not self.registered) and (self.unpaid_hours >= 1)
+        return (not self.registered) and (self.fairware_mode) and (self.unpaid_hours >= 1)
+    
+    @property
+    def should_apply_demo_limitation(self):
+        return (not self.registered) and (not self.fairware_mode)
     
     @property
     def unpaid_hours(self):
