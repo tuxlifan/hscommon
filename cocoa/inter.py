@@ -12,8 +12,7 @@ import logging
 
 import objc
 
-from ..reg import InvalidCodeError
-from .objcmin import NSObject, NSUserDefaults, NSArray, NSDictionary
+from .objcmin import NSObject, NSUserDefaults, NSArray, NSDictionary, NSWorkspace, NSURL
 
 def signature(signature):
     """Returns an objc.signature with 'i' and 'f' letters changed to correct NSInteger and
@@ -231,32 +230,27 @@ class PyFairware(NSObject):
         self.py.initial_registration_setup()
     
     def appName(self):
-        return ""
+        return self.py.PROMPT_NAME
     
     @signature('c@:')
     def isRegistered(self):
         return self.py.registered
     
-    @signature('c@:')
-    def isFirstRun(self):
-        return self.py.is_first_run
-    
-    def isCodeValid_withEmail_(self, code, email):
-        try:
-            self.py.validate_code(code, email)
-            return None
-        except InvalidCodeError as e:
-            return str(e)
-    
-    @signature('v@:@@c')
+    @signature('c@:@@c')
     def setRegisteredCode_andEmail_registerOS_(self, code, email, registerOS):
-        self.py.set_registration(code, email)
-        if registerOS:
-            self.py.register_os()
-        self.py.write_registration_to_defaults()
+        return self.py.set_registration(code, email, registerOS)
     
     def unpaidHours(self):
         return self.py.unpaid_hours
+    
+    def contribute(self):
+        self.py.contribute()
+    
+    def buy(self):
+        self.py.buy()
+    
+    def aboutFairware(self):
+        self.py.about_fairware()
     
     #--- Python --> Cocoa
     def get_default(self, key_name):
@@ -270,6 +264,12 @@ class PyFairware(NSObject):
     def setup_as_registered(self):
         self.cocoa.setupAsRegistered()
     
-    def show_fairware_nag(self):
-        self.cocoa.showFairwareNag()
+    def show_fairware_nag(self, prompt):
+        self.cocoa.showFairwareNagWithPrompt_(prompt)
+    
+    def show_demo_nag(self, prompt):
+        self.cocoa.showDemoNagWithPrompt_(prompt)
+    
+    def open_url(self, url):
+        NSWorkspace.sharedWorkspace().openURL_(NSURL.URLWithString_(url))
     

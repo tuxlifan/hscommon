@@ -16,10 +16,13 @@ from http.client import HTTPException
 import logging
 import socket
 
+from .trans import trmsg
+
 ALL_APPS = [
     (1, 'dupeGuru'),
     (2, 'moneyGuru'),
     (3, 'musicGuru'),
+    (6, 'PdfMasher'),
 ]
 
 OLDAPPIDS = {
@@ -31,20 +34,31 @@ OLDAPPIDS = {
 class InvalidCodeError(Exception):
     """The supplied code is invalid."""
 
+# At the moment, the translations for FairwarePromptMsg and DemoPromptMsg are in each application's
+# message trans files, which means that there's needless duplication. At some point, I'll have to
+# implement a way to automatically merge a central trans file with another at build time to reduce
+# that duplication.
+
 class RegistrableApplication:
     #--- View interface
     # get_default(key_name)
     # set_default(key_name, value)
     # setup_as_registered()
-    # show_fairware_nag()
+    # show_message(msg)
+    # show_fairware_nag(prompt)
+    # show_demo_nag(prompt)
+    # open_url(url)
+    
+    PROMPT_NAME = "<undefined>"
+    DEMO_LIMITATION = "<undefined>"
     
     def __init__(self, view, appid):
         self.view = view
         self.appid = appid
         self.registered = False
+        self.fairware_mode = False
         self.registration_code = ''
         self.registration_email = ''
-        self.is_first_run = False # has to be set by the app.
         self._unpaid_hours = None
     
     @staticmethod
@@ -59,14 +73,32 @@ class RegistrableApplication:
                 return True
         return False
     
+    def _set_registration(self, code, email):
+        self.validate_code(code, email)
+        self.registration_code = code
+        self.registration_email = email
+        self.registered = True
+        self.view.setup_as_registered()
+    
     def initial_registration_setup(self):
         # Should be called only after the app is finished launching
         code = self.view.get_default('RegistrationCode')
         email = self.view.get_default('RegistrationEmail')
         if code and email:
-            self.set_registration(code, email)
-        if self.should_show_fairware_reminder:
-            self.view.show_fairware_nag()
+            try:
+                self._set_registration(code, email)
+            except InvalidCodeError:
+                pass
+        if not self.registered:
+            if self.view.get_default('FairwareMode'):
+                self.fairware_mode = True
+            if self.fairware_mode:
+                if self.should_show_fairware_reminder:
+                    prompt = trmsg('FairwarePromptMsg').format(name=self.PROMPT_NAME)
+                    self.view.show_fairware_nag(prompt)
+            else:
+                prompt = trmsg('DemoPromptMsg').format(name=self.PROMPT_NAME, limitation=self.DEMO_LIMITATION)
+                self.view.show_demo_nag(prompt)
     
     def validate_code(self, code, email):
         code = code.strip().lower()
@@ -98,15 +130,23 @@ class RegistrableApplication:
             "that the e-mail you gave is the same as the e-mail you used for your purchase."
         raise InvalidCodeError(DEFAULT_MSG)
     
-    def set_registration(self, code, email):
+    def set_registration(self, code, email, register_os):
+        if not self.fairware_mode and 'fairware' in {code.strip().lower(), email.strip().lower()}:
+            self.fairware_mode = True
+            self.view.set_default('FairwareMode', True)
+            self.view.show_message("Fairware mode enabled.")
+            return True
         try:
-            self.validate_code(code, email)
-            self.registration_code = code
-            self.registration_email = email
-            self.registered = True
-            self.view.setup_as_registered()
-        except InvalidCodeError:
-            pass
+            self._set_registration(code, email)
+            self.view.show_message("Your code is valid. Thanks!")
+            if register_os:
+                self.register_os()
+            self.view.set_default('RegistrationCode', self.registration_code)
+            self.view.set_default('RegistrationEmail', self.registration_email)
+            return True
+        except InvalidCodeError as e:
+            self.view.show_message(str(e))
+            return False
     
     def register_os(self):
         if not self.registered:
@@ -119,10 +159,14 @@ class RegistrableApplication:
         except URLError:
             pass
     
-    def write_registration_to_defaults(self):
-        if self.registered:
-            self.view.set_default('RegistrationCode', self.registration_code)
-            self.view.set_default('RegistrationEmail', self.registration_email)
+    def contribute(self):
+        self.view.open_url("http://open.hardcoded.net/contribute/")
+    
+    def buy(self):
+        self.view.open_url("http://www.hardcoded.net/purchase.htm")
+    
+    def about_fairware(self):
+        self.view.open_url("http://open.hardcoded.net/about/")
     
     @property
     def should_show_fairware_reminder(self):
@@ -131,7 +175,7 @@ class RegistrableApplication:
     @property
     def unpaid_hours(self):
         if self._unpaid_hours is None:
-            url = 'http://open.hardcoded.net/backend/unpaid/{0}'.format(self.appid)
+            url = 'http://open.hardcoded.net/backend/unpaid/{}'.format(self.appid)
             try:
                 # The timeout is there to avoid delaying the launching of the app too much. Ideally,
                 # this operation should be async, but that's for another time.
