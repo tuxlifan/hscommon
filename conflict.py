@@ -56,7 +56,7 @@ def smart_copy(source_path, dest_path):
     try:
         _smart_move_or_copy(io.copy, source_path, dest_path)
     except IOError as e:
-        if e.errno == 21: # it's a directory
+        if e.errno in {21, 13}: # it's a directory, code is 21 on OS X / Linux and 13 on Windows
             _smart_move_or_copy(io.copytree, source_path, dest_path)
         else:
             raise
