@@ -16,6 +16,7 @@ from subprocess import Popen, PIPE
 import re
 import importlib
 from datetime import datetime
+import glob
 
 from .plat import ISWINDOWS
 from .util import rem_file_ext, modified_after, find_in_path
@@ -24,6 +25,22 @@ def print_and_do(cmd):
     print(cmd)
     p = Popen(cmd, shell=True)
     p.wait()
+
+def move(src, dst):
+    if not op.exists(src):
+        return
+    if op.exists(dst):
+        os.remove(dst)
+    print('Moving %s --> %s' % (src, dst))
+    os.rename(src, dst)
+
+def move_all(pattern, dst):
+    # pattern is a glob pattern, example "folder/foo*". The file is moved directly in dst, no folder
+    # structure from src is kept.
+    filenames = glob.glob(pattern)
+    for fn in filenames:
+        destpath = op.join(dst, op.basename(fn))
+        move(fn, destpath)
 
 def ensure_empty_folder(path):
     """Make sure that the path exists and that it's an empty folder.
