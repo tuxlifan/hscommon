@@ -273,3 +273,5 @@ class PyFairware(NSObject):
     def open_url(self, url):
         NSWorkspace.sharedWorkspace().openURL_(NSURL.URLWithString_(url))
     
+    def show_message(self, msg):
+        self.cocoa.showMessage_(msg)
