@@ -8,7 +8,6 @@
 
 from collections import Sequence, MutableSequence
 
-from ..util import minmax
 from .base import NoopGUI
 
 class Selectable(Sequence):
@@ -27,7 +26,12 @@ class Selectable(Sequence):
     
     #--- Virtual
     def _update_selection(self):
-        # Takes the table's selection and does appropriates updates on the Document's side.
+        # Takes the table's selection and does appropriates updates on the view and/or model, when
+        # appropriate. Common sense would dictate that when the selection doesn't change, we don't
+        # update anything (and thus don't call _update_selection() at all), but there are cases
+        # where it's false. For example, if our list updates its items but doesn't change its
+        # selection, we probably want to update the model's selection. A redesign of how this whole
+        # thing works is probably in order, but not now, there's too much breakage at once involved.
         pass
     
     #--- Public
@@ -100,11 +104,19 @@ class SelectableList(MutableSequence, Selectable):
     
 
 class GUISelectableList(SelectableList):
+    #--- View interface
+    # refresh()
+    # update_selection()
+    #
+    
     def __init__(self, items=None, view=None):
         SelectableList.__init__(self, items)
         if view is None:
             view = NoopGUI()
         self.view = view
+    
+    def _update_selection(self):
+        self.view.update_selection()
     
     def _on_change(self):
         self.view.refresh()

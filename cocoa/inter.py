@@ -223,7 +223,11 @@ class PySelectableList(PyGUIObject):
     
     def selectIndexes_(self, indexes):
         self.py.select(indexes)
-
+    
+    #--- model --> view
+    def update_selection(self):
+        self.cocoa.updateSelection()
+    
 
 class PyFairware(NSObject):
     def initialRegistrationSetup(self):

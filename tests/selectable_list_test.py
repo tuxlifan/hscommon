@@ -51,3 +51,9 @@ def test_guicalls():
     gui.check_gui_calls(['refresh'])
     sl.insert(0, 'foo')
     gui.check_gui_calls(['refresh'])
+    sl.select(1)
+    gui.check_gui_calls(['update_selection'])
+    # XXX We have to give up on this for now because of a breakage it causes in the tables.
+    # sl.select(1) # don't update when selection stays the same
+    # gui.check_gui_calls([])
+    

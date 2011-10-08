@@ -96,16 +96,21 @@ class CallLogger:
     
 
 class TestApp:
+    def __init__(self):
+        self._call_loggers = []
+    
     def clear_gui_calls(self):
-        for attr in dir(self):
-            if attr.endswith('_gui'):
-                gui = getattr(self, attr)
-                if hasattr(gui, 'calls'): # We might have test methods ending with '_gui'
-                    gui.clear_calls()
+        for logger in self._call_loggers:
+            logger.clear_calls()
+    
+    def make_logger(self, class_=CallLogger):
+        logger = class_()
+        self._call_loggers.append(logger)
+        return logger
     
     def make_gui(self, name, class_, view=None, parent=None, holder=None):
         if view is None:
-            view = CallLogger()
+            view = self.make_logger()
         if parent is None:
             # XXX change this to something less moneyguru-centric
             parent = self.mw
