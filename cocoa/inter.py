@@ -42,6 +42,17 @@ def pythonify(o):
     logging.warning('Could not pythonify {0} (of type {1}'.format(repr(o), type(o)))
     return o
 
+def subproxy(name, target_name, class_):
+    def result(self):
+        holder_name = '_' + name
+        if not hasattr(self, holder_name):
+            target = getattr(self.py, target_name)
+            setattr(self, holder_name, class_.alloc().initWithPy_(target))
+        return getattr(self, holder_name)
+    
+    result.__name__ = name
+    return result
+
 class PyGUIObject(NSObject):
     def initWithCocoa_pyParent_(self, cocoa, pyparent):
         super(PyGUIObject, self).init()
