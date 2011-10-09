@@ -112,8 +112,8 @@ class TestApp:
         if view is None:
             view = self.make_logger()
         if parent is None:
-            # XXX change this to something less moneyguru-centric
-            parent = self.mw
+            # The attribute "default_parent" has to be set for this to work correctly
+            parent = self.default_parent
         if holder is None:
             holder = self
         setattr(holder, '{0}_gui'.format(name), view)
