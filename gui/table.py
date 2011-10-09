@@ -8,6 +8,7 @@
 
 from collections import MutableSequence, namedtuple
 
+from .base import NoopGUI
 from .selectable_list import Selectable
 
 # We used to directly subclass list, but it caused problems at some point with deepcopy
@@ -145,10 +146,17 @@ class Table(MutableSequence, Selectable):
 SortDescriptor = namedtuple('SortDescriptor', 'column desc')
 # Subclasses of this class must have a "view" attribute
 class GUITable(Table):
-    def __init__(self):
+    def __init__(self, view=None):
         Table.__init__(self)
         self.edited = None
         self._sort_descriptor = None
+        # Because of legacy GUITable subclasses setting 'view' themselves, sometimes before GUITable
+        # init, we have to make sure that we don't already have a 'view' attr before setting it to
+        # NoopGUI to make sure we're not overwriting a real view.
+        if view is not None:
+            self.view = view
+        elif not hasattr(self, 'view'):
+            self.view = NoopGUI()
     
     #--- Virtual
     def _do_add(self):
