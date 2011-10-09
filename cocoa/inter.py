@@ -95,7 +95,36 @@ class PyGUIObject(NSObject):
         self.cocoa.refresh()
     
 
+class PyColumns(PyGUIObject):
+    def columnNamesInOrder(self):
+        return self.py.colnames
+    
+    @signature('i@:@')
+    def columnIsVisible_(self, colname):
+        return self.py.column_is_visible(colname)
+    
+    @signature('i@:@')
+    def columnWidth_(self, colname):
+        return self.py.column_width(colname)
+    
+    @signature('v@:@i')
+    def moveColumn_toIndex_(self, colname, index):
+        self.py.move_column(colname, index)
+    
+    @signature('v@:@i')
+    def resizeColumn_toWidth_(self, colname, newwidth):
+        self.py.resize_column(colname, newwidth)
+    
+    #--- Python --> Cocoa
+    def restore_columns(self):
+        self.cocoa.restoreColumns()
+    
+    def set_column_visible(self, colname, visible):
+        self.cocoa.setColumn_visible_(colname, visible)
+
 class PyOutline(PyGUIObject):
+    columns = subproxy('columns', 'columns', PyColumns)
+    
     def cancelEdits(self):
         self.py.cancel_edits()
     
@@ -142,6 +171,8 @@ class PyOutline(PyGUIObject):
     
 
 class PyTable(PyGUIObject):
+    columns = subproxy('columns', 'columns', PyColumns)
+    
     #--- Helpers
     def _getrow(self, row):
         try:
