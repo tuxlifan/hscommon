@@ -102,9 +102,6 @@ class Tree(Node):
         Node.__init__(self, '')
         self._selected_nodes = []
     
-    def __hash__(self):
-        return object.__hash__(self)
-    
     def _select_nodes(self, nodes):
         # all selection changes go through this method, so you can override this if you want to
         # customize the tree's behavior.
