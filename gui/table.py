@@ -34,15 +34,8 @@ class Table(MutableSequence, Selectable):
             self._footer = None
         self._check_selection_range()
     
-    def __eq__(self, other):
-        # object doesn't have __eq__ and __cmp__ doesn't work
-        return self is other
-    
     def __getitem__(self, key):
         return self._rows.__getitem__(key)
-    
-    def __hash__(self):
-        return object.__hash__(self)
     
     def __len__(self):
         return len(self._rows)

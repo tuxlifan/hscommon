@@ -4,27 +4,42 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-class Node(list):
+from collections import MutableSequence
+
+class Node(MutableSequence):
     def __init__(self, name):
-        list.__init__(self)
         self._name = name
         self._parent = None
         self._path = None
-    
-    def __eq__(self, other):
-        return self is other
-    
-    def __hash__(self):
-        return object.__hash__(self)
+        self._children = []
     
     def __repr__(self):
         return '<Node %r>' % self.name
     
+    #--- MutableSequence overrides
+    def __delitem__(self, key):
+        self._children.__delitem__(key)
+    
+    def __getitem__(self, key):
+        return self._children.__getitem__(key)
+    
+    def __len__(self):
+        return len(self._children)
+    
+    def __setitem__(self, key, value):
+        self._children.__setitem__(key, value)
+    
     def append(self, node):
-        list.append(self, node)
+        self._children.append(node)
         node._parent = self
         node._path = None
     
+    def insert(self, index, node):
+        self._children.insert(index, node)
+        node._parent = self
+        node._path = None
+    
+    #--- Public
     def clear(self):
         del self[:]
     
