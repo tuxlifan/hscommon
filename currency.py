@@ -200,6 +200,8 @@ MYR = Currency.register('MYR', 'Malaysian ringgit',
 # MZN in not supported in any of my sources, so I'm just creating it with a fixed rate.
 MZN = Currency.register('MZN', 'Mozambican metical',
     start_date=date(2011, 2, 6), start_rate=0.03, stop_date=date(2011, 2, 5), latest_rate=0.03)
+NIO = Currency.register('NIO', 'Nicaraguan córdoba',
+    start_date=date(2011, 10, 12), start_rate=0.0448, latest_rate=0.0448)
 NLG = Currency.register('NLG', 'Netherlands guilder',
     start_date=date(1998, 1, 2), start_rate=0.7013, stop_date=date(2001, 12, 31), latest_rate=0.6437) # obsolete (euro)
 NOK = Currency.register('NOK', 'Norwegian krone',
