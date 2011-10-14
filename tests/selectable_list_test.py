@@ -56,4 +56,10 @@ def test_guicalls():
     # XXX We have to give up on this for now because of a breakage it causes in the tables.
     # sl.select(1) # don't update when selection stays the same
     # gui.check_gui_calls([])
-    
+
+def test_search_by_prefix():
+    sl = SelectableList(['foo', 'bAr', 'baZ'])
+    eq_(sl.search_by_prefix('b'), 1)
+    eq_(sl.search_by_prefix('BA'), 1)
+    eq_(sl.search_by_prefix('BAZ'), 2)
+    eq_(sl.search_by_prefix('BAZZ'), -1)

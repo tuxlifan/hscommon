@@ -266,6 +266,10 @@ class PySelectableList(PyGUIObject):
     def selectIndexes_(self, indexes):
         self.py.select(indexes)
     
+    @signature('i@:@')
+    def searchByPrefix_(self, prefix):
+        return self.py.search_by_prefix(prefix)
+    
     #--- model --> view
     def update_selection(self):
         self.cocoa.updateSelection()

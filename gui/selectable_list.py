@@ -102,6 +102,14 @@ class SelectableList(MutableSequence, Selectable):
     def _on_change(self):
         pass
     
+    #--- Public
+    def search_by_prefix(self, prefix):
+        prefix = prefix.lower()
+        for index, s in enumerate(self):
+            if s.lower().startswith(prefix):
+                return index
+        return -1
+    
 
 class GUISelectableList(SelectableList):
     #--- View interface
