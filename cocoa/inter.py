@@ -99,6 +99,9 @@ class PyColumns(PyGUIObject):
     def columnNamesInOrder(self):
         return self.py.colnames
     
+    def columnDisplay_(self, colname):
+        return self.py.column_display(colname)
+    
     @signature('i@:@')
     def columnIsVisible_(self, colname):
         return self.py.column_is_visible(colname)
