@@ -13,8 +13,6 @@ import subprocess
 import sys
 
 import objc
-from jobprogress.job import JobCancelled
-from jobprogress.performer import ThreadedJobPerformer as ThreadedJobPerformerBase
 
 from .inter import signature
 from .objcmin import (NSBundle, NSAutoreleasePool, NSObject, NSExceptionHandler,
@@ -42,25 +40,31 @@ def report_crash(type, value, tb):
             pass
     HSErrorReportWindow.showErrorReportWithContent_(s)
 
-class ThreadedJobPerformer(ThreadedJobPerformerBase):
-    def _async_run(self, *args):
-        pool = NSAutoreleasePool.alloc().init()
-        target = args[0]
-        args = tuple(args[1:])
-        self._job_running = True
-        self._last_error = None
-        try:
-            target(*args)
-        except JobCancelled:
-            pass
-        except Exception:
-            self._last_error = sys.exc_info()
-            report_crash(*self._last_error)
-        finally:
-            self._job_running = False
-            self.last_progress = None
-            del pool
-    
+try:
+    from jobprogress.job import JobCancelled
+    from jobprogress.performer import ThreadedJobPerformer as ThreadedJobPerformerBase
+    class ThreadedJobPerformer(ThreadedJobPerformerBase):
+        def _async_run(self, *args):
+            pool = NSAutoreleasePool.alloc().init()
+            target = args[0]
+            args = tuple(args[1:])
+            self._job_running = True
+            self._last_error = None
+            try:
+                target(*args)
+            except JobCancelled:
+                pass
+            except Exception:
+                self._last_error = sys.exc_info()
+                report_crash(*self._last_error)
+            finally:
+                self._job_running = False
+                self.last_progress = None
+                del pool
+except ImportError:
+    # jobprogress isn't used in all HS apps
+    pass
+
 
 def as_fetch(as_list, as_type, step_size=1000):
     """When fetching items from a very big list through applescript, the connection with the app
