@@ -1,5 +1,6 @@
 syntax: glob
 
 *.pyc
+*.mo
 .DS_Store
 docs_html

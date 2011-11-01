@@ -1,0 +1,13 @@
+
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+
+#: hscommon/reg.py:99
+msgid "FairwarePromptMsg"
+msgstr ""
+
+#: hscommon/reg.py:102
+msgid "DemoPromptMsg"
+msgstr ""
+

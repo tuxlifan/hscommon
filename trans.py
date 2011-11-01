@@ -9,13 +9,13 @@
 # Doing i18n with GNU gettext for the core text gets complicated, so what I do is that I make the
 # GUI layer responsible for supplying a tr() function.
 
-import sys
 import locale
 import logging
 
 from .plat import ISWINDOWS, ISLINUX
 
 _trfunc = None
+_trget = None
 
 def tr(s, context=None):
     if _trfunc is None:
@@ -26,18 +26,18 @@ def tr(s, context=None):
         else:
             return _trfunc(s)
 
-def trmsg(s, context='message'):
-    # Long messages in HS translations are referred to by identifiers (SomethingMsg). We really don't
-    # want to not have an entry for them in the language database, so if the trfunc returns the same
-    # string, we log a warning.
-    result = tr(s, context)
-    if result == s:
-        logging.warning("Message '{}' couldn't be found in the translation database.".format(s))
-    return result
+def trget(domain):
+    # Returns a tr() function for the specified domain.
+    if _trget is None:
+        return lambda s: tr(s, domain)
+    else:
+        return _trget(domain)
 
-def set_tr(new_tr):
-    global _trfunc
+def set_tr(new_tr, new_trget=None):
+    global _trfunc, _trget
     _trfunc = new_tr
+    if new_trget is not None:
+        _trget = new_trget
 
 def get_locale_name(lang):
     if ISWINDOWS:
@@ -52,6 +52,7 @@ def get_locale_name(lang):
         result += '.UTF-8'
     return result
 
+#--- Cocoa
 def install_cocoa_trans():
     from .cocoa.objcmin import NSBundle
     mainBundle = NSBundle.mainBundle()
@@ -63,6 +64,7 @@ def install_cocoa_trans():
     if localename is not None:
         locale.setlocale(locale.LC_ALL, localename)
 
+#--- Qt
 def install_qt_trans(lang=None):
     from PyQt4.QtCore import QCoreApplication, QTranslator, QLocale
     if not lang:
@@ -84,3 +86,22 @@ def install_qt_trans(lang=None):
     def qt_tr(s, context='core'):
         return str(QCoreApplication.translate(context, s, None))
     set_tr(qt_tr)
+
+#--- gettext
+def install_gettext_trans(base_folder, lang=None):
+    import gettext
+    def gettext_trget(domain):
+        languages = [lang] if lang else None
+        try:
+            return gettext.translation(domain, localedir=base_folder, languages=languages, codeset='utf-8').gettext
+        except IOError:
+            return lambda s: s
+    
+    default_gettext = gettext_trget('core')
+    def gettext_tr(s, context=None):
+        if not context:
+            return default_gettext(s)
+        else:
+            trfunc = gettext_trget(context)
+            return trfunc(s)
+    set_tr(gettext_tr, gettext_trget)

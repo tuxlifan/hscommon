@@ -16,7 +16,9 @@ from http.client import HTTPException
 import logging
 import socket
 
-from .trans import trmsg
+from .trans import trget
+
+tr = trget('hscommon')
 
 ALL_APPS = [
     (1, 'dupeGuru'),
@@ -94,10 +96,10 @@ class RegistrableApplication:
                 self.fairware_mode = True
             if self.fairware_mode:
                 if self.should_show_fairware_reminder:
-                    prompt = trmsg('FairwarePromptMsg').format(name=self.PROMPT_NAME)
+                    prompt = tr('FairwarePromptMsg').format(name=self.PROMPT_NAME)
                     self.view.show_fairware_nag(prompt)
             else:
-                prompt = trmsg('DemoPromptMsg').format(name=self.PROMPT_NAME, limitation=self.DEMO_LIMITATION)
+                prompt = tr('DemoPromptMsg').format(name=self.PROMPT_NAME, limitation=self.DEMO_LIMITATION)
                 self.view.show_demo_nag(prompt)
     
     def validate_code(self, code, email):
