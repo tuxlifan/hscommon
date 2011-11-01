@@ -88,12 +88,13 @@ def install_qt_trans(lang=None):
     set_tr(qt_tr)
 
 #--- gettext
-def install_gettext_trans(base_folder, lang=None):
+def install_gettext_trans(base_folder, lang):
     import gettext
     def gettext_trget(domain):
-        languages = [lang] if lang else None
+        if not lang:
+            return lambda s: s
         try:
-            return gettext.translation(domain, localedir=base_folder, languages=languages, codeset='utf-8').gettext
+            return gettext.translation(domain, localedir=base_folder, languages=[lang]).gettext
         except IOError:
             return lambda s: s
     

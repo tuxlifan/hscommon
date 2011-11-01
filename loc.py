@@ -2,8 +2,9 @@ import os
 import os.path as op
 import shutil
 
+import polib
+
 from . import pygettext
-from . import msgfmt
 
 def _get_langs(folder):
     return [name for name in os.listdir(folder) if op.isdir(op.join(folder, name))]
@@ -21,7 +22,9 @@ def compile_all_po(base_folder):
     for lang in langs:
         pofolder = op.join(base_folder, lang, 'LC_MESSAGES')
         pofiles = [op.join(pofolder, fn) for fn in os.listdir(pofolder) if fn.endswith('.po')]
-        msgfmt.main(pofiles)
+        for pofile in pofiles:
+            p = polib.pofile(pofile)
+            p.save_as_mofile(pofile[:-3] + '.mo')
 
 def merge_locale_dir(target, mergeinto):
     langs = _get_langs(target)
