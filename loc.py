@@ -6,6 +6,7 @@ import re
 import polib
 
 from . import pygettext
+from .util import modified_after
 
 LC_MESSAGES = 'LC_MESSAGES'
 
@@ -142,6 +143,9 @@ def po2strings(pofile, en_strings, dest):
     # Takes en_strings and replace all righthand parts of "foo" = "bar"; entries with translations
     # in pofile, then puts the result in dest.
     po = polib.pofile(pofile)
+    if not modified_after(pofile, dest):
+        return
+    print("Creating {} from {}".format(dest, pofile))
     with open(en_strings, 'rt', encoding='utf-8') as fp:
         contents = fp.read()
     re_trans = re.compile(r'(?<= = ").*(?=";\n)')

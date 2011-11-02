@@ -11,6 +11,7 @@
 
 import locale
 import logging
+import os.path as op
 
 from .plat import ISWINDOWS, ISLINUX
 
@@ -96,6 +97,7 @@ def install_gettext_trans(base_folder, lang):
         try:
             return gettext.translation(domain, localedir=base_folder, languages=[lang]).gettext
         except IOError:
+            logging.warning("Couldn't find translation for language %s and domain %s in %s", lang, domain, base_folder)
             return lambda s: s
     
     default_gettext = gettext_trget('core')
@@ -106,3 +108,14 @@ def install_gettext_trans(base_folder, lang):
             trfunc = gettext_trget(context)
             return trfunc(s)
     set_tr(gettext_tr, gettext_trget)
+
+def install_gettext_trans_under_cocoa():
+    from .cocoa.objcmin import NSBundle
+    mainBundle = NSBundle.mainBundle()
+    resFolder = mainBundle.resourceURL().path()
+    baseFolder = op.join(resFolder, 'locale')
+    currentLang = NSBundle.preferredLocalizationsFromArray_(mainBundle.localizations())[0]
+    install_gettext_trans(baseFolder, currentLang)
+    localename = get_locale_name(currentLang)
+    if localename is not None:
+        locale.setlocale(locale.LC_ALL, localename)
