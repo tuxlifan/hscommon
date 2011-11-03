@@ -36,10 +36,28 @@ OLDAPPIDS = {
 class InvalidCodeError(Exception):
     """The supplied code is invalid."""
 
-# At the moment, the translations for FairwarePromptMsg and DemoPromptMsg are in each application's
-# message trans files, which means that there's needless duplication. At some point, I'll have to
-# implement a way to automatically merge a central trans file with another at build time to reduce
-# that duplication.
+FAIRWARE_PROMPT = tr("{name} is Fairware, which means \"open source software developed with "
+"expectation of fair contributions from users\". Hours have been invested in this software with "
+"the expectation that users will be fair enough to compensate them. The \"Unpaid hours\" figure "
+"you see below is the hours that have yet to be compensated for this project."
+"\n\n"
+"If you like this application, please make a contribution that you consider fair. Thanks!"
+"\n\n"
+"If you cannot afford to contribute, you can either ignore this reminder or send an e-mail at "
+"support@hardcoded.net so I can send you a registration key."
+"\n\n"
+"This dialog doesn't show when there are no unpaid hours or when you have a valid contribution key.")
+
+DEMO_PROMPT = tr("{name} is fairware, which means \"open source software developed with expectation "
+"of fair contributions from users\". It's a very interesting concept, but one year of fairware has "
+"shown that most people just want to know how much it costs and not be bothered with theories "
+"about intellectual property."
+"\n\n"
+"So I won't bother you and will be very straightforward: You can try {name} for free but you have "
+"to buy it in order to use it without limitations. In demo mode, {name} {limitation}."
+"\n\n"
+"So it's as simple as this. If you're curious about fairware, however, I encourage you to read "
+"more about it by clicking on the \"Fairware?\" button.")
 
 class RegistrableApplication:
     #--- View interface
@@ -96,10 +114,10 @@ class RegistrableApplication:
                 self.fairware_mode = True
             if self.fairware_mode:
                 if self.should_show_fairware_reminder:
-                    prompt = tr('FairwarePromptMsg').format(name=self.PROMPT_NAME)
+                    prompt = FAIRWARE_PROMPT.format(name=self.PROMPT_NAME)
                     self.view.show_fairware_nag(prompt)
             else:
-                prompt = tr('DemoPromptMsg').format(name=self.PROMPT_NAME, limitation=self.DEMO_LIMITATION)
+                prompt = DEMO_PROMPT.format(name=self.PROMPT_NAME, limitation=self.DEMO_LIMITATION)
                 self.view.show_demo_nag(prompt)
     
     def validate_code(self, code, email):
