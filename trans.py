@@ -119,3 +119,23 @@ def install_gettext_trans_under_cocoa():
     localename = get_locale_name(currentLang)
     if localename is not None:
         locale.setlocale(locale.LC_ALL, localename)
+
+def install_gettext_trans_under_qt(lang=None):
+    # So, we install the gettext locale, great, but we also should try to install qt_*.qm if
+    # available so that strings that are inside Qt itself over which I have no control are in the
+    # right language.
+    from PyQt4.QtCore import QCoreApplication, QTranslator, QLocale
+    if not lang:
+        lang = str(QLocale.system().name())[:2]
+    localename = get_locale_name(lang)
+    if localename is not None:
+        try:
+            locale.setlocale(locale.LC_ALL, localename)
+        except locale.Error:
+            logging.warning("Couldn't set locale %s", localename)
+    else:
+        lang = 'en'
+    qtr = QTranslator(QCoreApplication.instance())
+    qtr.load(':/qt_%s' % lang)
+    QCoreApplication.installTranslator(qtr)
+    install_gettext_trans('locale', lang)
