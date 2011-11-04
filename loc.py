@@ -102,16 +102,20 @@ def strings2po(en_strings, tr_strings, dest):
     # characters are ommited from the comment, so it messes up our stuff.
     # Once all cocoa strings have been translated and I only receive translations in the new .po
     # format, this function won't be needed anymore.
+    # If the strings you're working with is a non-XIB one, pass None in en_strings.
     print("Processing {} with {} onto {}".format(tr_strings, en_strings, dest))
     re_trans = re.compile(r'"(.*)" = "(.*)";')
-    with open(en_strings, 'rt', encoding='utf-8') as fp:
-        contents = fp.read()
-    # ref2en = {123.title: en}
-    ref2en = {ref: unescape_cocoa_strings(en) for ref, en in re_trans.findall(contents)}
     with open(tr_strings, 'rt', encoding='utf-8') as fp:
         contents = fp.read()
     # ref2tr = {123.title: translated}
     ref2tr = {ref: unescape_cocoa_strings(tr) for ref, tr in re_trans.findall(contents)}
+    if en_strings:
+        with open(en_strings, 'rt', encoding='utf-8') as fp:
+            contents = fp.read()
+        # ref2en = {123.title: en}
+        ref2en = {ref: unescape_cocoa_strings(en) for ref, en in re_trans.findall(contents)}
+    else:
+        ref2en = {x: x for x in ref2tr}
     po = polib.pofile(dest)
     print("Untranslated entries: {}".format(len(po.untranslated_entries())))
     count = 0
