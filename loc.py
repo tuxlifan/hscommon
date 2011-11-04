@@ -120,7 +120,9 @@ def strings2po(en_strings, tr_strings, dest):
         if not translated:
             continue
         entry = po.find(en)
-        assert entry is not None # supposed to be in the .pot and .po
+        if entry is None:
+            print("WARGNING: {} not found in dest .po".format(en))
+            continue
         if entry.msgstr:
             if entry.msgstr != translated:
                 print("WARNING: {} != {} for {}".format(translated, entry.msgstr, en))
