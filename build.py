@@ -159,7 +159,7 @@ def add_to_pythonpath(path):
 # in setuptools. We copy the packages *without data* in a build folder and then build the plugin
 # from there.
 def copy_packages(packages_names, dest):
-    ignore = shutil.ignore_patterns('.hg*', 'tests', 'testdata', 'modules', 'docs')
+    ignore = shutil.ignore_patterns('.hg*', 'tests', 'testdata', 'modules', 'docs', 'locale')
     for package_name in packages_names:
         if op.exists(package_name):
             source_path = package_name
