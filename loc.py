@@ -6,7 +6,7 @@ import re
 import polib
 
 from . import pygettext
-from .util import modified_after
+from .util import modified_after, dedupe
 
 LC_MESSAGES = 'LC_MESSAGES'
 
@@ -77,7 +77,7 @@ def strings2pot(target, dest):
     re_trans = re.compile(r'".*" = "(.*)";')
     strings = re_trans.findall(contents)
     po = polib.pofile(dest)
-    for s in strings:
+    for s in dedupe(strings):
         s = unescape_cocoa_strings(s)
         entry = po.find(s)
         if entry is None:
