@@ -175,3 +175,31 @@ def po2allxibstrings(pofile, en_lproj, dest_lproj):
     for strings in allstrings:
         deststrings = op.join(dest_lproj, op.basename(strings))
         po2strings(pofile, strings, deststrings)
+
+#--- Qt
+def unescape_xml(s):
+    return s.replace('&quot;', '"').replace('&apos;', '\'').replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
+
+def ts2po(tsfile, dest):
+    # This function is a temporary function to get translation information from Qt's ts files.
+    print("Processing {} onto {}".format(tsfile, dest))
+    re_trans = re.compile(r'<source>(.*?)</source>[\n\r\t ]*?<translation>(.*?)</translation>', re.MULTILINE)
+    with open(tsfile, 'rt', encoding='utf-8') as fp:
+        contents = fp.read()
+    # ref2tr = {123.title: translated}
+    en2tr = {en: unescape_xml(tr) for en, tr in re_trans.findall(contents)}
+    po = polib.pofile(dest)
+    print("Untranslated entries: {}".format(len(po.untranslated_entries())))
+    count = 0
+    for en, translated in en2tr.items():
+        entry = po.find(en)
+        if entry is None:
+            continue
+        if entry.msgstr:
+            if entry.msgstr != translated:
+                print("WARNING: {} != {} for {}".format(translated, entry.msgstr, en))
+        else:
+            entry.msgstr = translated
+            count += 1
+    print("Updated {} translations".format(count))
+    po.save()
