@@ -43,9 +43,11 @@ def set_tr(new_tr, new_trget=None):
 def get_locale_name(lang):
     if ISWINDOWS:
         # http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
-        LANG2LOCALENAME = {'fr': 'fra', 'de': 'deu', 'it': 'ita', 'zh_CN': 'chs', 'cs': 'czy'}
+        LANG2LOCALENAME = {'fr': 'fra', 'de': 'deu', 'it': 'ita', 'zh_CN': 'chs', 'cs': 'czy',
+            'nl': 'nld'}
     else:
-        LANG2LOCALENAME = {'fr': 'fr_FR', 'de': 'de_DE', 'it': 'it_IT', 'zh_CN': 'zh_CN', 'cs': 'cs_CZ'}
+        LANG2LOCALENAME = {'fr': 'fr_FR', 'de': 'de_DE', 'it': 'it_IT', 'zh_CN': 'zh_CN',
+            'cs': 'cs_CZ', 'nl': 'nl_NL'}
     if lang not in LANG2LOCALENAME:
         return None
     result = LANG2LOCALENAME[lang]
