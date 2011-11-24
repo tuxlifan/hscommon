@@ -183,11 +183,11 @@ def unescape_xml(s):
 def ts2po(tsfile, dest):
     # This function is a temporary function to get translation information from Qt's ts files.
     print("Processing {} onto {}".format(tsfile, dest))
-    re_trans = re.compile(r'<source>(.*?)</source>[\n\r\t ]*?<translation>(.*?)</translation>', re.MULTILINE)
+    re_trans = re.compile(r'<source>(.*?)</source>[\n\r\t ]*?<translation>(.*?)</translation>', re.MULTILINE|re.DOTALL)
     with open(tsfile, 'rt', encoding='utf-8') as fp:
         contents = fp.read()
     # ref2tr = {123.title: translated}
-    en2tr = {en: unescape_xml(tr) for en, tr in re_trans.findall(contents)}
+    en2tr = {unescape_xml(en): unescape_xml(tr) for en, tr in re_trans.findall(contents)}
     po = polib.pofile(dest)
     print("Untranslated entries: {}".format(len(po.untranslated_entries())))
     count = 0
