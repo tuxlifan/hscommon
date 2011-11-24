@@ -97,7 +97,6 @@ def install_gettext_trans(base_folder, lang):
         try:
             return gettext.translation(domain, localedir=base_folder, languages=[lang]).gettext
         except IOError:
-            logging.warning("Couldn't find translation for language %s and domain %s in %s", lang, domain, base_folder)
             return lambda s: s
     
     default_gettext = gettext_trget('core')
