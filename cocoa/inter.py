@@ -118,6 +118,20 @@ class PyColumns(PyGUIObject):
     def resizeColumn_toWidth_(self, colname, newwidth):
         self.py.resize_column(colname, newwidth)
     
+    @signature('v@:@i')
+    def setColumn_defaultWidth_(self, colname, width):
+        self.py.set_default_width(colname, width)
+    
+    def menuItems(self):
+        return self.py.menu_items()
+    
+    @signature('c@:i')
+    def toggleMenuItem_(self, index):
+        return self.py.toggle_menu_item(index)
+    
+    def resetToDefaults(self):
+        self.py.reset_to_defaults()
+    
     #--- Python --> Cocoa
     def restore_columns(self):
         self.cocoa.restoreColumns()
