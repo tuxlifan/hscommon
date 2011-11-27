@@ -9,6 +9,8 @@
 import copy
 from collections import OrderedDict
 
+from .base import NoopGUI
+
 class Column:
     def __init__(self, name, display='', visible=True, optional=False):
         self.name = name
@@ -27,7 +29,7 @@ class Columns:
         self.prefaccess = prefaccess
         self.savename = savename
         # Set this view as soon as the GUI layer column instance is created
-        self.view = None
+        self.view = NoopGUI()
         # We use copy here for test isolation. If we don't, changing a column affects all tests.
         columns = list(map(copy.copy, table.COLUMNS))
         for i, column in enumerate(columns):
