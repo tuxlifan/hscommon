@@ -7,14 +7,14 @@
 # http://www.hardcoded.net/licenses/bsd_license
 
 import copy
-from collections import OrderedDict
 
 from .base import NoopGUI
 
 class Column:
     def __init__(self, name, display='', visible=True, optional=False):
         self.name = name
-        self.index = 0
+        self.logical_index = 0
+        self.ordered_index = 0
         self.width = 0
         self.default_width = 0
         self.display = display
@@ -31,10 +31,11 @@ class Columns:
         # Set this view as soon as the GUI layer column instance is created
         self.view = NoopGUI()
         # We use copy here for test isolation. If we don't, changing a column affects all tests.
-        columns = list(map(copy.copy, table.COLUMNS))
-        for i, column in enumerate(columns):
-            column.index = i
-        self.coldata = OrderedDict((col.name, col) for col in columns)
+        self.column_list = list(map(copy.copy, table.COLUMNS))
+        for i, column in enumerate(self.column_list):
+            column.logical_index = i
+            column.ordered_index = i
+        self.coldata = {col.name: col for col in self.column_list}
     
     #--- Private
     def _get_colname_attr(self, colname, attrname, default):
@@ -51,9 +52,18 @@ class Columns:
             pass
     
     def _optional_columns(self):
-        return [c for c in self.coldata.values() if c.optional]
+        return [c for c in self.column_list if c.optional]
     
     #--- Public
+    def column_by_index(self, index):
+        return self.column_list[index]
+    
+    def column_by_name(self, name):
+        return self.coldata[name]
+    
+    def columns_count(self):
+        return len(self.column_list)
+    
     def column_display(self, colname):
         return self._get_colname_attr(colname, 'display', '')
     
@@ -65,8 +75,8 @@ class Columns:
     
     def columns_to_right(self, colname):
         column = self.coldata[colname]
-        index = column.index
-        return [col.name for col in self.coldata.values() if (col.visible and col.index > index)]
+        index = column.ordered_index
+        return [col.name for col in self.column_list if (col.visible and col.ordered_index > index)]
     
     def menu_items(self):
         # Returns a list of (display_name, marked) items for each optional column in the current
@@ -80,7 +90,7 @@ class Columns:
         self.set_column_order(colnames)
     
     def reset_to_defaults(self):
-        self.set_column_order(list(self.coldata.keys()))
+        self.set_column_order([col.name for col in self.column_list])
         for col in self._optional_columns():
             col.visible = col.default_visible
             col.width = col.default_width
@@ -92,11 +102,11 @@ class Columns:
     def restore_columns(self):
         if not (self.prefaccess and self.savename and self.coldata):
             return
-        for col in self.coldata.values():
+        for col in self.column_list:
             pref_name = '{0}.Columns.{1}'.format(self.savename, col.name)
             coldata = self.prefaccess.get_default(pref_name, fallback_value={})
             if 'index' in coldata:
-                col.index = coldata['index']
+                col.ordered_index = coldata['index']
             if 'width' in coldata:
                 col.width = coldata['width']
             if 'visible' in coldata:
@@ -106,16 +116,16 @@ class Columns:
     def save_columns(self):
         if not (self.prefaccess and self.savename and self.coldata):
             return
-        for col in self.coldata.values():
+        for col in self.column_list:
             pref_name = '{0}.Columns.{1}'.format(self.savename, col.name)
-            coldata = {'index': col.index, 'width': col.width, 'visible': col.visible}
+            coldata = {'index': col.ordered_index, 'width': col.width, 'visible': col.visible}
             self.prefaccess.set_default(pref_name, coldata)
     
     def set_column_order(self, colnames):
         colnames = (name for name in colnames if name in self.coldata)
         for i, colname in enumerate(colnames):
             col = self.coldata[colname]
-            col.index = i
+            col.ordered_index = i
     
     def set_column_visible(self, colname, visible):
         self.table.save_edits() # the table on the GUI side will stop editing when the columns change
@@ -133,7 +143,7 @@ class Columns:
     #--- Properties
     @property
     def ordered_columns(self):
-        return [col for col in sorted(iter(self.coldata.values()), key=lambda col: col.index)]
+        return [col for col in sorted(self.column_list, key=lambda col: col.ordered_index)]
     
     @property
     def colnames(self):
