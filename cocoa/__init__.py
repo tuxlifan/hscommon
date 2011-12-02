@@ -100,15 +100,23 @@ def install_exception_hook():
     class PyObjCExceptionDelegate(NSObject):
         @signature('c@:@@I')
         def exceptionHandler_shouldLogException_mask_(self, sender, exception, aMask):
-            if exception.name() == 'NSAccessibilityException':
-                return False # These kind of exception are really weird and happen all the time with VoiceOver on.
-            if isPythonException(exception):
-                userInfo = exception.userInfo()
-                type = userInfo['__pyobjc_exc_type__']
-                value = userInfo['__pyobjc_exc_value__']
-                tb = userInfo.get('__pyobjc_exc_traceback__', [])
-                report_crash(type, value, tb)
-            return True
+            try:
+                if exception.name() == 'NSAccessibilityException':
+                    # These kind of exception are really weird and happen all the time with
+                    # VoiceOver on.
+                    return False
+                if isPythonException(exception):
+                    userInfo = exception.userInfo()
+                    type = userInfo['__pyobjc_exc_type__']
+                    value = userInfo['__pyobjc_exc_value__']
+                    tb = userInfo.get('__pyobjc_exc_traceback__', [])
+                    report_crash(type, value, tb)
+                return True
+            except Exception:
+                # We can't allow the possibility of an exception coming out of this method or else
+                # we get an infinite loop. Forget about trying to report the error and just let it
+                # log to the console.
+                return True
         
         @signature('c@:@@I')
         def exceptionHandler_shouldHandleException_mask_(self, sender, exception, aMask):
