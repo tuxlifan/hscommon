@@ -47,7 +47,7 @@ def get_locale_name(lang):
             'nl': 'nld'}
     else:
         LANG2LOCALENAME = {'fr': 'fr_FR', 'de': 'de_DE', 'it': 'it_IT', 'zh_CN': 'zh_CN',
-            'cs': 'cs_CZ', 'nl': 'nl_NL'}
+            'cs': 'cs_CZ', 'nl': 'nl_NL', 'hy': 'hy_AM'}
     if lang not in LANG2LOCALENAME:
         return None
     result = LANG2LOCALENAME[lang]
