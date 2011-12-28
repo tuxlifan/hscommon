@@ -55,18 +55,6 @@ def get_locale_name(lang):
         result += '.UTF-8'
     return result
 
-#--- Cocoa
-def install_cocoa_trans():
-    from .cocoa.objcmin import NSBundle
-    mainBundle = NSBundle.mainBundle()
-    def cocoa_tr(s, context='core'):
-        return mainBundle.localizedStringForKey_value_table_(s, s, context)
-    set_tr(cocoa_tr)
-    currentLang = NSBundle.preferredLocalizationsFromArray_(mainBundle.localizations())[0]
-    localename = get_locale_name(currentLang)
-    if localename is not None:
-        locale.setlocale(locale.LC_ALL, localename)
-
 #--- Qt
 def install_qt_trans(lang=None):
     from PyQt4.QtCore import QCoreApplication, QTranslator, QLocale
@@ -111,11 +99,10 @@ def install_gettext_trans(base_folder, lang):
     set_tr(gettext_tr, gettext_trget)
 
 def install_gettext_trans_under_cocoa():
-    from .cocoa.objcmin import NSBundle
-    mainBundle = NSBundle.mainBundle()
-    resFolder = mainBundle.resourceURL().path()
+    from .cocoa import proxy
+    resFolder = proxy.getResourcePath()
     baseFolder = op.join(resFolder, 'locale')
-    currentLang = NSBundle.preferredLocalizationsFromArray_(mainBundle.localizations())[0]
+    currentLang = proxy.systemLang()
     install_gettext_trans(baseFolder, currentLang)
     localename = get_locale_name(currentLang)
     if localename is not None:

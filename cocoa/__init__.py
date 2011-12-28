@@ -12,40 +12,39 @@ import traceback
 import subprocess
 import sys
 
-import objc
+from .CocoaProxy import CocoaProxy
 
-from .inter import signature
-from .objcmin import (NSBundle, NSAutoreleasePool, NSObject, NSExceptionHandler,
-    NSLogAndHandleEveryExceptionMask)
-
+proxy = CocoaProxy()
 
 def report_crash(type, value, tb):
-    mainBundle = NSBundle.mainBundle()
-    app_identifier = mainBundle.bundleIdentifier()
-    app_version = mainBundle.infoDictionary().get('CFBundleVersion', 'Unknown')
-    s = "Application Identifier: {0}".format(app_identifier)
-    s += "\nApplication Version: {0}\n\n".format(app_version)
-    s += ''.join(traceback.format_exception(type, value, tb))
-    HSErrorReportWindow = mainBundle.classNamed_('HSErrorReportWindow')
-    if HSErrorReportWindow is None:
-        logging.error(s)
-        return
-    if app_identifier:
-        s += '\nRelevant Console logs:\n\n'
-        p = subprocess.Popen(['grep', app_identifier, '/var/log/system.log'], stdout=subprocess.PIPE)
-        try:
-            s += str(p.communicate()[0], encoding='utf-8')
-        except IndexError:
-            # This can happen if something went wrong with the grep (permission errors?)
-            pass
-    HSErrorReportWindow.showErrorReportWithContent_(s)
+    logging.error(traceback.format_exception(type, value, tb))
+    # XXX re-implement that under objp
+    # mainBundle = NSBundle.mainBundle()
+    # app_identifier = mainBundle.bundleIdentifier()
+    # app_version = mainBundle.infoDictionary().get('CFBundleVersion', 'Unknown')
+    # s = "Application Identifier: {0}".format(app_identifier)
+    # s += "\nApplication Version: {0}\n\n".format(app_version)
+    # s += ''.join(traceback.format_exception(type, value, tb))
+    # HSErrorReportWindow = mainBundle.classNamed_('HSErrorReportWindow')
+    # if HSErrorReportWindow is None:
+    #     logging.error(s)
+    #     return
+    # if app_identifier:
+    #     s += '\nRelevant Console logs:\n\n'
+    #     p = subprocess.Popen(['grep', app_identifier, '/var/log/system.log'], stdout=subprocess.PIPE)
+    #     try:
+    #         s += str(p.communicate()[0], encoding='utf-8')
+    #     except IndexError:
+    #         # This can happen if something went wrong with the grep (permission errors?)
+    #         pass
+    # HSErrorReportWindow.showErrorReportWithContent_(s)
 
 try:
     from jobprogress.job import JobCancelled
     from jobprogress.performer import ThreadedJobPerformer as ThreadedJobPerformerBase
     class ThreadedJobPerformer(ThreadedJobPerformerBase):
         def _async_run(self, *args):
-            pool = NSAutoreleasePool.alloc().init()
+            proxy.createPool()
             target = args[0]
             args = tuple(args[1:])
             self._job_running = True
@@ -60,7 +59,7 @@ try:
             finally:
                 self._job_running = False
                 self.last_progress = None
-                del pool
+                proxy.destroyPool()
 except ImportError:
     # jobprogress isn't used in all HS apps
     pass
@@ -91,40 +90,42 @@ def as_fetch(as_list, as_type, step_size=1000):
     return result
 
 def install_exception_hook():
-    if '_exceptionHandlerDelegate' in globals():
-        # already installed
-        return
-    def isPythonException(exception):
-        return (exception.userInfo() or {}).get('__pyobjc_exc_type__') is not None
-
-    class PyObjCExceptionDelegate(NSObject):
-        @signature('c@:@@I')
-        def exceptionHandler_shouldLogException_mask_(self, sender, exception, aMask):
-            try:
-                if exception.name() == 'NSAccessibilityException':
-                    # These kind of exception are really weird and happen all the time with
-                    # VoiceOver on.
-                    return False
-                if isPythonException(exception):
-                    userInfo = exception.userInfo()
-                    type = userInfo['__pyobjc_exc_type__']
-                    value = userInfo['__pyobjc_exc_value__']
-                    tb = userInfo.get('__pyobjc_exc_traceback__', [])
-                    report_crash(type, value, tb)
-                return True
-            except Exception:
-                # We can't allow the possibility of an exception coming out of this method or else
-                # we get an infinite loop. Forget about trying to report the error and just let it
-                # log to the console.
-                return True
-        
-        @signature('c@:@@I')
-        def exceptionHandler_shouldHandleException_mask_(self, sender, exception, aMask):
-            return False
-    
-    # we need to retain this, cause the handler doesn't
-    global _exceptionHandlerDelegate
-    delegate = PyObjCExceptionDelegate.alloc().init()
-    NSExceptionHandler.defaultExceptionHandler().setExceptionHandlingMask_(NSLogAndHandleEveryExceptionMask)
-    NSExceptionHandler.defaultExceptionHandler().setDelegate_(delegate)
-    _exceptionHandlerDelegate = delegate
+    pass
+    # XXX Re-implement this under objp
+    # if '_exceptionHandlerDelegate' in globals():
+    #         # already installed
+    #         return
+    #     def isPythonException(exception):
+    #         return (exception.userInfo() or {}).get('__pyobjc_exc_type__') is not None
+    # 
+    #     class PyObjCExceptionDelegate(NSObject):
+    #         @signature('c@:@@I')
+    #         def exceptionHandler_shouldLogException_mask_(self, sender, exception, aMask):
+    #             try:
+    #                 if exception.name() == 'NSAccessibilityException':
+    #                     # These kind of exception are really weird and happen all the time with
+    #                     # VoiceOver on.
+    #                     return False
+    #                 if isPythonException(exception):
+    #                     userInfo = exception.userInfo()
+    #                     type = userInfo['__pyobjc_exc_type__']
+    #                     value = userInfo['__pyobjc_exc_value__']
+    #                     tb = userInfo.get('__pyobjc_exc_traceback__', [])
+    #                     report_crash(type, value, tb)
+    #                 return True
+    #             except Exception:
+    #                 # We can't allow the possibility of an exception coming out of this method or else
+    #                 # we get an infinite loop. Forget about trying to report the error and just let it
+    #                 # log to the console.
+    #                 return True
+    #         
+    #         @signature('c@:@@I')
+    #         def exceptionHandler_shouldHandleException_mask_(self, sender, exception, aMask):
+    #             return False
+    #     
+    #     # we need to retain this, cause the handler doesn't
+    #     global _exceptionHandlerDelegate
+    #     delegate = PyObjCExceptionDelegate.alloc().init()
+    #     NSExceptionHandler.defaultExceptionHandler().setExceptionHandlingMask_(NSLogAndHandleEveryExceptionMask)
+    #     NSExceptionHandler.defaultExceptionHandler().setDelegate_(delegate)
+    #     _exceptionHandlerDelegate = delegate
