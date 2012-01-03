@@ -17,6 +17,7 @@ from .plat import ISWINDOWS, ISLINUX
 
 _trfunc = None
 _trget = None
+installed_lang = None
 
 def tr(s, context=None):
     if _trfunc is None:
@@ -44,10 +45,10 @@ def get_locale_name(lang):
     if ISWINDOWS:
         # http://msdn.microsoft.com/en-us/library/39cwe7zf(vs.71).aspx
         LANG2LOCALENAME = {'fr': 'fra', 'de': 'deu', 'it': 'ita', 'zh_CN': 'chs', 'cs': 'czy',
-            'nl': 'nld'}
+            'nl': 'nld', 'ru': 'rus'}
     else:
         LANG2LOCALENAME = {'fr': 'fr_FR', 'de': 'de_DE', 'it': 'it_IT', 'zh_CN': 'zh_CN',
-            'cs': 'cs_CZ', 'nl': 'nl_NL', 'hy': 'hy_AM'}
+            'cs': 'cs_CZ', 'nl': 'nl_NL', 'hy': 'hy_AM', 'ru': 'ru_RU'}
     if lang not in LANG2LOCALENAME:
         return None
     result = LANG2LOCALENAME[lang]
@@ -109,6 +110,8 @@ def install_gettext_trans(base_folder, lang):
             trfunc = gettext_trget(context)
             return trfunc(s)
     set_tr(gettext_tr, gettext_trget)
+    global installed_lang
+    installed_lang = lang
 
 def install_gettext_trans_under_cocoa():
     from .cocoa.objcmin import NSBundle
