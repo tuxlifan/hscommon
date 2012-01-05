@@ -23,7 +23,6 @@ API Documentation
    :maxdepth: 2
    
    build
-   cocoa
    conflict
    currency
    notify
