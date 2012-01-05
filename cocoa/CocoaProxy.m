@@ -1,6 +1,6 @@
-#import "Cocoa.h"
+#import "CocoaProxy.h"
 
-@implementation Cocoa
+@implementation CocoaProxy
 - (void)openPath:(NSString *)path
 {
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:path]];

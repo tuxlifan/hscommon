@@ -1,6 +1,6 @@
 #import <Cocoa/Cocoa.h>
 
-@interface Cocoa : NSObject
+@interface CocoaProxy : NSObject
 {
 	NSAutoreleasePool *currentPool;
 }
