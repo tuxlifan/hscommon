@@ -99,7 +99,7 @@ def install_gettext_trans(base_folder, lang):
     set_tr(gettext_tr, gettext_trget)
 
 def install_gettext_trans_under_cocoa():
-    from .cocoa import proxy
+    from cocoa import proxy
     resFolder = proxy.getResourcePath()
     baseFolder = op.join(resFolder, 'locale')
     currentLang = proxy.systemLang()
