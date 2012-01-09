@@ -159,6 +159,8 @@ def add_to_pythonpath(path):
 # in setuptools. We copy the packages *without data* in a build folder and then build the plugin
 # from there.
 def copy_packages(packages_names, dest, create_links=False):
+    if ISWINDOWS:
+        create_links = False
     ignore = shutil.ignore_patterns('.hg*', 'tests', 'testdata', 'modules', 'docs', 'locale')
     for package_name in packages_names:
         if op.exists(package_name):
@@ -169,10 +171,13 @@ def copy_packages(packages_names, dest, create_links=False):
         dest_name = op.basename(package_name) # the package name can be a path as well
         dest_path = op.join(dest, dest_name)
         if op.exists(dest_path):
-            shutil.rmtree(dest_path)
+            if op.islink(dest_path):
+                os.unlink(dest_path)
+            else:
+                shutil.rmtree(dest_path)
         print("Copying package at {0} to {1}".format(source_path, dest_path))
         if create_links:
-            os.link(source_path, dest_path)
+            os.symlink(op.abspath(source_path), dest_path)
         else:
             shutil.copytree(source_path, dest_path, ignore=ignore)
 
