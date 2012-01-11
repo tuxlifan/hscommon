@@ -27,21 +27,33 @@ def print_and_do(cmd):
     p = Popen(cmd, shell=True)
     p.wait()
 
-def move(src, dst):
+def _perform(src, dst, action, actionname):
     if not op.exists(src):
         return
     if op.exists(dst):
         os.remove(dst)
-    print('Moving %s --> %s' % (src, dst))
-    os.rename(src, dst)
+    print('%s %s --> %s' % (actionname, src, dst))
+    action(src, dst)
 
-def move_all(pattern, dst):
+def move(src, dst):
+    _perform(src, dst, os.rename, 'Moving')
+
+def copy(src, dst):
+    _perform(src, dst, shutil.copy, 'Copying')
+
+def _perform_on_all(pattern, dst, action):
     # pattern is a glob pattern, example "folder/foo*". The file is moved directly in dst, no folder
     # structure from src is kept.
     filenames = glob.glob(pattern)
     for fn in filenames:
         destpath = op.join(dst, op.basename(fn))
-        move(fn, destpath)
+        action(fn, destpath)
+
+def move_all(pattern, dst):
+    _perform_on_all(pattern, dst, move)
+
+def copy_all(pattern, dst):
+    _perform_on_all(pattern, dst, copy)
 
 def ensure_empty_folder(path):
     """Make sure that the path exists and that it's an empty folder.
