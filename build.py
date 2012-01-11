@@ -17,6 +17,7 @@ import re
 import importlib
 from datetime import datetime
 import glob
+import sysconfig
 
 from .plat import ISWINDOWS
 from .util import rem_file_ext, modified_after, find_in_path
@@ -144,6 +145,20 @@ def build_all_cocoa_locs(basedir):
         loc_path = op.join(basedir, loc)
         print("Building {0} localizations".format(loc_path))
         build_cocoa_localization(model_path, loc_path)
+
+def copy_sysconfig_files_for_embed(destpath):
+    # This normally shouldn't be needed for Python 3.3+.
+    makefile = sysconfig.get_makefile_filename()
+    configh = sysconfig.get_config_h_filename()
+    shutil.copy(makefile, destpath)
+    shutil.copy(configh, destpath)
+    with open(op.join(destpath, 'site.py'), 'w') as fp:
+        fp.write("""
+import os.path as op
+from distutils import sysconfig
+sysconfig.get_makefile_filename = lambda: op.join(op.dirname(__file__), 'Makefile')
+sysconfig.get_config_h_filename = lambda: op.join(op.dirname(__file__), 'pyconfig.h')
+""")
 
 def add_to_pythonpath(path):
     """Adds `path` to both PYTHONPATH env and sys.path.
