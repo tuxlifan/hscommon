@@ -17,6 +17,7 @@ import re
 import importlib
 from datetime import datetime
 import glob
+import sysconfig
 
 from .plat import ISWINDOWS
 from .util import rem_file_ext, modified_after, find_in_path
@@ -26,21 +27,33 @@ def print_and_do(cmd):
     p = Popen(cmd, shell=True)
     p.wait()
 
-def move(src, dst):
+def _perform(src, dst, action, actionname):
     if not op.exists(src):
         return
     if op.exists(dst):
         os.remove(dst)
-    print('Moving %s --> %s' % (src, dst))
-    os.rename(src, dst)
+    print('%s %s --> %s' % (actionname, src, dst))
+    action(src, dst)
 
-def move_all(pattern, dst):
+def move(src, dst):
+    _perform(src, dst, os.rename, 'Moving')
+
+def copy(src, dst):
+    _perform(src, dst, shutil.copy, 'Copying')
+
+def _perform_on_all(pattern, dst, action):
     # pattern is a glob pattern, example "folder/foo*". The file is moved directly in dst, no folder
     # structure from src is kept.
     filenames = glob.glob(pattern)
     for fn in filenames:
         destpath = op.join(dst, op.basename(fn))
-        move(fn, destpath)
+        action(fn, destpath)
+
+def move_all(pattern, dst):
+    _perform_on_all(pattern, dst, move)
+
+def copy_all(pattern, dst):
+    _perform_on_all(pattern, dst, copy)
 
 def ensure_empty_folder(path):
     """Make sure that the path exists and that it's an empty folder.
@@ -145,6 +158,20 @@ def build_all_cocoa_locs(basedir):
         print("Building {0} localizations".format(loc_path))
         build_cocoa_localization(model_path, loc_path)
 
+def copy_sysconfig_files_for_embed(destpath):
+    # This normally shouldn't be needed for Python 3.3+.
+    makefile = sysconfig.get_makefile_filename()
+    configh = sysconfig.get_config_h_filename()
+    shutil.copy(makefile, destpath)
+    shutil.copy(configh, destpath)
+    with open(op.join(destpath, 'site.py'), 'w') as fp:
+        fp.write("""
+import os.path as op
+from distutils import sysconfig
+sysconfig.get_makefile_filename = lambda: op.join(op.dirname(__file__), 'Makefile')
+sysconfig.get_config_h_filename = lambda: op.join(op.dirname(__file__), 'pyconfig.h')
+""")
+
 def add_to_pythonpath(path):
     """Adds `path` to both PYTHONPATH env and sys.path.
     """
@@ -159,6 +186,8 @@ def add_to_pythonpath(path):
 # in setuptools. We copy the packages *without data* in a build folder and then build the plugin
 # from there.
 def copy_packages(packages_names, dest, create_links=False):
+    if ISWINDOWS:
+        create_links = False
     ignore = shutil.ignore_patterns('.hg*', 'tests', 'testdata', 'modules', 'docs', 'locale')
     for package_name in packages_names:
         if op.exists(package_name):
@@ -169,10 +198,13 @@ def copy_packages(packages_names, dest, create_links=False):
         dest_name = op.basename(package_name) # the package name can be a path as well
         dest_path = op.join(dest, dest_name)
         if op.exists(dest_path):
-            shutil.rmtree(dest_path)
+            if op.islink(dest_path):
+                os.unlink(dest_path)
+            else:
+                shutil.rmtree(dest_path)
         print("Copying package at {0} to {1}".format(source_path, dest_path))
         if create_links:
-            os.link(source_path, dest_path)
+            os.symlink(op.abspath(source_path), dest_path)
         else:
             shutil.copytree(source_path, dest_path, ignore=ignore)
 
