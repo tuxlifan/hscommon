@@ -48,7 +48,7 @@ def get_locale_name(lang):
             'nl': 'nld', 'ru': 'rus'}
     else:
         LANG2LOCALENAME = {'fr': 'fr_FR', 'de': 'de_DE', 'it': 'it_IT', 'zh_CN': 'zh_CN',
-            'cs': 'cs_CZ', 'nl': 'nl_NL', 'hy': 'hy_AM', 'ru': 'ru_RU'}
+            'cs': 'cs_CZ', 'nl': 'nl_NL', 'hy': 'hy_AM', 'ru': 'ru_RU', 'uk': 'uk_UA'}
     if lang not in LANG2LOCALENAME:
         return None
     result = LANG2LOCALENAME[lang]
@@ -124,8 +124,6 @@ def install_gettext_trans_under_qt(base_folder, lang=None):
             locale.setlocale(locale.LC_ALL, localename)
         except locale.Error:
             logging.warning("Couldn't set locale %s", localename)
-    else:
-        lang = 'en'
     qtr = QTranslator(QCoreApplication.instance())
     qtr.load(':/qt_%s' % lang)
     QCoreApplication.installTranslator(qtr)
