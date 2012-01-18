@@ -28,9 +28,9 @@ def print_and_do(cmd):
     p.wait()
 
 def _perform(src, dst, action, actionname):
-    if not op.exists(src):
+    if not op.lexists(src):
         return
-    if op.exists(dst):
+    if op.lexists(dst):
         os.remove(dst)
     print('%s %s --> %s' % (actionname, src, dst))
     action(src, dst)
@@ -40,6 +40,9 @@ def move(src, dst):
 
 def copy(src, dst):
     _perform(src, dst, shutil.copy, 'Copying')
+
+def symlink(src, dst):
+    _perform(src, dst, os.symlink, 'Symlinking')
 
 def _perform_on_all(pattern, dst, action):
     # pattern is a glob pattern, example "folder/foo*". The file is moved directly in dst, no folder
