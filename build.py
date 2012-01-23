@@ -44,6 +44,9 @@ def copy(src, dst):
 def symlink(src, dst):
     _perform(src, dst, os.symlink, 'Symlinking')
 
+def hardlink(src, dst):
+    _perform(src, dst, os.link, 'Hardlinking')
+
 def _perform_on_all(pattern, dst, action):
     # pattern is a glob pattern, example "folder/foo*". The file is moved directly in dst, no folder
     # structure from src is kept.
