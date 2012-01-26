@@ -53,6 +53,10 @@ class Columns(GUIObject):
     def _optional_columns(self):
         return [c for c in self.column_list if c.optional]
     
+    #--- Override
+    def _view_updated(self):
+        self.restore_columns()
+    
     #--- Public
     def column_by_index(self, index):
         return self.column_list[index]
