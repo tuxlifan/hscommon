@@ -5,17 +5,16 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-from .base import NoopGUI
+from .base import GUIObject
 from ..util import nonone
 
-class TextField:
-    def __init__(self, view=None):
-        if view is None:
-            view = NoopGUI()
-        self.view = view
+class TextField(GUIObject):
+    def __init__(self):
+        GUIObject.__init__(self)
         self._text = ''
         self._value = None
     
+    #--- Virtual
     def _parse(self, text):
         return text
     
@@ -25,6 +24,11 @@ class TextField:
     def _update(self, newvalue):
         pass
     
+    #--- Override
+    def _view_updated(self):
+        self.view.refresh()
+    
+    #--- Public
     def refresh(self):
         self.view.refresh()
     

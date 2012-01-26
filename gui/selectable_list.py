@@ -8,7 +8,7 @@
 
 from collections import Sequence, MutableSequence
 
-from .base import NoopGUI
+from .base import GUIObject
 
 class Selectable(Sequence):
     def __init__(self):
@@ -111,17 +111,18 @@ class SelectableList(MutableSequence, Selectable):
         return -1
     
 
-class GUISelectableList(SelectableList):
+class GUISelectableList(SelectableList, GUIObject):
     #--- View interface
     # refresh()
     # update_selection()
     #
     
-    def __init__(self, items=None, view=None):
+    def __init__(self, items=None):
         SelectableList.__init__(self, items)
-        if view is None:
-            view = NoopGUI()
-        self.view = view
+        GUIObject.__init__(self)
+    
+    def _view_updated(self):
+        self.view.refresh()
     
     def _update_selection(self):
         self.view.update_selection()

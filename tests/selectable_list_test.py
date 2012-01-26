@@ -38,21 +38,21 @@ def test_update_selection_called():
 
 def test_guicalls():
     # A GUISelectableList appropriately calls its view.
-    gui = CallLogger()
-    sl = GUISelectableList(['foo', 'bar'], view=gui)
-    gui.check_gui_calls([]) # nothing inistally
+    sl = GUISelectableList(['foo', 'bar'])
+    sl.view = CallLogger()
+    sl.view.check_gui_calls(['refresh']) # Upon setting the view, we get a call to refresh()
     sl[1] = 'baz'
-    gui.check_gui_calls(['refresh'])
+    sl.view.check_gui_calls(['refresh'])
     sl.append('foo')
-    gui.check_gui_calls(['refresh'])
+    sl.view.check_gui_calls(['refresh'])
     del sl[2]
-    gui.check_gui_calls(['refresh'])
+    sl.view.check_gui_calls(['refresh'])
     sl.remove('baz')
-    gui.check_gui_calls(['refresh'])
+    sl.view.check_gui_calls(['refresh'])
     sl.insert(0, 'foo')
-    gui.check_gui_calls(['refresh'])
+    sl.view.check_gui_calls(['refresh'])
     sl.select(1)
-    gui.check_gui_calls(['update_selection'])
+    sl.view.check_gui_calls(['update_selection'])
     # XXX We have to give up on this for now because of a breakage it causes in the tables.
     # sl.select(1) # don't update when selection stays the same
     # gui.check_gui_calls([])

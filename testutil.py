@@ -117,7 +117,8 @@ class TestApp:
         if holder is None:
             holder = self
         setattr(holder, '{0}_gui'.format(name), view)
-        gui = class_(view, parent)
+        gui = class_(parent)
+        gui.view = view
         setattr(holder, name, gui)
         return gui
     

@@ -8,7 +8,7 @@
 
 import copy
 
-from .base import NoopGUI
+from .base import GUIObject
 
 class Column:
     def __init__(self, name, display='', visible=True, optional=False):
@@ -23,13 +23,12 @@ class Column:
         self.optional = optional
     
 
-class Columns:
+class Columns(GUIObject):
     def __init__(self, table, prefaccess=None, savename=None):
+        GUIObject.__init__(self)
         self.table = table
         self.prefaccess = prefaccess
         self.savename = savename
-        # Set this view as soon as the GUI layer column instance is created
-        self.view = NoopGUI()
         # We use copy here for test isolation. If we don't, changing a column affects all tests.
         self.column_list = list(map(copy.copy, table.COLUMNS))
         for i, column in enumerate(self.column_list):

@@ -6,6 +6,8 @@
 
 from collections import MutableSequence
 
+from .base import GUIObject
+
 class Node(MutableSequence):
     def __init__(self, name):
         self._name = name
@@ -97,16 +99,23 @@ class Node(MutableSequence):
             return self._parent.root
     
 
-class Tree(Node):
+class Tree(Node, GUIObject):
     def __init__(self):
         Node.__init__(self, '')
+        GUIObject.__init__(self)
         self._selected_nodes = []
     
+    #--- Virtual
     def _select_nodes(self, nodes):
         # all selection changes go through this method, so you can override this if you want to
         # customize the tree's behavior.
         self._selected_nodes = nodes
     
+    #--- Override
+    def _view_updated(self):
+        self.view.refresh()
+    
+    #--- Public
     def clear(self):
         self._selected_nodes = []
         Node.clear(self)
