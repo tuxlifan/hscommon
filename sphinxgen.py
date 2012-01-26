@@ -27,7 +27,7 @@ def tixgen(tixurl):
     repl = '`#\\1 <{}>`__'.format(urlpattern)
     return lambda text: R.sub(repl, text)
 
-def gen(basepath, destpath, changelogpath, tixurl, confrepl=None, confpath=None):
+def gen(basepath, destpath, changelogpath, tixurl, confrepl=None, confpath=None, changelogtmpl=None):
     """Generate sphinx docs with all bells and whistles.
     
     basepath: The base sphinx source path.
@@ -40,6 +40,8 @@ def gen(basepath, destpath, changelogpath, tixurl, confrepl=None, confpath=None)
         confrepl = {}
     if confpath is None:
         confpath = op.join(basepath, 'conf.tmpl')
+    if changelogtmpl is None:
+        changelogtmpl = op.join(basepath, 'changelog.tmpl')
     changelog = read_changelog_file(changelogpath)
     tix = tixgen(tixurl)
     rendered_logs = []
@@ -52,9 +54,8 @@ def gen(basepath, destpath, changelogpath, tixurl, confrepl=None, confpath=None)
             description=description)
         rendered_logs.append(rendered)
     confrepl['version'] = changelog[0]['version']
-    changelog_in = op.join(basepath, 'changelog.tmpl')
     changelog_out = op.join(basepath, 'changelog.rst')
-    filereplace(changelog_in, changelog_out, changelog='\n'.join(rendered_logs))
+    filereplace(changelogtmpl, changelog_out, changelog='\n'.join(rendered_logs))
     conf_out = op.join(basepath, 'conf.py')
     filereplace(confpath, conf_out, **confrepl)
     cmd = 'sphinx-build "{}" "{}"'.format(basepath, destpath)
