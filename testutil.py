@@ -103,8 +103,8 @@ class TestApp:
         for logger in self._call_loggers:
             logger.clear_calls()
     
-    def make_logger(self, class_=CallLogger):
-        logger = class_()
+    def make_logger(self, class_=CallLogger, *initargs):
+        logger = class_(*initargs)
         self._call_loggers.append(logger)
         return logger
     
