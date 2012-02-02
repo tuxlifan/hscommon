@@ -85,6 +85,7 @@ def strings2pot(target, dest):
             po.append(entry)
         # we don't know or care about a line number so we put 0
         entry.occurrences.append((target, '0'))
+        entry.occurrences = dedupe(entry.occurrences)
     po.save()
 
 def allstrings2pot(lprojpath, dest, excludes=None):
