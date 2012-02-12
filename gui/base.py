@@ -37,10 +37,19 @@ class GUIObject:
     
     @view.setter
     def view(self, value):
-        # not supposed to set the view more than once
-        assert self._view is None
-        if value is None:
-            return 
-        self._view = value
-        self._view_updated()
+        # There's two times at which we set the view property: On initialization, where we set the
+        # view that we'll use for your lifetime, and just before the view is deallocated. We need
+        # to unset our view at that time to avoid calls to a deallocated instance (which means a
+        # crash).
+        if self._view is None:
+            # Initial view assignment
+            if value is None:
+                return 
+            self._view = value
+            self._view_updated()
+        else:
+            assert value is None
+            # Instead of None, we put a NoopGUI() there to avoid rogue view callback raising an
+            # exception.
+            self._view = NoopGUI()
     
