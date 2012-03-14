@@ -1,15 +1,16 @@
+# 
 msgid ""
 msgstr ""
-"Content-Type: text/plain; charset=UTF-8\n"
 "Project-Id-Version: Ukrainian\n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: YuriPetrashko <Petrashko@mail.ua>\n"
 "MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Ukrainian\n"
 "X-Poedit-Country: UKRAINE\n"
+"X-Poedit-Language: Ukrainian\n"
 
 #: hscommon/reg.py:39
 msgid ""
@@ -42,4 +43,3 @@ msgstr ""
 "Так що я не буду втомлювати вас і буде дуже просто: Ви можете спробувати {name} безкоштовно, але вам доведеться купити його, щоб використовувати її без обмежень. У демо-режимі, {name} {limitation}.\n"
 "\n"
 "Так само просто, як це. Якщо вам цікаво, про fairware, тим не менше, я закликаю вас, щоб дізнатися більше про це, натиснувши на  \"Fairware? \" Кнопку."
-

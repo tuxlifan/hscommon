@@ -1,15 +1,16 @@
+# 
 msgid ""
 msgstr ""
-"Content-Type: text/plain; charset=UTF-8\n"
 "Project-Id-Version: Armenian\n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
 "Last-Translator: Hrant Ohanyan <hrantohanyan@mail.am>\n"
 "Language-Team: HaySoft <hrantohanyan@mail.am>\n"
 "MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Armenian\n"
 "X-Poedit-Country: ARMENIA\n"
+"X-Poedit-Language: Armenian\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
 #: hscommon/reg.py:39
@@ -43,4 +44,3 @@ msgstr ""
 "Ուստի ես չեմ ցանկանում խանգարել Ձեզ և կլինեմ շատ պարզ. Կարող եք փորձել {name}-ը ազատորեն, բայց պետք է գնեք ծրագիրը՝ հանելու համար բոլոր սահմանափակումները: Փորձնական եղանակում {name} {limitation}:\n"
 "\n"
 "Ամեն ինչ պարզ է, եթե Ձեզ հետաքրքիր է fairware-ը, ապա կարող եք մանրամասն կարդաք՝ սեղմելով այս հղմանը՝ \"Fairware է՞\":"
-
