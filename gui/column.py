@@ -104,6 +104,10 @@ class Columns(GUIObject):
     
     def restore_columns(self):
         if not (self.prefaccess and self.savename and self.coldata):
+            if (not self.savename) and (self.coldata):
+                # This is a table that will not have its coldata saved/restored. we should
+                # "restore" its default column attributes.
+                self.view.restore_columns()
             return
         for col in self.column_list:
             pref_name = '{0}.Columns.{1}'.format(self.savename, col.name)
