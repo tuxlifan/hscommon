@@ -29,6 +29,9 @@ class Path(tuple):
     be converted to str only at the last moment (when it is needed in an external function, such
     as os.rename)
     """
+    # Saves a little bit of memory usage
+    __slots__ = ()
+    
     def __new__(cls, value, separator=None):
         def unicode_if_needed(s):
             if isinstance(s, str):
