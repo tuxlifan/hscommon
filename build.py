@@ -25,7 +25,7 @@ from .util import rem_file_ext, modified_after, find_in_path
 def print_and_do(cmd):
     print(cmd)
     p = Popen(cmd, shell=True)
-    p.wait()
+    return p.wait()
 
 def _perform(src, dst, action, actionname):
     if not op.lexists(src):
@@ -118,7 +118,29 @@ def build_all_qt_locs(basedir, extradirs=None):
         destfile = op.join(basedir, ts.replace('.ts', '.qm'))
         print_and_do('lrelease {} -qm {}'.format(tsfiles_cmd, destfile))
 
-def build_dmg(app_path, dest_path):
+def setup_package_argparser(parser):
+    parser.add_argument('--sign', dest='sign_identity',
+        help="Sign app under specified identity before packaging (OS X only)")
+    parser.add_argument('--nosign', action='store_true', dest='nosign',
+        help="Don't sign the packaged app (OS X only)")
+
+# `args` come from an ArgumentParser updated with setup_package_argparser()
+def package_cocoa_app_in_dmg(app_path, destfolder, args):
+    # Rather than signing our app in XCode during the build phase, we sign it during the package
+    # phase because running the app before packaging can modify it and we want to be sure to have
+    # a valid signature.
+    if args.sign_identity:
+        sign_identity = "Developer ID Application: {}".format(args.sign_identity)
+        result = print_and_do('codesign --force --sign "{}" "{}"'.format(sign_identity, app_path))
+        if result != 0:
+            print("ERROR: Signing failed. Aborting packaging.")
+            return
+    elif not args.nosign:
+        print("ERROR: Either --nosign or --sign argument required.")
+        return
+    build_dmg(app_path, destfolder)
+
+def build_dmg(app_path, destfolder):
     print(repr(op.join(app_path, 'Contents', 'Info.plist')))
     plist = plistlib.readPlist(op.join(app_path, 'Contents', 'Info.plist'))
     workpath = tempfile.mkdtemp()
@@ -129,7 +151,7 @@ def build_dmg(app_path, dest_path):
     dmgname = '%s_osx_%s.dmg' % (plist['CFBundleName'].lower().replace(' ', '_'), plist['CFBundleVersion'].replace('.', '_'))
     print('Building %s' % dmgname)
     # UDBZ = bzip compression. UDZO (zip compression) was used before, but it compresses much less.
-    print_and_do('hdiutil create "%s" -format UDBZ -nocrossdev -srcdir "%s"' % (op.join(dest_path, dmgname), dmgpath))
+    print_and_do('hdiutil create "%s" -format UDBZ -nocrossdev -srcdir "%s"' % (op.join(destfolder, dmgname), dmgpath))
     print('Build Complete')
 
 def build_cocoa_localization(model_path, loc_path):
