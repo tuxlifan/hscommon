@@ -255,7 +255,7 @@ def build_debian_changelog(changelogpath, destfile, pkgname, from_version=None):
     fp.write(result)
     fp.close()
 
-re_changelog_header = re.compile(r'=== ([\d.]*) \(([\d\-]*)\)')
+re_changelog_header = re.compile(r'=== ([\d.b]*) \(([\d\-]*)\)')
 def read_changelog_file(filename):
     def iter_by_three(it):
         while True:
