@@ -29,17 +29,27 @@ def print_and_do(cmd):
 
 def _perform(src, dst, action, actionname):
     if not op.lexists(src):
+        print("Copying %s failed: it doesn't exist." % src)
         return
     if op.lexists(dst):
-        os.remove(dst)
+        if op.isdir(dst):
+            shutil.rmtree(dst)
+        else:
+            os.remove(dst)
     print('%s %s --> %s' % (actionname, src, dst))
     action(src, dst)
+
+def copy_file_or_folder(src, dst):
+    if op.isdir(src):
+        shutil.copytree(src, dst, symlinks=True)
+    else:
+        shutil.copy(src, dst)
 
 def move(src, dst):
     _perform(src, dst, os.rename, 'Moving')
 
 def copy(src, dst):
-    _perform(src, dst, shutil.copy, 'Copying')
+    _perform(src, dst, copy_file_or_folder, 'Copying')
 
 def symlink(src, dst):
     _perform(src, dst, os.symlink, 'Symlinking')
@@ -274,3 +284,32 @@ def read_changelog_file(filename):
         d = {'date': date, 'date_str': date_str, 'version': version, 'description': description.strip()}
         result.append(d)
     return result
+
+def create_osx_app_structure(dest, executable, infoplist, resources=None, frameworks=None):
+    # `dest`: A path to the destination .app folder
+    # `executable`: the path of the executable file that goes in "MacOS"
+    # `infoplist`: The path to your Info.plist file.
+    # `resources`: A list of paths of files or folders going in the "Resources" folder.
+    # `frameworks`: Same as above for "Frameworks".
+    ensure_empty_folder(dest)
+    contents = op.join(dest, 'Contents')
+    macos = op.join(contents, 'MacOS')
+    os.makedirs(macos)
+    info = plistlib.readPlist(infoplist)
+    executablename = info['CFBundleExecutable']
+    copy(executable, op.join(macos, executablename))
+    copy(infoplist, op.join(contents, 'Info.plist'))
+    open(op.join(contents, 'PkgInfo'), 'wt').write("APPLxxxx")
+    if resources:
+        resources_path = op.join(contents, 'Resources')
+        os.mkdir(resources_path)
+        for path in resources:
+            resource_dest = op.join(resources_path, op.basename(path))
+            copy(path, resource_dest)
+    if frameworks:
+        frameworks_path = op.join(contents, 'Frameworks')
+        os.mkdir(frameworks_path)
+        for path in frameworks:
+            framework_dest = op.join(frameworks_path, op.basename(path))
+            copy(path, framework_dest)
+
