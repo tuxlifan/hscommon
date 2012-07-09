@@ -285,12 +285,14 @@ def read_changelog_file(filename):
         result.append(d)
     return result
 
-def create_osx_app_structure(dest, executable, infoplist, resources=None, frameworks=None):
+def create_osx_app_structure(dest, executable, infoplist, resources=None, frameworks=None,
+        symlink_resources=False):
     # `dest`: A path to the destination .app folder
     # `executable`: the path of the executable file that goes in "MacOS"
     # `infoplist`: The path to your Info.plist file.
     # `resources`: A list of paths of files or folders going in the "Resources" folder.
     # `frameworks`: Same as above for "Frameworks".
+    # `symlink_resources`: If True, will symlink resources into the structure instead of copying them.
     ensure_empty_folder(dest)
     contents = op.join(dest, 'Contents')
     macos = op.join(contents, 'MacOS')
@@ -305,7 +307,8 @@ def create_osx_app_structure(dest, executable, infoplist, resources=None, framew
         os.mkdir(resources_path)
         for path in resources:
             resource_dest = op.join(resources_path, op.basename(path))
-            copy(path, resource_dest)
+            action = symlink if symlink_resources else copy
+            action(op.abspath(path), resource_dest)
     if frameworks:
         frameworks_path = op.join(contents, 'Frameworks')
         os.mkdir(frameworks_path)
