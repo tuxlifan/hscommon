@@ -231,7 +231,8 @@ def copy_qt_plugins(folder_names, dest): # This is only for Windows
             return [n for n in names if not n.endswith('.dll')]
     shutil.copytree(qt_plugin_dir, dest, ignore=ignore)
 
-def build_debian_changelog(changelogpath, destfile, pkgname, from_version=None):
+def build_debian_changelog(changelogpath, destfile, pkgname, from_version=None,
+        distribution='precise'):
     """Builds a debian changelog out of a YAML changelog.
     """
     def desc2list(desc):
@@ -241,7 +242,7 @@ def build_debian_changelog(changelogpath, destfile, pkgname, from_version=None):
         result = desc.split('*')
         return [s.strip() for s in result if s.strip()]
     
-    ENTRY_MODEL = "{pkg} ({version}) stable; urgency=low\n\n{changes}\n -- Virgil Dupras <hsoft@hardcoded.net>  {date}\n\n"
+    ENTRY_MODEL = "{pkg} ({version}) {distribution}; urgency=low\n\n{changes}\n -- Virgil Dupras <hsoft@hardcoded.net>  {date}\n\n"
     CHANGE_MODEL = "  * {description}\n"
     changelogs = read_changelog_file(changelogpath)
     if from_version:
@@ -258,7 +259,8 @@ def build_debian_changelog(changelogpath, destfile, pkgname, from_version=None):
         rendered_date = logdate.strftime('%a, %d %b %Y 00:00:00 +0000')
         rendered_descs = [CHANGE_MODEL.format(description=d) for d in desc2list(desc)]
         changes = ''.join(rendered_descs)
-        rendered_log = ENTRY_MODEL.format(pkg=pkgname, version=version, changes=changes, date=rendered_date)
+        rendered_log = ENTRY_MODEL.format(pkg=pkgname, version=version, changes=changes,
+            date=rendered_date, distribution=distribution)
         rendered_logs.append(rendered_log)
     result = ''.join(rendered_logs)
     fp = open(destfile, 'w')
