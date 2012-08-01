@@ -6,7 +6,8 @@ import re
 import polib
 
 from . import pygettext
-from .util import modified_after, dedupe
+from .util import modified_after, dedupe, ensure_folder, ensure_file
+from .build import print_and_do, ensure_empty_folder
 
 LC_MESSAGES = 'LC_MESSAGES'
 
@@ -76,6 +77,7 @@ def strings2pot(target, dest):
     # We're reading an en.lproj file. We only care about the righthand part of the translation.
     re_trans = re.compile(r'".*" = "(.*)";')
     strings = re_trans.findall(contents)
+    ensure_file(dest)
     po = polib.pofile(dest)
     for s in dedupe(strings):
         s = unescape_cocoa_strings(s)
@@ -152,6 +154,7 @@ def po2strings(pofile, en_strings, dest):
     po = polib.pofile(pofile)
     if not modified_after(pofile, dest):
         return
+    ensure_folder(op.dirname(dest))
     print("Creating {} from {}".format(dest, pofile))
     with open(en_strings, 'rt', encoding='utf-8') as fp:
         contents = fp.read()
@@ -176,6 +179,27 @@ def po2allxibstrings(pofile, en_lproj, dest_lproj):
     for strings in allstrings:
         deststrings = op.join(dest_lproj, op.basename(strings))
         po2strings(pofile, strings, deststrings)
+
+
+def generate_cocoa_strings_from_code(code_folder, dest_folder):
+    # Uses the "genstrings" command to generate strings file from all .m files in "code_folder".
+    # The strings file (their name depends on the localization table used in the source) will be
+    # placed in "dest_folder".
+    # genstrings produces utf-16 files with comments. After having generated the files, we convert
+    # them to utf-8 and remove the comments.
+    ensure_empty_folder(dest_folder)
+    print_and_do('genstrings -o "{}" `find "{}" -name *.m | xargs`'.format(dest_folder, code_folder))
+    for stringsfile in os.listdir(dest_folder):
+        stringspath = op.join(dest_folder, stringsfile)
+        with open(stringspath, 'rt', encoding='utf-16') as fp:
+            content = fp.read()
+        content = re.sub('/\*.*?\*/', '', content)
+        content = re.sub('\n{2,}', '\n', content)
+        # I have no idea why, but genstrings seems to have problems with "%" character in strings
+        # and inserts (number)$ after it. Find these bogus inserts and remove them.
+        content = re.sub('%\d\$', '%', content)
+        with open(stringspath, 'wt', encoding='utf-8') as fp:
+            fp.write(content)
 
 #--- Qt
 def unescape_xml(s):

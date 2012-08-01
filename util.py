@@ -306,6 +306,16 @@ def open_if_filename(infile, mode='rb'):
     else:
         return (infile, False)
 
+def ensure_folder(path):
+    "Create `path` as a folder if it doesn't exist."
+    if not op.exists(path):
+        os.makedirs(path)
+
+def ensure_file(path):
+    "Create `path` as an empty file if it doesn't exist."
+    if not op.exists(path):
+        open(path, 'w').close()
+
 class FileOrPath:
     def __init__(self, file_or_path, mode='rb'):
         self.file_or_path = file_or_path
