@@ -287,6 +287,41 @@ def read_changelog_file(filename):
         result.append(d)
     return result
 
+class OSXAppStructure:
+    def __init__(self, dest):
+        self.dest = dest
+        self.contents = op.join(dest, 'Contents')
+        self.macos = op.join(self.contents, 'MacOS')
+        self.resources = op.join(self.contents, 'Resources')
+        self.frameworks = op.join(self.contents, 'Frameworks')
+        self.infoplist = op.join(self.contents, 'Info.plist')
+    
+    def create(self, infoplist):
+        ensure_empty_folder(self.dest)
+        os.makedirs(self.macos)
+        os.mkdir(self.resources)
+        os.mkdir(self.frameworks)
+        copy(infoplist, self.infoplist)
+        open(op.join(self.contents, 'PkgInfo'), 'wt').write("APPLxxxx")
+    
+    def copy_executable(self, executable):
+        info = plistlib.readPlist(self.infoplist)
+        self.executablename = info['CFBundleExecutable']
+        self.executablepath = op.join(self.macos, self.executablename)
+        copy(executable, self.executablepath)
+    
+    def copy_resources(self, *resources, use_symlinks=False):
+        for path in resources:
+            resource_dest = op.join(self.resources, op.basename(path))
+            action = symlink if use_symlinks else copy
+            action(op.abspath(path), resource_dest)
+    
+    def copy_frameworks(self, *frameworks):
+        for path in frameworks:
+            framework_dest = op.join(self.frameworks, op.basename(path))
+            copy(path, framework_dest)
+    
+
 def create_osx_app_structure(dest, executable, infoplist, resources=None, frameworks=None,
         symlink_resources=False):
     # `dest`: A path to the destination .app folder
@@ -295,29 +330,11 @@ def create_osx_app_structure(dest, executable, infoplist, resources=None, framew
     # `resources`: A list of paths of files or folders going in the "Resources" folder.
     # `frameworks`: Same as above for "Frameworks".
     # `symlink_resources`: If True, will symlink resources into the structure instead of copying them.
-    ensure_empty_folder(dest)
-    contents = op.join(dest, 'Contents')
-    macos = op.join(contents, 'MacOS')
-    os.makedirs(macos)
-    info = plistlib.readPlist(infoplist)
-    executablename = info['CFBundleExecutable']
-    copy(executable, op.join(macos, executablename))
-    copy(infoplist, op.join(contents, 'Info.plist'))
-    open(op.join(contents, 'PkgInfo'), 'wt').write("APPLxxxx")
-    if resources:
-        resources_path = op.join(contents, 'Resources')
-        os.mkdir(resources_path)
-        for path in resources:
-            resource_dest = op.join(resources_path, op.basename(path))
-            action = symlink if symlink_resources else copy
-            action(op.abspath(path), resource_dest)
-    if frameworks:
-        frameworks_path = op.join(contents, 'Frameworks')
-        os.mkdir(frameworks_path)
-        for path in frameworks:
-            framework_dest = op.join(frameworks_path, op.basename(path))
-            copy(path, framework_dest)
-
+    app = OSXAppStructure(dest, infoplist)
+    app.create()
+    app.copy_executable(executable)
+    app.copy_resources(*resources, use_symlinks=symlink_resources)
+    app.copy_frameworks(*frameworks)
 
 def build_cocoalib_xibless(dest='cocoa/autogen'):
     import xibless
