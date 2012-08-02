@@ -12,7 +12,7 @@ import os.path as op
 import shutil
 import tempfile
 import plistlib
-from subprocess import Popen, PIPE
+from subprocess import Popen
 import re
 import importlib
 from datetime import datetime
@@ -20,7 +20,7 @@ import glob
 import sysconfig
 
 from .plat import ISWINDOWS
-from .util import rem_file_ext, modified_after, find_in_path
+from .util import rem_file_ext, modified_after, find_in_path, ensure_folder
 
 def print_and_do(cmd):
     print(cmd)
@@ -318,3 +318,17 @@ def create_osx_app_structure(dest, executable, infoplist, resources=None, framew
             framework_dest = op.join(frameworks_path, op.basename(path))
             copy(path, framework_dest)
 
+
+def build_cocoalib_xibless(dest='cocoa/autogen'):
+    import xibless
+    ensure_folder(dest)
+    FNPAIRS = [
+        ('progress.py', 'ProgressController_UI'),
+        ('about.py', 'HSAboutBox_UI'),
+        ('fairware_reminder.py', 'HSFairwareReminder_UI'),
+        ('demo_reminder.py', 'HSDemoReminder_UI'),
+        ('enter_code.py', 'HSEnterCode_UI'),
+        ('error_report.py', 'HSErrorReportWindow_UI'),
+    ]
+    for srcname, dstname in FNPAIRS:
+        xibless.generate(op.join('cocoalib', 'ui', srcname), op.join(dest, dstname), localizationTable='cocoalib')
