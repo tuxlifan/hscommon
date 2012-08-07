@@ -349,3 +349,15 @@ def build_cocoalib_xibless(dest='cocoa/autogen'):
     ]
     for srcname, dstname in FNPAIRS:
         xibless.generate(op.join('cocoalib', 'ui', srcname), op.join(dest, dstname), localizationTable='cocoalib')
+
+def fix_qt_resource_file(path):
+    # pyrcc4 under Windows, if the locale is non-english, can produce a source file with a date
+    # containing accented characters. If it does, the encoding is wrong and it prevents the file
+    # from being correctly frozen by cx_freeze. To work around that, we open the file, strip all
+    # comments, and save.
+    with open(path, 'rb') as fp:
+        contents = fp.read()
+    lines = contents.split(b'\n')
+    lines = [l for l in lines if not l.startswith(b'#')]
+    with open(path, 'wb') as fp:
+        fp.write(b'\n'.join(lines))
