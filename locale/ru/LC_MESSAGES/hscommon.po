@@ -1,3 +1,4 @@
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: dupGuru\n"
@@ -8,10 +9,11 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 "X-Poedit-Country: RUSSIAN FEDERATION\n"
 "X-Poedit-Language: Russian\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
+#: hscommon/reg.py:39
 msgid ""
 "{name} is Fairware, which means \"open source software developed with expectation of fair contributions from users\". Hours have been invested in this software with the expectation that users will be fair enough to compensate them. The \"Unpaid hours\" figure you see below is the hours that have yet to be compensated for this project.\n"
 "\n"
@@ -29,6 +31,7 @@ msgstr ""
 "\n"
 "Этот диалог не показывается когда нет неоплаченных часов, или когда у вас есть действительный ключ за вклад."
 
+#: hscommon/reg.py:51
 msgid ""
 "{name} is fairware, which means \"open source software developed with expectation of fair contributions from users\". It's a very interesting concept, but one year of fairware has shown that most people just want to know how much it costs and not be bothered with theories about intellectual property.\n"
 "\n"
@@ -41,4 +44,3 @@ msgstr ""
 "Так что, я не буду утомлять вас и буду очень краток: вы можете попробовать {name} бесплатно, но вам придётся купить её, чтобы использовать без ограничений. В демо-режиме {name} {limitation}.\n"
 "\n"
 "То есть, это просто. Если вам интересно, о fairware вы можете больше узнать нажав на  кнопку \"Fairware?\"."
-
