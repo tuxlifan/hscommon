@@ -8,6 +8,8 @@
 
 import logging
 import os
+import os.path as op
+import shutil
 import sys
 from itertools import takewhile
 
@@ -130,4 +132,53 @@ class Path(tuple):
     
     def tobytes(self):
         return str(self).encode(sys.getfilesystemencoding())
+    
+    # OS method wrappers
+    def exists(self):
+        return op.exists(str(self))
+    
+    def copy(self, dest_path):
+        return shutil.copy(str(self), str(dest_path))
+
+    def copytree(self, dest_path, *args, **kwargs):
+        return shutil.copytree(str(self), str(dest_path), *args, **kwargs)
+
+    def isdir(self):
+        return op.isdir(str(self))
+
+    def isfile(self):
+        return op.isfile(str(self))
+
+    def islink(self):
+        return op.islink(str(self))
+
+    def listdir(self):
+        return os.listdir(str(self))
+
+    def mkdir(self, *args, **kwargs):
+        return os.mkdir(str(self), *args, **kwargs)
+
+    def makedirs(self, *args, **kwargs):
+        return os.makedirs(str(self), *args, **kwargs)
+
+    def move(self, dest_path):
+        return shutil.move(str(self), str(dest_path))
+
+    def open(self, *args, **kwargs):
+        return open(str(self), *args, **kwargs)
+
+    def remove(self):
+        return os.remove(str(self))
+
+    def rename(self, dest_path):
+        return os.rename(str(self), str(dest_path))
+
+    def rmdir(self):
+        return os.rmdir(str(self))
+
+    def rmtree(self):
+        return shutil.rmtree(str(self))
+
+    def stat(self):
+        return os.stat(str(self))
     
