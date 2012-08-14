@@ -125,7 +125,7 @@ BBD = Currency.register('BBD', 'Barbadian dollar',
     start_date=date(2010, 4, 30), start_rate=0.5003, latest_rate=0.5003)
 BEF = Currency.register('BEF', 'Belgian franc',
     start_date=date(1998, 1, 2), start_rate=0.03832, stop_date=date(2001, 12, 31), latest_rate=0.03516) # obsolete (euro)
-BRL = Currency.register('BHD', 'Bahraini dinar',
+BHD = Currency.register('BHD', 'Bahraini dinar',
     exponent=3, start_date=date(2008, 11, 8), start_rate=3.1518, latest_rate=2.6603)
 BRL = Currency.register('BRL', 'Brazilian real',
     start_date=date(1998, 1, 2), start_rate=1.2707, latest_rate=0.5741)
