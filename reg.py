@@ -102,6 +102,11 @@ class RegistrableApplication:
     
     def initial_registration_setup(self):
         # Should be called only after the app is finished launching
+        if self.registered:
+            # We've already set registration in a hardcoded way (for example, for the Ubuntu Store)
+            # Just ignore registration, but not before having set as registered.
+            self.view.setup_as_registered()
+            return
         code = self.view.get_default('RegistrationCode')
         email = self.view.get_default('RegistrationEmail')
         if code and email:
