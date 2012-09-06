@@ -348,7 +348,10 @@ def build_cocoalib_xibless(dest='cocoa/autogen'):
         ('error_report.py', 'HSErrorReportWindow_UI'),
     ]
     for srcname, dstname in FNPAIRS:
-        xibless.generate(op.join('cocoalib', 'ui', srcname), op.join(dest, dstname), localizationTable='cocoalib')
+        srcpath = op.join('cocoalib', 'ui', srcname)
+        dstpath = op.join(dest, dstname)
+        if modified_after(srcpath, dstpath + '.h'):
+            xibless.generate(srcpath, dstpath, localizationTable='cocoalib')
 
 def fix_qt_resource_file(path):
     # pyrcc4 under Windows, if the locale is non-english, can produce a source file with a date
