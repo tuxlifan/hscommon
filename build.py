@@ -172,8 +172,10 @@ def copy_packages(packages_names, dest, create_links=False):
             source_path = package_name
         else:
             mod = __import__(package_name)
-            source_path = op.dirname(mod.__file__)
-        dest_name = op.basename(package_name) # the package name can be a path as well
+            source_path = mod.__file__
+            if mod.__file__.endswith('__init__.py'):
+                source_path = op.dirname(source_path)
+        dest_name = op.basename(source_path)
         dest_path = op.join(dest, dest_name)
         if op.exists(dest_path):
             if op.islink(dest_path):
@@ -184,7 +186,10 @@ def copy_packages(packages_names, dest, create_links=False):
         if create_links:
             os.symlink(op.abspath(source_path), dest_path)
         else:
-            shutil.copytree(source_path, dest_path, ignore=ignore)
+            if op.isdir(source_path):
+                shutil.copytree(source_path, dest_path, ignore=ignore)
+            else:
+                shutil.copy(source_path, dest_path)
 
 def copy_qt_plugins(folder_names, dest): # This is only for Windows
     qmake_path = find_in_path('qmake.exe')
@@ -343,8 +348,6 @@ def collect_stdlib_dependencies(script, dest_folder):
         return True
     
     ensure_folder(dest_folder)
-    import encodings
-    shutil.copytree(op.dirname(encodings.__file__), op.join(dest_folder, 'encodings'))
     mf = modulefinder.ModuleFinder()
     mf.run_script(script)
     modpaths = [mod.__file__ for mod in mf.modules.values()]
@@ -360,13 +363,17 @@ def collect_stdlib_dependencies(script, dest_folder):
             raise AssertionError()
         if relpath.startswith('lib-dynload'): # We copy .so files in lib-dynload directly in our dest
             relpath = relpath[len('lib-dynload/'):]
-        if relpath.startswith('distutils'):
-            # We copy the whole of distutils later.
+        if relpath.startswith('encodings') or relpath.startswith('distutils'):
+            # We force their inclusion later.
             continue
         dest_path = op.join(dest_folder, relpath)
         ensure_folder(op.dirname(dest_path))
         copy(p, dest_path)
-    copy_packages([op.join(real_lib_prefix, 'distutils')], dest_folder)
+    # stringprep is used by encodings.
+    # We use real_lib_prefix with distutils because virtualenv messes with it and we need to refer
+    # to the original distutils folder.
+    FORCED_INCLUSION = ['encodings', 'stringprep', op.join(real_lib_prefix, 'distutils')]
+    copy_packages(FORCED_INCLUSION, dest_folder)
     # There's a couple of rather big exe files in the distutils folder that we absolutely don't
     # need. Remove them.
     delete_files_with_pattern(op.join(dest_folder, 'distutils'), '*.exe')
