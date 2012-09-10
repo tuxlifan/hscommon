@@ -11,6 +11,8 @@ import os
 import os.path as op
 import re
 from math import ceil
+import glob
+import shutil
 
 from . import io
 from .path import Path
@@ -315,6 +317,21 @@ def ensure_file(path):
     "Create `path` as an empty file if it doesn't exist."
     if not op.exists(path):
         open(path, 'w').close()
+
+def delete_files_with_pattern(folder_path, pattern, recursive=True):
+    """Delete all files (or folders) in `folder_path` that match the glob `pattern`.
+    """
+    to_delete = glob.glob(op.join(folder_path, pattern))
+    for fn in to_delete:
+        if op.isdir(fn):
+            shutil.rmtree(fn)
+        else:
+            os.remove(fn)
+    if recursive:
+        subpaths = [op.join(folder_path, fn) for fn in os.listdir(folder_path)]
+        subfolders = [p for p in subpaths if op.isdir(p)]
+        for p in subfolders:
+            delete_files_with_pattern(p, pattern, True)
 
 class FileOrPath:
     def __init__(self, file_or_path, mode='rb'):

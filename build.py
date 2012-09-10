@@ -18,6 +18,7 @@ import importlib
 from datetime import datetime
 import glob
 import sysconfig
+import modulefinder
 
 from setuptools import setup, Extension
 
@@ -317,6 +318,55 @@ def build_cocoalib_xibless(dest='cocoa/autogen'):
         dstpath = op.join(dest, dstname)
         if modified_after(srcpath, dstpath + '.h'):
             xibless.generate(srcpath, dstpath, localizationTable='cocoalib')
+
+def copy_embeddable_python_dylib(dst):
+    runtime = op.join(sysconfig.get_config_var('PYTHONFRAMEWORKPREFIX'), sysconfig.get_config_var('LDLIBRARY'))
+    filedest = op.join(dst, 'Python')
+    shutil.copy(runtime, filedest)
+    os.chmod(filedest, 0o774) # We need write permission to use install_name_tool
+    cmd = 'install_name_tool -id @rpath/Python %s' % filedest
+    print_and_do(cmd)
+
+def collect_stdlib_dependencies(script, dest_folder):
+    sysprefix = sys.prefix # could be a virtualenv
+    real_lib_prefix = sysconfig.get_config_var('LIBDEST')
+    def is_stdlib_path(path):
+        # A module path is only a stdlib path if it's in either sys.prefix or
+        # sysconfig.get_config_var('prefix') (the 2 are different if we are in a virtualenv) and if
+        # there's no "site-package in the path.
+        if not path:
+            return False
+        if 'site-package' in path:
+            return False
+        if not (path.startswith(sysprefix) or path.startswith(real_lib_prefix)):
+            return False
+        return True
+    
+    ensure_folder(dest_folder)
+    import encodings
+    shutil.copytree(op.dirname(encodings.__file__), op.join(dest_folder, 'encodings'))
+    mf = modulefinder.ModuleFinder()
+    mf.run_script(script)
+    modpaths = [mod.__file__ for mod in mf.modules.values()]
+    modpaths = filter(is_stdlib_path, modpaths)
+    for p in modpaths:
+        if p.startswith(real_lib_prefix):
+            relpath = op.relpath(p, real_lib_prefix)
+        elif p.startswith(sysprefix):
+            relpath = op.relpath(p, sysprefix)
+            assert relpath.startswith('lib/python3.') # we want to get rid of that lib/python3.x part
+            relpath = relpath[len('lib/python3.X/'):]
+        else:
+            raise AssertionError()
+        if relpath.startswith('lib-dynload'): # We copy .so files in lib-dynload directly in our dest
+            relpath = relpath[len('lib-dynload/'):]
+        if relpath.startswith('distutils'):
+            # We copy the whole of distutils later.
+            continue
+        dest_path = op.join(dest_folder, relpath)
+        ensure_folder(op.dirname(dest_path))
+        copy(p, dest_path)
+    copy_packages([op.join(real_lib_prefix, 'distutils')], dest_folder)
 
 def fix_qt_resource_file(path):
     # pyrcc4 under Windows, if the locale is non-english, can produce a source file with a date
