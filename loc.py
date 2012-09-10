@@ -201,12 +201,11 @@ def generate_cocoa_strings_from_code(code_folder, dest_folder):
         with open(stringspath, 'wt', encoding='utf-8') as fp:
             fp.write(content)
 
-def build_cocoa_localizations(app):
+def build_cocoa_localizations(app, en_stringsfile=op.join('cocoa', 'en.lproj', 'Localizable.strings')):
     # Creates .lproj folders with Localizable.strings and cocoalib.strings based on cocoalib.po and
     # ui.po for all available languages as well as base strings files in en.lproj. These lproj
     # folders are created in `app`'s (a OSXAppStructure) resource folder.
     print("Creating lproj folders based on .po files")
-    en_stringsfile = op.join('cocoa', 'en.lproj', 'Localizable.strings')
     en_cocoastringsfile = op.join('cocoalib', 'en.lproj', 'cocoalib.strings')
     for lang in get_langs('locale'):
         pofile = op.join('locale', lang, 'LC_MESSAGES', 'ui.po')
