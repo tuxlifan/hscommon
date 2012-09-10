@@ -23,7 +23,7 @@ import modulefinder
 from setuptools import setup, Extension
 
 from .plat import ISWINDOWS
-from .util import modified_after, find_in_path, ensure_folder
+from .util import modified_after, find_in_path, ensure_folder, delete_files_with_pattern
 
 def print_and_do(cmd):
     print(cmd)
@@ -367,6 +367,9 @@ def collect_stdlib_dependencies(script, dest_folder):
         ensure_folder(op.dirname(dest_path))
         copy(p, dest_path)
     copy_packages([op.join(real_lib_prefix, 'distutils')], dest_folder)
+    # There's a couple of rather big exe files in the distutils folder that we absolutely don't
+    # need. Remove them.
+    delete_files_with_pattern(op.join(dest_folder, 'distutils'), '*.exe')
 
 def fix_qt_resource_file(path):
     # pyrcc4 under Windows, if the locale is non-english, can produce a source file with a date
