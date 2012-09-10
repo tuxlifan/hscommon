@@ -19,6 +19,8 @@ from datetime import datetime
 import glob
 import sysconfig
 
+from setuptools import setup, Extension
+
 from .plat import ISWINDOWS
 from .util import rem_file_ext, modified_after, find_in_path, ensure_folder
 
@@ -364,3 +366,13 @@ def fix_qt_resource_file(path):
     lines = [l for l in lines if not l.startswith(b'#')]
     with open(path, 'wb') as fp:
         fp.write(b'\n'.join(lines))
+
+def build_cocoa_ext(extname, dest, source_files, extra_frameworks=(), extra_includes=()):
+    extra_link_args = ["-framework", "CoreFoundation", "-framework", "Foundation"]
+    for extra in extra_frameworks:
+        extra_link_args += ['-framework', extra]
+    ext = Extension(extname, source_files, extra_link_args=extra_link_args, include_dirs=extra_includes)
+    setup(script_args=['build_ext', '--inplace'], ext_modules=[ext])
+    fn = extname + '.so'
+    assert op.exists(fn)
+    move(fn, op.join(dest, fn))

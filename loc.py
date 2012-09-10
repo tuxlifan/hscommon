@@ -7,7 +7,7 @@ import polib
 
 from . import pygettext
 from .util import modified_after, dedupe, ensure_folder, ensure_file
-from .build import print_and_do, ensure_empty_folder
+from .build import print_and_do, ensure_empty_folder, copy
 
 LC_MESSAGES = 'LC_MESSAGES'
 
@@ -200,6 +200,26 @@ def generate_cocoa_strings_from_code(code_folder, dest_folder):
         content = re.sub('%\d\$', '%', content)
         with open(stringspath, 'wt', encoding='utf-8') as fp:
             fp.write(content)
+
+def build_cocoa_localizations(app):
+    # Creates .lproj folders with Localizable.strings and cocoalib.strings based on cocoalib.po and
+    # ui.po for all available languages as well as base strings files in en.lproj. These lproj
+    # folders are created in `app`'s (a OSXAppStructure) resource folder.
+    print("Creating lproj folders based on .po files")
+    en_stringsfile = op.join('cocoa', 'en.lproj', 'Localizable.strings')
+    en_cocoastringsfile = op.join('cocoalib', 'en.lproj', 'cocoalib.strings')
+    for lang in get_langs('locale'):
+        pofile = op.join('locale', lang, 'LC_MESSAGES', 'ui.po')
+        dest_lproj = op.join(app.resources, lang + '.lproj')
+        ensure_folder(dest_lproj)
+        po2strings(pofile, en_stringsfile, op.join(dest_lproj, 'Localizable.strings'))
+        pofile = op.join('cocoalib', 'locale', lang, 'LC_MESSAGES', 'cocoalib.po')
+        po2strings(pofile, en_cocoastringsfile, op.join(dest_lproj, 'cocoalib.strings'))
+    # We also have to copy the "en.lproj" strings
+    en_lproj = op.join(app.resources, 'en.lproj')
+    ensure_folder(en_lproj)
+    copy(en_stringsfile, en_lproj)
+    copy(en_cocoastringsfile, en_lproj)
 
 #--- Qt
 def unescape_xml(s):
