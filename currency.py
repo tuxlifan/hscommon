@@ -224,6 +224,8 @@ RSD = Currency.register('RSD', 'Serbian dinar',
     start_date=date(2007, 9, 4), start_rate=0.0179, latest_rate=0.01338)
 RUB = Currency.register('RUB', 'Russian rouble',
     start_date=date(1998, 1, 2), start_rate=0.2375, latest_rate=0.03443)
+SAR = Currency.register('SAR', 'Saudi riyal',
+    start_date=date(2012, 9, 13), start_rate=0.26, latest_rate=0.26)
 SEK = Currency.register('SEK', 'Swedish krona',
     start_date=date(1998, 1, 2), start_rate=0.1787, latest_rate=0.1378)
 SGD = Currency.register('SGD', 'Singapore dollar',
