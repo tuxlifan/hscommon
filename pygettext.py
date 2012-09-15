@@ -38,6 +38,7 @@ pot_header = """
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=utf-8\\n"
+"Content-Transfer-Encoding: utf-8\\n"
 """
 
 
