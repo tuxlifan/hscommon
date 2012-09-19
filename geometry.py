@@ -154,3 +154,37 @@ class Rect:
         h += dy * 2
         return Rect(x, y, w, h)
     
+    #--- Properties
+    @property
+    def top(self):
+        return self.y
+    
+    @top.setter
+    def top(self, value):
+        self.y = value
+    
+    @property
+    def bottom(self):
+        return self.y + self.h
+    
+    @bottom.setter
+    def bottom(self, value):
+        self.y = value - self.h
+    
+    @property
+    def left(self):
+        return self.x
+    
+    @left.setter
+    def left(self, value):
+        self.x = value
+    
+    @property
+    def right(self):
+        return self.x + self.w
+    
+    @right.setter
+    def right(self, value):
+        self.x = value - self.w
+    
+
