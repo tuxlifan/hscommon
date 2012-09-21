@@ -92,6 +92,9 @@ class Rect:
         yield self.w
         yield self.h
     
+    def __repr__(self):
+        return '<Rect {:2.2f}, {:2.2f}, {:2.2f}, {:2.2f}>'.format(*self)
+    
     @classmethod
     def from_center(cls, center, width, height):
         x = center.x - width / 2
@@ -153,6 +156,16 @@ class Rect:
         w += dx * 2
         h += dy * 2
         return Rect(x, y, w, h)
+    
+    def united(self, other):
+        """Returns the bounding rectangle of this rectangle and `other`.
+        """
+        # ul=upper left lr=lower right
+        ulcorner1, lrcorner1 = self.corners()
+        ulcorner2, lrcorner2 = other.corners()
+        corner1 = Point(min(ulcorner1.x, ulcorner2.x), min(ulcorner1.y, ulcorner2.y))
+        corner2 = Point(max(lrcorner1.x, lrcorner2.x), max(lrcorner1.y, lrcorner2.y))
+        return Rect.from_corners(corner1, corner2)
     
     #--- Properties
     @property
