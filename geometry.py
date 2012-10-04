@@ -200,4 +200,19 @@ class Rect:
     def right(self, value):
         self.x = value - self.w
     
-
+    @property
+    def width(self):
+        return self.w
+    
+    @width.setter
+    def width(self, value):
+        self.w = value
+    
+    @property
+    def height(self):
+        return self.h
+    
+    @height.setter
+    def height(self, value):
+        self.h = value
+    
