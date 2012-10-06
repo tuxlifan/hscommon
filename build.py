@@ -307,6 +307,48 @@ def create_osx_app_structure(dest, executable, infoplist, resources=None, framew
     app.copy_resources(*resources, use_symlinks=symlink_resources)
     app.copy_frameworks(*frameworks)
 
+class OSXFrameworkStructure:
+    def __init__(self, dest):
+        self.dest = dest
+        self.contents = op.join(dest, 'Versions', 'A')
+        self.resources = op.join(self.contents, 'Resources')
+        self.headers = op.join(self.contents, 'Headers')
+        self.infoplist = op.join(self.resources, 'Info.plist')
+    
+    def create(self, infoplist):
+        ensure_empty_folder(self.dest)
+        os.makedirs(self.contents)
+        os.mkdir(self.resources)
+        os.mkdir(self.headers)
+        copy(infoplist, self.infoplist)
+    
+    def create_symlinks(self):
+        # Only call this after create() and copy_executable()
+        rel = lambda path: op.relpath(path, self.dest)
+        os.symlink('A', op.join(self.dest, 'Versions', 'Current'))
+        os.symlink(rel(self.executablepath), op.join(self.dest, self.executablename))
+        os.symlink(rel(self.headers), op.join(self.dest, 'Headers'))
+        os.symlink(rel(self.resources), op.join(self.dest, 'Resources'))
+    
+    def copy_executable(self, executable):
+        info = plistlib.readPlist(self.infoplist)
+        self.executablename = info['CFBundleExecutable']
+        self.executablepath = op.join(self.contents, self.executablename)
+        copy(executable, self.executablepath)
+    
+    def copy_resources(self, *resources, use_symlinks=False):
+        for path in resources:
+            resource_dest = op.join(self.resources, op.basename(path))
+            action = symlink if use_symlinks else copy
+            action(op.abspath(path), resource_dest)
+    
+    def copy_headers(self, *headers, use_symlinks=False):
+        for path in headers:
+            header_dest = op.join(self.headers, op.basename(path))
+            action = symlink if use_symlinks else copy
+            action(op.abspath(path), header_dest)
+    
+
 def build_cocoalib_xibless(dest='cocoa/autogen'):
     import xibless
     ensure_folder(dest)
