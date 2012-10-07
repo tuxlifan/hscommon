@@ -110,13 +110,13 @@ class Columns(GUIObject):
                 self.view.restore_columns()
             return
         for col in self.column_list:
-            pref_name = '{0}.Columns.{1}'.format(self.savename, col.name)
+            pref_name = '{}.Columns.{}'.format(self.savename, col.name)
             coldata = self.prefaccess.get_default(pref_name, fallback_value={})
             if 'index' in coldata:
                 col.ordered_index = coldata['index']
             if 'width' in coldata:
                 col.width = coldata['width']
-            if 'visible' in coldata:
+            if col.optional and 'visible' in coldata:
                 col.visible = coldata['visible']
         self.view.restore_columns()
     
@@ -124,8 +124,10 @@ class Columns(GUIObject):
         if not (self.prefaccess and self.savename and self.coldata):
             return
         for col in self.column_list:
-            pref_name = '{0}.Columns.{1}'.format(self.savename, col.name)
-            coldata = {'index': col.ordered_index, 'width': col.width, 'visible': col.visible}
+            pref_name = '{}.Columns.{}'.format(self.savename, col.name)
+            coldata = {'index': col.ordered_index, 'width': col.width}
+            if col.optional:
+                coldata['visible'] = col.visible
             self.prefaccess.set_default(pref_name, coldata)
     
     def set_column_order(self, colnames):
