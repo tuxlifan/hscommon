@@ -314,6 +314,15 @@ class OSXFrameworkStructure:
         self.resources = op.join(self.contents, 'Resources')
         self.headers = op.join(self.contents, 'Headers')
         self.infoplist = op.join(self.resources, 'Info.plist')
+        self._update_executable_path()
+    
+    def _update_executable_path(self):
+        if not op.exists(self.infoplist):
+            self.executablename = self.executablepath = None
+            return
+        info = plistlib.readPlist(self.infoplist)
+        self.executablename = info['CFBundleExecutable']
+        self.executablepath = op.join(self.contents, self.executablename)
     
     def create(self, infoplist):
         ensure_empty_folder(self.dest)
@@ -321,6 +330,7 @@ class OSXFrameworkStructure:
         os.mkdir(self.resources)
         os.mkdir(self.headers)
         copy(infoplist, self.infoplist)
+        self._update_executable_path()
     
     def create_symlinks(self):
         # Only call this after create() and copy_executable()
@@ -331,9 +341,6 @@ class OSXFrameworkStructure:
         os.symlink(rel(self.resources), op.join(self.dest, 'Resources'))
     
     def copy_executable(self, executable):
-        info = plistlib.readPlist(self.infoplist)
-        self.executablename = info['CFBundleExecutable']
-        self.executablepath = op.join(self.contents, self.executablename)
         copy(executable, self.executablepath)
     
     def copy_resources(self, *resources, use_symlinks=False):
