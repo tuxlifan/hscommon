@@ -31,6 +31,9 @@ class GUIObject:
     def _view_updated(self):
         pass #virtual
     
+    def has_view(self):
+        return (self._view is not None) and (not isinstance(self._view, NoopGUI))
+    
     @property
     def view(self):
         return self._view
