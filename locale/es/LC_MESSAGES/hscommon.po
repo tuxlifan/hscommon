@@ -1,0 +1,35 @@
+
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: utf-8\n"
+
+#: hscommon/reg.py:39
+msgid ""
+"{name} is Fairware, which means \"open source software developed with expectation of fair contributions from users\". Hours have been invested in this software with the expectation that users will be fair enough to compensate them. The \"Unpaid hours\" figure you see below is the hours that have yet to be compensated for this project.\n"
+"\n"
+"If you like this application, please make a contribution that you consider fair. Thanks!\n"
+"\n"
+"If you cannot afford to contribute, you can either ignore this reminder or send an e-mail at support@hardcoded.net so I can send you a registration key.\n"
+"\n"
+"This dialog doesn't show when there are no unpaid hours or when you have a valid contribution key."
+msgstr "{name} es Fairware, es decir \"software de código abierto desarrollado con la expectativa de recibir una retribución justa por parte de los usuarios\". Se han invertido muchas horas en este programa con la expectativa de que los usuarios recompensarán el esfuerzo de forma justa. La cifra de \"horas sin remunerar\" que aparece en la parte inferior indica el número de horas de esfuerzo invertidas en este proyecto que todavía no han sido remuneradas.\n"
+"\n"
+"Si le gusta la aplicación, por favor colabore con una aportación que considere justo. ¡Muchas gracias!\n"
+"\n"
+"Si realmente no puede permitirse una donación, ignore este recordatorio o envíe un email a support@hardcoded.net para que pueda enviarle una clave de registro.\n"
+"\n"
+"Este recordatorio no aparecerá cuando no haya horas sin remunerar o si ya tiene una clave válida de registro."
+
+#: hscommon/reg.py:51
+msgid ""
+"{name} is fairware, which means \"open source software developed with expectation of fair contributions from users\". It's a very interesting concept, but one year of fairware has shown that most people just want to know how much it costs and not be bothered with theories about intellectual property.\n"
+"\n"
+"So I won't bother you and will be very straightforward: You can try {name} for free but you have to buy it in order to use it without limitations. In demo mode, {name} {limitation}.\n"
+"\n"
+"So it's as simple as this. If you're curious about fairware, however, I encourage you to read more about it by clicking on the \"Fairware?\" button."
+msgstr "{name} es Fairware, es decir \"software de código abierto desarrollado con la expectativa de recibir una retribución justa por parte de los usuarios\". Es una idea muy interesante, aunque tras más de un año de uso es evidente que la mayoría de los usuarios sólo están interesados en el precio del producto y no en teorías sobre la propiedad intelectual.\n"
+"\n"
+"Así pues seré claro: puede probar {name} gratuitamente pero debe comprarlo para un uso completo sin limitaciones. En el modo de prueba, {name} {limitation}.\n"
+"\n"
+"En resumen, si tiene curiosidad por conocer fairware le animo a que lea sobre ello pulsando el botón de \"¿Fairware?\"."
+
