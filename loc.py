@@ -2,6 +2,7 @@ import os
 import os.path as op
 import shutil
 import re
+import tempfile
 
 import polib
 
@@ -17,13 +18,22 @@ def get_langs(folder):
 def files_with_ext(folder, ext):
     return [op.join(folder, fn) for fn in os.listdir(folder) if fn.endswith(ext)]
 
-def generate_pot(folders, outpath, keywords):
+def generate_pot(folders, outpath, keywords, merge=False):
+    if merge and not op.exists(outpath):
+        merge = False
+    if merge:
+        _, genpath = tempfile.mkstemp()
+    else:
+        genpath = outpath
     pyfiles = []
     for folder in folders:
         for root, dirs, filenames in os.walk(folder):
             keep = [fn for fn in filenames if fn.endswith('.py')]
             pyfiles += [op.join(root, fn) for fn in keep]
-    pygettext.main(pyfiles, outpath=outpath, keywords=keywords)
+    pygettext.main(pyfiles, outpath=genpath, keywords=keywords)
+    if merge:
+        merge_po_and_preserve(genpath, outpath)
+        os.remove(genpath)
 
 def compile_all_po(base_folder):
     langs = get_langs(base_folder)
@@ -55,6 +65,17 @@ def merge_pots_into_pos(folder):
             po = polib.pofile(op.join(folder, lang, LC_MESSAGES, refname + '.po'))
             po.merge(refpot)
             po.save()
+
+def merge_po_and_preserve(source, dest):
+    # Merges source entries into dest, but keep old entries intact
+    sourcepo = polib.pofile(source)
+    destpo = polib.pofile(dest)
+    for entry in sourcepo:
+        if destpo.find(entry.msgid) is not None:
+            # The entry is already there
+            continue
+        destpo.append(entry)
+    destpo.save()
 
 #--- Cocoa
 def all_lproj_paths(folder):
