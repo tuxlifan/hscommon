@@ -192,9 +192,8 @@ def copy_packages(packages_names, dest, create_links=False):
                 shutil.copy(source_path, dest_path)
 
 def copy_qt_plugins(folder_names, dest): # This is only for Windows
-    qmake_path = find_in_path('qmake.exe')
-    qt_dir = op.split(op.dirname(qmake_path))[0]
-    qt_plugin_dir = op.join(qt_dir, 'plugins')
+    from PyQt4.QtCore import QLibraryInfo
+    qt_plugin_dir = QLibraryInfo.location(QLibraryInfo.PluginsPath)
     def ignore(path, names):
         if path == qt_plugin_dir:
             return [n for n in names if n not in folder_names]
