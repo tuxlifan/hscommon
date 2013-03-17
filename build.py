@@ -355,17 +355,20 @@ class OSXFrameworkStructure:
             action(op.abspath(path), header_dest)
     
 
-def build_cocoalib_xibless(dest='cocoa/autogen'):
+def build_cocoalib_xibless(dest='cocoa/autogen', withfairware=True):
     import xibless
     ensure_folder(dest)
     FNPAIRS = [
         ('progress.py', 'ProgressController_UI'),
         ('about.py', 'HSAboutBox_UI'),
-        ('fairware_reminder.py', 'HSFairwareReminder_UI'),
-        ('demo_reminder.py', 'HSDemoReminder_UI'),
-        ('enter_code.py', 'HSEnterCode_UI'),
         ('error_report.py', 'HSErrorReportWindow_UI'),
     ]
+    if withfairware:
+        FNPAIRS += [
+            ('fairware_reminder.py', 'HSFairwareReminder_UI'),
+            ('demo_reminder.py', 'HSDemoReminder_UI'),
+            ('enter_code.py', 'HSEnterCode_UI'),
+        ]
     for srcname, dstname in FNPAIRS:
         srcpath = op.join('cocoalib', 'ui', srcname)
         dstpath = op.join(dest, dstname)
