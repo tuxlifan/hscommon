@@ -360,14 +360,17 @@ def build_cocoalib_xibless(dest='cocoa/autogen', withfairware=True):
     ensure_folder(dest)
     FNPAIRS = [
         ('progress.py', 'ProgressController_UI'),
-        ('about.py', 'HSAboutBox_UI'),
         ('error_report.py', 'HSErrorReportWindow_UI'),
     ]
     if withfairware:
         FNPAIRS += [
-            ('fairware_reminder.py', 'HSFairwareReminder_UI'),
+            ('fairware_about.py', 'HSFairwareAboutBox_UI'),
             ('demo_reminder.py', 'HSDemoReminder_UI'),
             ('enter_code.py', 'HSEnterCode_UI'),
+        ]
+    else:
+        FNPAIRS += [
+            ('about.py', 'HSAboutBox_UI'),
         ]
     for srcname, dstname in FNPAIRS:
         srcpath = op.join('cocoalib', 'ui', srcname)
