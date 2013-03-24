@@ -6,15 +6,8 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
-import sys
 import re
 from hashlib import md5
-import json
-from urllib.request import urlopen, URLError
-from urllib.parse import urlencode
-from http.client import HTTPException
-import logging
-import socket
 
 from .trans import trget
 
@@ -36,18 +29,6 @@ OLDAPPIDS = {
 class InvalidCodeError(Exception):
     """The supplied code is invalid."""
 
-FAIRWARE_PROMPT = tr("{name} is Fairware, which means \"open source software developed with "
-"expectation of fair contributions from users\". Hours have been invested in this software with "
-"the expectation that users will be fair enough to compensate them. The \"Unpaid hours\" figure "
-"you see below is the hours that have yet to be compensated for this project."
-"\n\n"
-"If you like this application, please make a contribution that you consider fair. Thanks!"
-"\n\n"
-"If you cannot afford to contribute, you can either ignore this reminder or send an e-mail at "
-"support@hardcoded.net so I can send you a registration key."
-"\n\n"
-"This dialog doesn't show when there are no unpaid hours or when you have a valid contribution key.")
-
 DEMO_PROMPT = tr("{name} is fairware, which means \"open source software developed with expectation "
 "of fair contributions from users\". It's a very interesting concept, but one year of fairware has "
 "shown that most people just want to know how much it costs and not be bothered with theories "
@@ -65,7 +46,6 @@ class RegistrableApplication:
     # set_default(key_name, value)
     # setup_as_registered()
     # show_message(msg)
-    # show_fairware_nag(prompt)
     # show_demo_nag(prompt)
     # open_url(url)
     
@@ -117,11 +97,7 @@ class RegistrableApplication:
         if not self.registered:
             if self.view.get_default('FairwareMode'):
                 self.fairware_mode = True
-            if self.fairware_mode:
-                if self.should_show_fairware_reminder:
-                    prompt = FAIRWARE_PROMPT.format(name=self.PROMPT_NAME)
-                    self.view.show_fairware_nag(prompt)
-            else:
+            if not self.fairware_mode:
                 prompt = DEMO_PROMPT.format(name=self.PROMPT_NAME, limitation=self.DEMO_LIMITATION)
                 self.view.show_demo_nag(prompt)
     
@@ -174,15 +150,8 @@ class RegistrableApplication:
             return False
     
     def register_os(self):
-        if not self.registered:
-            return
-        url = 'http://open.hardcoded.net/backend/register/'
-        data = {'email': self.registration_email, 'osname': sys.platform}
-        encoded = bytes(urlencode(data), encoding='ascii')
-        try:
-            urlopen(url, data=encoded)
-        except URLError:
-            pass
+        # We don't do that anymore.
+        pass
     
     def contribute(self):
         self.view.open_url("http://open.hardcoded.net/contribute/")
@@ -203,18 +172,8 @@ class RegistrableApplication:
     
     @property
     def unpaid_hours(self):
-        if self._unpaid_hours is None:
-            url = 'http://open.hardcoded.net/backend/unpaid/{}'.format(self.appid)
-            try:
-                # The timeout is there to avoid delaying the launching of the app too much. Ideally,
-                # this operation should be async, but that's for another time.
-                # XXX Make unpaid hours fetching (and display of fairware dialog) async.
-                connection = urlopen(url, timeout=5)
-                response = str(connection.read(), 'latin-1')
-                self._unpaid_hours = json.loads(response)
-                connection.close()
-            except (URLError, HTTPException, socket.error, ValueError): # ValueError is for json.loads()
-                logging.warning("Couldn't connect to open.hardcoded.net")
-                self._unpaid_hours = 0
-        return self._unpaid_hours
+        # We don't bother verifying unpaid hours anymore, the only app that still has fairware
+        # dialogs is dupeGuru and it has a huge surplus. Now, "fairware mode" really means
+        # "free mode".
+        return 0
     
