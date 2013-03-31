@@ -202,8 +202,11 @@ def copy_qt_plugins(folder_names, dest): # This is only for Windows
     shutil.copytree(qt_plugin_dir, dest, ignore=ignore)
 
 def build_debian_changelog(changelogpath, destfile, pkgname, from_version=None,
-        distribution='precise'):
+        distribution='precise', fix_version=None):
     """Builds a debian changelog out of a YAML changelog.
+    
+    Use fix_version to patch the top changelog to that version (if, for example, there was a
+    packaging error and you need to quickly fix it)
     """
     def desc2list(desc):
         # We take each item, enumerated with the '*' character, and transform it into a list.
@@ -221,6 +224,8 @@ def build_debian_changelog(changelogpath, destfile, pkgname, from_version=None,
             if log['version'] == from_version:
                 changelogs = changelogs[:index+1]
                 break
+    if fix_version:
+        changelogs[0]['version'] = fix_version
     rendered_logs = []
     for log in changelogs:
         version = log['version']
