@@ -393,7 +393,7 @@ def copy_embeddable_python_dylib(dst):
     cmd = 'install_name_tool -id @rpath/Python %s' % filedest
     print_and_do(cmd)
 
-def collect_stdlib_dependencies(script, dest_folder):
+def collect_stdlib_dependencies(script, dest_folder, extra_deps=None):
     sysprefix = sys.prefix # could be a virtualenv
     real_lib_prefix = sysconfig.get_config_var('LIBDEST')
     def is_stdlib_path(path):
@@ -434,6 +434,8 @@ def collect_stdlib_dependencies(script, dest_folder):
     # We use real_lib_prefix with distutils because virtualenv messes with it and we need to refer
     # to the original distutils folder.
     FORCED_INCLUSION = ['encodings', 'stringprep', op.join(real_lib_prefix, 'distutils')]
+    if extra_deps:
+        FORCED_INCLUSION += extra_deps
     copy_packages(FORCED_INCLUSION, dest_folder)
     # There's a couple of rather big exe files in the distutils folder that we absolutely don't
     # need. Remove them.
