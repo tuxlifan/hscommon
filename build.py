@@ -105,6 +105,8 @@ def setup_package_argparser(parser):
         help="Sign app under specified identity before packaging (OS X only)")
     parser.add_argument('--nosign', action='store_true', dest='nosign',
         help="Don't sign the packaged app (OS X only)")
+    parser.add_argument('--src-pkg', action='store_true', dest='src_pkg',
+        help="Build a tar.gz of the current source.")
 
 # `args` come from an ArgumentParser updated with setup_package_argparser()
 def package_cocoa_app_in_dmg(app_path, destfolder, args):
