@@ -165,10 +165,12 @@ def add_to_pythonpath(path):
 # This is a method to hack around those freakingly tricky data inclusion/exlusion rules
 # in setuptools. We copy the packages *without data* in a build folder and then build the plugin
 # from there.
-def copy_packages(packages_names, dest, create_links=False):
+def copy_packages(packages_names, dest, create_links=False, extra_ignores=None):
     if ISWINDOWS:
         create_links = False
-    ignore = shutil.ignore_patterns('.hg*', 'tests', 'testdata', 'modules', 'docs', 'locale')
+    if not extra_ignores:
+        extra_ignores = []
+    ignore = shutil.ignore_patterns('.hg*', 'tests', 'testdata', 'modules', 'docs', 'locale', *extra_ignores)
     for package_name in packages_names:
         if op.exists(package_name):
             source_path = package_name
