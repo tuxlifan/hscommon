@@ -105,6 +105,8 @@ def setup_package_argparser(parser):
         help="Sign app under specified identity before packaging (OS X only)")
     parser.add_argument('--nosign', action='store_true', dest='nosign',
         help="Don't sign the packaged app (OS X only)")
+    parser.add_argument('--src-pkg', action='store_true', dest='src_pkg',
+        help="Build a tar.gz of the current source.")
 
 # `args` come from an ArgumentParser updated with setup_package_argparser()
 def package_cocoa_app_in_dmg(app_path, destfolder, args):
@@ -163,10 +165,12 @@ def add_to_pythonpath(path):
 # This is a method to hack around those freakingly tricky data inclusion/exlusion rules
 # in setuptools. We copy the packages *without data* in a build folder and then build the plugin
 # from there.
-def copy_packages(packages_names, dest, create_links=False):
+def copy_packages(packages_names, dest, create_links=False, extra_ignores=None):
     if ISWINDOWS:
         create_links = False
-    ignore = shutil.ignore_patterns('.hg*', 'tests', 'testdata', 'modules', 'docs', 'locale')
+    if not extra_ignores:
+        extra_ignores = []
+    ignore = shutil.ignore_patterns('.hg*', 'tests', 'testdata', 'modules', 'docs', 'locale', *extra_ignores)
     for package_name in packages_names:
         if op.exists(package_name):
             source_path = package_name
@@ -202,8 +206,11 @@ def copy_qt_plugins(folder_names, dest): # This is only for Windows
     shutil.copytree(qt_plugin_dir, dest, ignore=ignore)
 
 def build_debian_changelog(changelogpath, destfile, pkgname, from_version=None,
-        distribution='precise'):
+        distribution='precise', fix_version=None):
     """Builds a debian changelog out of a YAML changelog.
+    
+    Use fix_version to patch the top changelog to that version (if, for example, there was a
+    packaging error and you need to quickly fix it)
     """
     def desc2list(desc):
         # We take each item, enumerated with the '*' character, and transform it into a list.
@@ -221,6 +228,8 @@ def build_debian_changelog(changelogpath, destfile, pkgname, from_version=None,
             if log['version'] == from_version:
                 changelogs = changelogs[:index+1]
                 break
+    if fix_version:
+        changelogs[0]['version'] = fix_version
     rendered_logs = []
     for log in changelogs:
         version = log['version']
@@ -360,14 +369,17 @@ def build_cocoalib_xibless(dest='cocoa/autogen', withfairware=True):
     ensure_folder(dest)
     FNPAIRS = [
         ('progress.py', 'ProgressController_UI'),
-        ('about.py', 'HSAboutBox_UI'),
         ('error_report.py', 'HSErrorReportWindow_UI'),
     ]
     if withfairware:
         FNPAIRS += [
-            ('fairware_reminder.py', 'HSFairwareReminder_UI'),
+            ('fairware_about.py', 'HSFairwareAboutBox_UI'),
             ('demo_reminder.py', 'HSDemoReminder_UI'),
             ('enter_code.py', 'HSEnterCode_UI'),
+        ]
+    else:
+        FNPAIRS += [
+            ('about.py', 'HSAboutBox_UI'),
         ]
     for srcname, dstname in FNPAIRS:
         srcpath = op.join('cocoalib', 'ui', srcname)
@@ -383,7 +395,7 @@ def copy_embeddable_python_dylib(dst):
     cmd = 'install_name_tool -id @rpath/Python %s' % filedest
     print_and_do(cmd)
 
-def collect_stdlib_dependencies(script, dest_folder):
+def collect_stdlib_dependencies(script, dest_folder, extra_deps=None):
     sysprefix = sys.prefix # could be a virtualenv
     real_lib_prefix = sysconfig.get_config_var('LIBDEST')
     def is_stdlib_path(path):
@@ -424,6 +436,8 @@ def collect_stdlib_dependencies(script, dest_folder):
     # We use real_lib_prefix with distutils because virtualenv messes with it and we need to refer
     # to the original distutils folder.
     FORCED_INCLUSION = ['encodings', 'stringprep', op.join(real_lib_prefix, 'distutils')]
+    if extra_deps:
+        FORCED_INCLUSION += extra_deps
     copy_packages(FORCED_INCLUSION, dest_folder)
     # There's a couple of rather big exe files in the distutils folder that we absolutely don't
     # need. Remove them.
