@@ -1,7 +1,5 @@
-syntax: glob
-
 *.pyc
 *.mo
 *.so
 .DS_Store
-docs_html
+/docs_html
