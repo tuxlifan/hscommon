@@ -6,13 +6,13 @@
 # which should be included with this package. The terms are also available at 
 # http://www.hardcoded.net/licenses/bsd_license
 
+import os
 from datetime import datetime, date, timedelta
 import logging
 import sqlite3 as sqlite
 import threading
 from queue import Queue, Empty
 
-from . import io
 from .path import Path
 from .util import iterdaterange
 
@@ -314,7 +314,7 @@ class RatesDB:
             logging.warning("Corrupt currency database at {0}. Starting over.".format(repr(self.db_or_path)))
             if isinstance(self.db_or_path, (str, Path)):
                 self.con.close()
-                io.remove(Path(self.db_or_path))
+                os.remove(str(self.db_or_path))
                 self.con = sqlite.connect(str(self.db_or_path))
             else:
                 logging.warning("Can't re-use the file, using a memory table")
