@@ -1,5 +1,4 @@
-# Created On: 2013/07/01
-# Copyright 2015 Hardcoded Software (http://www.hardcoded.net)
+# Copyright 2016 Hardcoded Software (http://www.hardcoded.net)
 #
 # This software is licensed under the "GPLv3" License as described in the "LICENSE" file,
 # which should be included with this package. The terms are also available at
@@ -51,14 +50,20 @@ class ProgressWindow(GUIObject, ThreadedJobPerformer):
     We subclass :class:`.GUIObject` and :class:`.ThreadedJobPerformer`.
     Expected view: :class:`ProgressWindowView`.
 
-    :param finishfunc: A function ``f(jobid)`` that is called when a job is completed. ``jobid`` is
-                       an arbitrary id passed to :meth:`run`.
+    :param finish_func: A function ``f(jobid)`` that is called when a job is completed. ``jobid`` is
+                        an arbitrary id passed to :meth:`run`.
+    :param error_func: A function ``f(jobid, err)`` that is called when an exception is raised and
+                       unhandled during the job. If not specified, the error will be raised in the
+                       main thread. If it's specified, it's your responsibility to raise the error
+                       if you want to. If the function returns ``True``, ``finish_func()`` will be
+                       called as if the job terminated normally.
     """
-    def __init__(self, finish_func):
+    def __init__(self, finish_func, error_func=None):
         # finish_func(jobid) is the function that is called when a job is completed.
         GUIObject.__init__(self)
         ThreadedJobPerformer.__init__(self)
         self._finish_func = finish_func
+        self._error_func = error_func
         #: :class:`.TextField`. It contains that title you gave the job on :meth:`run`.
         self.jobdesc_textfield = TextField()
         #: :class:`.TextField`. It contains the job textual update that the function might yield
@@ -89,8 +94,14 @@ class ProgressWindow(GUIObject, ThreadedJobPerformer):
         last_desc = self.last_desc
         if not self._job_running or last_progress is None:
             self.view.close()
-            self.reraise_if_error()
-            if not self.job_cancelled:
+            should_continue = True
+            if self.last_error is not None:
+                err = self.last_error.with_traceback(self.last_traceback)
+                if self._error_func is not None:
+                    should_continue = self._error_func(self.jobid, err)
+                else:
+                    raise err
+            if not self.job_cancelled and should_continue:
                 self._finish_func(self.jobid)
             return
         if self.job_cancelled:
