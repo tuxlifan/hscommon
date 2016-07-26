@@ -47,6 +47,7 @@ def get_locale_name(lang):
         LANG2LOCALENAME = {
             'cs': 'czy',
             'de': 'deu',
+            'el': 'grc',
             'es': 'esn',
             'fr': 'fra',
             'it': 'ita',
@@ -61,6 +62,7 @@ def get_locale_name(lang):
         LANG2LOCALENAME = {
             'cs': 'cs_CZ',
             'de': 'de_DE',
+            'el': 'el_GR',
             'es': 'es_ES',
             'fr': 'fr_FR',
             'it': 'it_IT',
