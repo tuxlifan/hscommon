@@ -186,6 +186,13 @@ def generate_cocoa_strings_from_code(code_folder, dest_folder):
         with open(stringspath, 'wt', encoding='utf-8') as fp:
             fp.write(content)
 
+def generate_cocoa_strings_from_xib(xib_folder):
+    xibs = [op.join(xib_folder, fn) for fn in os.listdir(xib_folder) if fn.endswith('.xib')]
+    for xib in xibs:
+        dest = xib.replace('.xib', '.strings')
+        print_and_do('ibtool {} --generate-strings-file {}'.format(xib, dest))
+        print_and_do('iconv -f utf-16 -t utf-8 {0} > {0}'.format(dest))
+
 def localize_stringsfile(stringsfile, dest_root_folder):
     stringsfile_name = op.basename(stringsfile)
     for lang in get_langs('locale'):
