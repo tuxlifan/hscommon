@@ -12,6 +12,15 @@ from .build import print_and_do, ensure_empty_folder, copy
 
 LC_MESSAGES = 'LC_MESSAGES'
 
+# There isn't a 1-on-1 exact fit between .po language codes and cocoa ones
+PO2COCOA = {
+    'pl_PL': 'pl',
+    'pt_BR': 'pt-BR',
+    'zh_CN': 'zh-Hans',
+}
+
+COCOA2PO = {v: k for k, v in PO2COCOA.items()}
+
 def get_langs(folder):
     return [name for name in os.listdir(folder) if op.isdir(op.join(folder, name))]
 
@@ -177,21 +186,16 @@ def generate_cocoa_strings_from_code(code_folder, dest_folder):
         with open(stringspath, 'wt', encoding='utf-8') as fp:
             fp.write(content)
 
-def build_cocoa_localizations(app, en_stringsfile=op.join('cocoa', 'en.lproj', 'Localizable.strings')):
-    # Creates .lproj folders with Localizable.strings and cocoalib.strings based on cocoalib.po and
-    # ui.po for all available languages as well as base strings files in en.lproj. These lproj
-    # folders are created in `app`'s (a OSXAppStructure) resource folder.
-    print("Creating lproj folders based on .po files")
-    en_cocoastringsfile = op.join('cocoalib', 'en.lproj', 'cocoalib.strings')
+def localize_stringsfile(stringsfile, dest_root_folder):
+    stringsfile_name = op.basename(stringsfile)
     for lang in get_langs('locale'):
         pofile = op.join('locale', lang, 'LC_MESSAGES', 'ui.po')
-        dest_lproj = op.join(app.resources, lang + '.lproj')
+        cocoa_lang = PO2COCOA.get(lang, lang)
+        dest_lproj = op.join(dest_root_folder, cocoa_lang + '.lproj')
         ensure_folder(dest_lproj)
-        po2strings(pofile, en_stringsfile, op.join(dest_lproj, 'Localizable.strings'))
-        pofile = op.join('cocoalib', 'locale', lang, 'LC_MESSAGES', 'cocoalib.po')
-        po2strings(pofile, en_cocoastringsfile, op.join(dest_lproj, 'cocoalib.strings'))
-    # We also have to copy the "en.lproj" strings
-    en_lproj = op.join(app.resources, 'en.lproj')
-    ensure_folder(en_lproj)
-    copy(en_stringsfile, en_lproj)
-    copy(en_cocoastringsfile, en_lproj)
+        po2strings(pofile, stringsfile, op.join(dest_lproj, stringsfile_name))
+
+def localize_all_stringsfiles(src_folder, dest_root_folder):
+    stringsfiles = [op.join(src_folder, fn) for fn in os.listdir(src_folder) if fn.endswith('.strings')]
+    for path in stringsfiles:
+        localize_stringsfile(path, dest_root_folder)
