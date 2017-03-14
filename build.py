@@ -389,20 +389,6 @@ class OSXFrameworkStructure:
             action(op.abspath(path), header_dest)
 
 
-def build_cocoalib_xibless(dest='cocoa/autogen'):
-    import xibless
-    ensure_folder(dest)
-    FNPAIRS = [
-        ('progress.py', 'ProgressController_UI'),
-        ('error_report.py', 'HSErrorReportWindow_UI'),
-        ('about.py', 'HSAboutBox_UI'),
-    ]
-    for srcname, dstname in FNPAIRS:
-        srcpath = op.join('cocoalib', 'ui', srcname)
-        dstpath = op.join(dest, dstname)
-        if modified_after(srcpath, dstpath + '.h'):
-            xibless.generate(srcpath, dstpath, localizationTable='cocoalib')
-
 def copy_embeddable_python_dylib(dst):
     runtime = op.join(sysconfig.get_config_var('PYTHONFRAMEWORKPREFIX'), sysconfig.get_config_var('LDLIBRARY'))
     filedest = op.join(dst, 'Python')
