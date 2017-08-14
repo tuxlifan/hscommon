@@ -1,9 +1,9 @@
 # Created By: Virgil Dupras
 # Created On: 2008-08-12
 # Copyright 2015 Hardcoded Software (http://www.hardcoded.net)
-# 
-# This software is licensed under the "GPLv3" License as described in the "LICENSE" file, 
-# which should be included with this package. The terms are also available at 
+#
+# This software is licensed under the "GPLv3" License as described in the "LICENSE" file,
+# which should be included with this package. The terms are also available at
 # http://www.gnu.org/licenses/gpl-3.0.html
 
 from ..testutil import CallLogger, eq_
@@ -14,38 +14,39 @@ class TestRow(Row):
         Row.__init__(self, table)
         self.is_new = is_new
         self._index = index
-    
+
     def load(self):
         pass
-    
+
     def save(self):
         self.is_new = False
-    
+
     @property
     def index(self):
         return self._index
-    
+
 
 class TestGUITable(GUITable):
-    def __init__(self, rowcount):
+    def __init__(self, rowcount, viewclass=CallLogger):
         GUITable.__init__(self)
-        self.view = CallLogger()
+        self.view = viewclass()
+        self.view.model = self
         self.rowcount = rowcount
         self.updated_rows = None
-    
+
     def _do_add(self):
         return TestRow(self, len(self), is_new=True), len(self)
-    
+
     def _is_edited_new(self):
         return self.edited is not None and self.edited.is_new
-    
+
     def _fill(self):
         for i in range(self.rowcount):
             self.append(TestRow(self, i))
-    
+
     def _update_selection(self):
         self.updated_rows = self.selected_rows[:]
-    
+
 
 def table_with_footer():
     table = Table()
@@ -74,7 +75,7 @@ def test_allow_edit_when_attr_is_property_with_fset():
         @bar.setter
         def bar(self, value):
             pass
-    
+
     row = TestRow(Table())
     assert row.can_edit_cell('bar')
     assert not row.can_edit_cell('foo')
@@ -91,7 +92,7 @@ def test_can_edit_prop_has_priority_over_fset_checks():
         def bar(self, value):
             pass
         can_edit_bar = False
-    
+
     row = TestRow(Table())
     assert not row.can_edit_cell('bar')
 
@@ -234,7 +235,7 @@ def test_restore_selection_after_cancel_edits():
     class MyTable(TestGUITable):
         def _restore_selection(self, previous_selection):
             self.selected_indexes = [6]
-    
+
     table = MyTable(10)
     table.refresh()
     table.add()
@@ -255,7 +256,7 @@ def test_restore_selection_custom():
     class MyTable(TestGUITable):
         def _restore_selection(self, previous_selection):
             self.selected_indexes = [6]
-        
+
     table = MyTable(10)
     table.refresh()
     eq_(table.selected_indexes, [6])
@@ -311,3 +312,14 @@ def test_sort_table_with_header():
     table, header = table_with_header()
     table.sort_by('index', desc=True)
     assert table[0] is header
+
+def test_add_with_view_that_saves_during_refresh():
+    # Calling save_edits during refresh() called by add() is ignored.
+    class TableView(CallLogger):
+        def refresh(self):
+            self.model.save_edits()
+
+    table = TestGUITable(10, viewclass=TableView)
+    table.add()
+    assert table.edited is not None # still in edit mode
+

@@ -322,8 +322,11 @@ class GUITable(Table, GUIObject):
         row, insert_index = self._do_add()
         self.insert(insert_index, row)
         self.select([insert_index])
-        self.edited = row
         self.view.refresh()
+        # We have to set "edited" after calling refresh() because some UI are trigger-happy
+        # about calling save_edits() and they do so during calls to refresh(). We don't want
+        # a call to save_edits() during refresh prematurely mess with our newly added item.
+        self.edited = row
         self.view.start_editing()
 
     def can_edit_cell(self, column_name, row_index):
