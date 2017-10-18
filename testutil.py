@@ -13,12 +13,12 @@ def eq_(a, b, msg=None):
     __tracebackhide__ = True
     assert a == b, msg or "%r != %r" % (a, b)
 
-def eq_sorted_(a, b, msg=None):
-    """If both a and b are lists sort them in-place before comparing using eq_"""
-    if isinstance(a, list) and isinstance(b, list):
-        a.sort()
-        b.sort()
-    eq_(a, b, msg)
+def eq_sorted(a, b, msg=None):
+    """If both a and b are iterable sort them and compare using eq_, otherwise just pass them through to eq_ anyway."""
+    try:
+        eq_(sorted(a), sorted(b), msg)
+    except TypeError:
+        eq_(a, b, msg)
 
 def assert_almost_equal(a, b, places=7):
     __tracebackhide__ = True
